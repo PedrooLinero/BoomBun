@@ -1,0 +1,43 @@
+
+### Obtener los productos
+
+GET http://localhost:3000/api/productos
+
+### Obtener un producto por ID
+
+GET http://localhost:3000/api/productos/64
+
+### Añadir un nuevo producto
+
+POST http://localhost:3000/api/productos
+Content-Type: application/json
+
+{
+  "Nombre": "Ensalada Mixta",
+  "Descripcion": "Ensalada con lechuga, tomate y cebolla",
+  "Foto": null,
+  "ID_Categoria": 2,
+  "Precios": [
+    { "Formato": "Tapa", "Precio": 3.25 },
+    { "Formato": "Plato", "Precio": 6.50 }
+  ]
+}
+
+### Actualizar un producto
+
+PUT  http://localhost:3000/api/productos/64
+Content-Type: application/json
+
+{
+  "Nombre": "Ensalada Mixta Actualizada",
+  "Descripcion": "Ensalada con lechuga, tomate, cebolla y pepino",
+  "ID_Categoria": 2,
+  "Precios": [
+    { "Formato": "Tapa", "Precio": 3.50 },
+    { "Formato": "Plato", "Precio": 7.00 }
+  ]
+}
+
+### Eliminar un producto
+
+DELETE http://localhost:3000/api/productos/64
