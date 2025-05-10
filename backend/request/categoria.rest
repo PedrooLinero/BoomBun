@@ -2,3 +2,6 @@
 ### obtener las categorias
 
 GET http://localhost:3000/api/categorias
+
+### obtener una categoria por id
+GET http://localhost:3000/api/categorias/1

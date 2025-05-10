@@ -27,6 +27,32 @@ class CategoriaController {
         .json(Respuesta.error(null, "Error al obtener las categorias"));
     }
   }
+
+  // GET /api/categorias/:id
+  async getCategoryById(req, res) {
+    const { id } = req.params;
+    try {
+      const categoria = await Categoria.findOne({
+        where: { ID_Categoria: id },
+        attributes: [
+          "ID_Categoria",
+          "Nombre",
+          "Orden",
+        ],
+      });
+      if (!categoria) {
+        return res.status(404).json(Respuesta.error(null, "Categoria no encontrada"));
+      }
+      return res.status(200).json(Respuesta.exito(categoria));
+    } catch (err) {
+      logMensaje(`Error al obtener categoria por ID: ${err.message}, Stack: ${err.stack}`, "error");
+      return res
+        .status(500)
+        .json(Respuesta.error(null, "Error al obtener la categoria"));
+    }
+  }
 }
+
+
 
 module.exports = new CategoriaController();
