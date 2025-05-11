@@ -1,0 +1,5 @@
+
+### obtener todas las resenas 
+GET http://localhost:3000/api/resenas
+Accept: application/json
+

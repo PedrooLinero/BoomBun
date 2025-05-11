@@ -4,6 +4,7 @@ const cookieParser = require("cookie-parser");
 const usuarioRoutes = require("./routes/usuarioRoutes");
 const productoRoutes = require("./routes/productoRoutes");
 const categoriaRoutes = require("./routes/categoriaRoutes");
+const resenaRoutes = require("./routes/resenaRoutes"); // Asegúrate de importar las rutas de reseñas
 const config = require("./config/config");
 
 const app = express();
@@ -22,6 +23,7 @@ app.use(cookieParser());
 app.use("/api", usuarioRoutes);
 app.use("/api", productoRoutes);
 app.use("/api", categoriaRoutes);
+app.use("/api", resenaRoutes); // Asegúrate de importar y usar las rutas de reseñas
 
 // Manejar rutas no encontradas (404)
 app.use((req, res, next) => {
