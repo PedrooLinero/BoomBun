@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from "react";
 import {
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField,
-  Button,
   Container,
   Typography,
-  Checkbox,
-  FormControlLabel,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
   FormGroup,
+  FormControlLabel,
+  Checkbox,
+  Button,
   Stack,
+  Paper,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { apiUrl } from "../pages/config";
@@ -40,15 +41,12 @@ export default function AñadirProducto() {
 
   useEffect(() => {
     fetch("http://localhost:3000/api/categorias")
-      .then((res) => {
-        if (!res.ok) throw new Error(`Error al cargar categorías: ${res.statusText}`);
-        return res.json();
-      })
+      .then((res) => res.ok ? res.json() : Promise.reject("Error al cargar categorías"))
       .then((data) => {
-        const cats = Array.isArray(data) ? data : Array.isArray(data.datos) ? data.datos : [];
+        const cats = Array.isArray(data) ? data : data.datos || [];
         setCategorias(cats);
       })
-      .catch((err) => console.error("Error cargando categorías:", err));
+      .catch((err) => console.error(err));
   }, []);
 
   const handleChange = (e) => {
@@ -76,7 +74,6 @@ export default function AñadirProducto() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Transformar datos al formato del backend
     const requestBody = {
       Nombre: datos.nombre,
       Descripcion: datos.descripcion,
@@ -87,7 +84,7 @@ export default function AñadirProducto() {
           Formato: formato.charAt(0).toUpperCase() + formato.slice(1),
           Precio: parseFloat(datos.precios[formato]) || 0,
         })),
-      Foto: null // Agregar campo Foto si es necesario
+      Foto: null,
     };
 
     try {
@@ -97,103 +94,156 @@ export default function AñadirProducto() {
         body: JSON.stringify(requestBody),
       });
 
-      const responseData = await response.json();
+      const data = await response.json();
 
       if (response.ok) {
-        alert(responseData.mensaje);
+        alert(data.mensaje);
         navigate("/");
       } else {
-        alert(`Error: ${responseData.mensaje || "Error desconocido"}`);
+        alert(`Error: ${data.mensaje || "Error desconocido"}`);
       }
     } catch (error) {
-      console.error("Error en la solicitud:", error);
       alert("Error de conexión: " + error.message);
     }
   };
 
   return (
-    <Container maxWidth="sm">
-      <Typography variant="h4" align="center" sx={{ mt: 4, mb: 3 }}>
-        Añadir Producto
-      </Typography>
+    <Container maxWidth="md" sx={{ backgroundColor: "#f5f5f5", minHeight: "100vh", py: 5 }}>
+      <Paper elevation={4} sx={{ p: 4, borderRadius: 4, bgcolor: "white" }}>
+        <Typography variant="h4" align="center" gutterBottom sx={{ color: "#333", fontWeight: "bold", mb: 4 }}>
+          Añadir Nuevo Producto
+        </Typography>
 
-      <form onSubmit={handleSubmit}>
-        <Stack spacing={3}>
-          <TextField
-            label="Nombre"
-            name="nombre"
-            value={datos.nombre}
-            onChange={handleChange}
-            fullWidth
-            required
-          />
+        <form onSubmit={handleSubmit}>
+          <Stack spacing={4}>
+            <TextField
+              label="Nombre"
+              name="nombre"
+              value={datos.nombre}
+              onChange={handleChange}
+              fullWidth
+              required
+              variant="outlined"
+              sx={{
+                "& .MuiInputLabel-root": { color: "#c98c26", fontWeight: "bold" },
+                "& .MuiInputLabel-root.Mui-focused": { color: "#c98c26" },
+                "& .MuiOutlinedInput-root": {
+                  "&.Mui-focused fieldset": { borderColor: "#c98c26" },
+                },
+              }}
+            />
 
-          <TextField
-            label="Descripción"
-            name="descripcion"
-            value={datos.descripcion}
-            onChange={handleChange}
-            fullWidth
-          />
+            <TextField
+              label="Descripción"
+              name="descripcion"
+              value={datos.descripcion}
+              onChange={handleChange}
+              fullWidth
+              multiline
+              minRows={2}
+              variant="outlined"
+              sx={{
+                "& .MuiInputLabel-root": { color: "#c98c26", fontWeight: "bold" },
+                "& .MuiInputLabel-root.Mui-focused": { color: "#c98c26" },
+                "& .MuiOutlinedInput-root": {
+                  "&.Mui-focused fieldset": { borderColor: "#c98c26" },
+                },
+              }}
+            />
 
-          <FormControl fullWidth required>
-            <InputLabel>Categoría</InputLabel>
-            <Select
-              value={datos.idCategoria}
-              onChange={(e) => setDatos({ ...datos, idCategoria: e.target.value })}
-              label="Categoría"
-            >
-              <MenuItem value="">Seleccione categoría</MenuItem>
-              {categorias.map((cat) => (
-                <MenuItem key={cat.ID_Categoria} value={cat.ID_Categoria}>
-                  {cat.Nombre}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+            <FormControl fullWidth required variant="outlined">
+              <InputLabel sx={{ color: "#c98c26", fontWeight: "bold" }}>Categoría</InputLabel>
+              <Select
+                name="idCategoria"
+                value={datos.idCategoria}
+                label="Categoría"
+                onChange={handleChange}
+                sx={{
+                  "& .MuiSelect-select": { color: "#333" },
+                  "& .MuiOutlinedInput-notchedOutline": { borderColor: "#c98c26" },
+                  "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#a76f1f" },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#c98c26" },
+                }}
+              >
+                <MenuItem value="">Seleccione categoría</MenuItem>
+                {categorias.map((cat) => (
+                  <MenuItem key={cat.ID_Categoria} value={cat.ID_Categoria}>
+                    {cat.Nombre}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
 
-          <FormGroup row>
-            {["tapa", "media", "plato", "unidad", "copa", "botella"].map((formato) => (
-              <FormControlLabel
-                key={formato}
-                control={
-                  <Checkbox
-                    checked={datos.formatos[formato]}
-                    onChange={handleCheckboxChange}
-                    name={formato}
-                  />
-                }
-                label={formato.charAt(0).toUpperCase() + formato.slice(1)}
-              />
-            ))}
-          </FormGroup>
+            <Typography variant="h6" sx={{ mt: 2, mb: 1, color: "#333", fontWeight: "bold" }}>
+              Formatos y Precios
+            </Typography>
 
-          {Object.entries(datos.formatos).map(
-            ([formato, activo]) =>
-              activo && (
-                <TextField
+            <FormGroup row sx={{ gap: 2, px: 1 }}>
+              {["tapa", "media", "plato", "unidad"].map((formato) => (
+                <FormControlLabel
                   key={formato}
-                  label={`Precio ${formato}`}
-                  name={formato}
-                  type="number"
-                  value={datos.precios[formato]}
-                  onChange={handlePrecioChange}
-                  fullWidth
-                  required
-                  inputProps={{ step: "0.01" }}
+                  control={
+                    <Checkbox
+                      checked={datos.formatos[formato]}
+                      onChange={handleCheckboxChange}
+                      name={formato}
+                      sx={{
+                        color: "#c98c26",
+                        "&.Mui-checked": { color: "#c98c26" },
+                      }}
+                    />
+                  }
+                  label={formato.charAt(0).toUpperCase() + formato.slice(1)}
                 />
-              )
-          )}
+              ))}
+            </FormGroup>
 
-          <Button
-            type="submit"
-            variant="contained"
-            sx={{ bgcolor: "#c98c26", "&:hover": { bgcolor: "#a76f1f" } }}
-          >
-            Guardar Producto
-          </Button>
-        </Stack>
-      </form>
+            <Stack spacing={2}>
+              {Object.entries(datos.formatos).map(
+                ([formato, activo]) =>
+                  activo && (
+                    <TextField
+                      key={formato}
+                      label={`Precio ${formato}`}
+                      name={formato}
+                      type="number"
+                      value={datos.precios[formato]}
+                      onChange={handlePrecioChange}
+                      fullWidth
+                      required
+                      inputProps={{ step: "0.01" }}
+                      variant="outlined"
+                      sx={{
+                        "& .MuiInputLabel-root": { color: "#c98c26", fontWeight: "bold" },
+                        "& .MuiInputLabel-root.Mui-focused": { color: "#c98c26" },
+                        "& .MuiOutlinedInput-root": {
+                          "&.Mui-focused fieldset": { borderColor: "#c98c26" },
+                        },
+                      }}
+                    />
+                  )
+              )}
+            </Stack>
+
+            <Button
+              type="submit"
+              variant="contained"
+              fullWidth
+              sx={{
+                mt: 2,
+                py: 1.5,
+                backgroundColor: "#c98c26",
+                "&:hover": {
+                  backgroundColor: "#a76f1f",
+                },
+                fontWeight: "bold",
+              }}
+            >
+              Guardar Producto
+            </Button>
+          </Stack>
+        </form>
+      </Paper>
     </Container>
   );
 }

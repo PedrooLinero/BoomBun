@@ -16,6 +16,9 @@ import PaginaError from "./pages/PaginaError";
 import Carta from "./components/Carta";
 import Login from "./components/Login";
 import AñadirProducto from "./components/AñadirProducto";
+import Resena from "./components/Resena";
+import Registro from "./components/Registro";
+import Jamon from "./components/Jamon";
 
 const router = createBrowserRouter([
   {
@@ -36,8 +39,20 @@ const router = createBrowserRouter([
         element: <Login />,
       },
       {
+        path: "/register",
+        element: <Registro />,
+      },
+      {
         path: "/añadirProducto",
         element: <AñadirProducto />,
+      },
+      {
+        path: "/resena",
+        element: <Resena />,
+      },
+      {
+        path: "/jamon",
+        element: <Jamon />,
       },
       // Añade esta ruta si implementas registro
       // {

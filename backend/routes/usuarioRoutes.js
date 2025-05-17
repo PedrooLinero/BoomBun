@@ -1,18 +1,14 @@
 const express = require("express");
 const router = express.Router();
 const usuarioController = require("../controller/usuarioController.js");
-const { verifyToken, verificarRol } = require("../middlewares/authMiddleware.js"); // Asumo que tienes estos middlewares
 
-// POST /api/login - Iniciar sesión
-router.post("/login", usuarioController.login);
+// POST /api/register
+router.post("/register", usuarioController.register); // <-- Corregido aquí
 
-// POST /api/logout - Cerrar sesión
-router.post("/logout", usuarioController.logout);
+// POST /api/login
+router.post("/login", usuarioController.login); // <-- Corregido aquí
 
-// GET /api/usuarios - Obtener todos los usuarios
-router.get("/usuarios", verifyToken, verificarRol(["Jefe"]), usuarioController.getAllUsers);
-
-// POST /api/register - Registrar un nuevo usuario
-router.post("/register", usuarioController.register);
+// POST /api/logout
+router.post("/logout", usuarioController.logout); // <-- Corregido aquí
 
 module.exports = router;
