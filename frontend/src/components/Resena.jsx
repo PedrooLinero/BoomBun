@@ -10,10 +10,12 @@ import {
   InputAdornment,
   Button,
   Fade,
+  Alert,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import SendIcon from "@mui/icons-material/Send";
 import { apiUrl } from "../pages/config";
+import { useNavigate } from "react-router-dom";
 
 const isAuthenticated = () => {
   const authData = localStorage.getItem("auth");
@@ -32,6 +34,7 @@ function Resena() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [auth, setAuth] = useState(isAuthenticated());
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function getResenas() {
@@ -103,128 +106,228 @@ function Resena() {
   };
 
   return (
-    <Box sx={{ backgroundColor: "#1E272E", minHeight: "100vh", py: 6 }}>
-      <Container maxWidth="lg">
-        <Typography
-          variant="h2"
-          component="h1"
-          sx={{
-            mb: 4,
-            textAlign: "center",
-            color: "#E0E0E0",
-            fontWeight: 900,
-            letterSpacing: "1px",
-          }}
-        >
-          Reseñas de Nuestros Clientes
-        </Typography>
-
-        {/* Buscador */}
-        <Box sx={{ mb: 4 }}>
-          <TextField
-            fullWidth
-            variant="outlined"
-            placeholder="Busca reseñas por usuario o texto..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon sx={{ color: "#6b7280" }} />
-                </InputAdornment>
-              ),
-            }}
+    <Box
+      sx={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "linear-gradient(to bottom right, #F5F5F5, #E0E0E0)",
+        py: { xs: 4, sm: 6 },
+      }}
+    >
+      <Fade in timeout={1000}>
+        <Container maxWidth="lg">
+          <Typography
+            variant="h4"
+            component="h1"
             sx={{
-              backgroundColor: "#ffffff",
-              borderRadius: "8px",
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": { borderColor: "#e5e7eb" },
-                "&:hover fieldset": { borderColor: "#4CAF50" },
-                "&.Mui-focused fieldset": { borderColor: "#4CAF50" },
-              },
-            }}
-          />
-        </Box>
-
-        {/* Lista de reseñas */}
-        {filteredReseñas.length === 0 ? (
-          <Typography variant="body1" color="#B0BEC5" textAlign="center" sx={{ py: 4 }}>
-            No hay reseñas disponibles.
-          </Typography>
-        ) : (
-          <Grid container spacing={3}>
-            {filteredReseñas.map((reseña) => (
-              <Grid item xs={12} key={reseña.id}>
-                <Fade in timeout={1000}>
-                  <Card sx={{ bgcolor: "#ffffff", boxShadow: "0 3px 15px rgba(0,0,0,0.1)" }}>
-                    <CardContent>
-                      <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: "#1a1a1a" }}>
-                        {reseña.usuario || "Anónimo"}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{ color: "#666666", mb: 2, fontStyle: "italic" }}
-                      >
-                        {reseña.texto || "Sin comentario"}
-                      </Typography>
-                      <Typography variant="caption" sx={{ color: "#90A4AE" }}>
-                        {reseña.fecha} - Producto: {reseña.producto || "Desconocido"}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Fade>
-              </Grid>
-            ))}
-          </Grid>
-        )}
-
-        {/* Formulario para dejar reseña */}
-        {auth && (
-          <Box
-            sx={{
-              mt: 6,
-              p: 3,
-              bgcolor: "#2D3436",
-              borderRadius: "12px",
-              boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+              mb: 6,
+              textAlign: "center",
+              color: "#1a1a1a",
+              fontWeight: 700,
+              letterSpacing: "1px",
             }}
           >
-            <Typography variant="h6" sx={{ color: "#E0E0E0", mb: 2 }}>
-              Deja tu reseña
-            </Typography>
+            Cervecería Boom Bun - Reseñas de Nuestros Clientes
+          </Typography>
+
+          {error && (
+            <Alert
+              severity="error"
+              sx={{
+                mb: 4,
+                bgcolor: "#fef2f2",
+                color: "#b91c1c",
+                borderRadius: 2,
+                boxShadow: "0 1px 5px rgba(0,0,0,0.1)",
+              }}
+            >
+              {error}
+            </Alert>
+          )}
+
+          {/* Buscador */}
+          <Box sx={{ mb: 6 }}>
             <TextField
               fullWidth
-              multiline
-              rows={4}
               variant="outlined"
-              placeholder="Escribe tu reseña aquí..."
-              value={newReseña}
-              onChange={(e) => setNewReseña(e.target.value)}
+              placeholder="Busca reseñas por usuario o texto..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ color: "#6b7280" }} />
+                  </InputAdornment>
+                ),
+              }}
               sx={{
                 backgroundColor: "#ffffff",
                 borderRadius: "8px",
+                "& .MuiInputLabel-root": {
+                  color: "#065f46",
+                  fontWeight: "bold",
+                },
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: "#065f46",
+                },
                 "& .MuiOutlinedInput-root": {
                   "& fieldset": { borderColor: "#e5e7eb" },
-                  "&:hover fieldset": { borderColor: "#4CAF50" },
-                  "&.Mui-focused fieldset": { borderColor: "#4CAF50" },
+                  "&:hover fieldset": { borderColor: "#064e3b" },
+                  "&.Mui-focused fieldset": { borderColor: "#065f46" },
+                  transition: "all 0.3s ease",
                 },
               }}
             />
-            <Button
-              variant="contained"
-              startIcon={<SendIcon />}
-              onClick={handleSubmitReseña}
+          </Box>
+
+          {/* Lista de reseñas */}
+          {filteredReseñas.length === 0 ? (
+            <Typography
+              variant="body1"
+              color="#666666"
+              textAlign="center"
+              sx={{ py: 4 }}
+            >
+              No hay reseñas disponibles.
+            </Typography>
+          ) : (
+            <Grid container spacing={4}>
+              {filteredReseñas.map((reseña) => (
+                <Grid item xs={12} sm={6} md={4} key={reseña.id}>
+                  <Fade in timeout={1000}>
+                    <Card
+                      sx={{
+                        bgcolor: "#ffffff",
+                        borderRadius: 2,
+                        boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+                        transition: "transform 0.3s ease",
+                        "&:hover": {
+                          transform: "translateY(-3px)",
+                          boxShadow: "0 6px 25px rgba(0,0,0,0.15)",
+                        },
+                      }}
+                    >
+                      <CardContent>
+                        <Typography
+                          variant="h6"
+                          sx={{ fontWeight: 700, mb: 1, color: "#1a1a1a" }}
+                        >
+                          {reseña.usuario || "Anónimo"}
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          sx={{ color: "#666666", mb: 2, fontStyle: "italic" }}
+                        >
+                          {reseña.texto || "Sin comentario"}
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          sx={{ color: "#90A4AE" }}
+                        >
+                          {reseña.fecha} - Producto: {reseña.producto || "Desconocido"}
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  </Fade>
+                </Grid>
+              ))}
+            </Grid>
+          )}
+
+          {/* Formulario para dejar reseña */}
+          {auth ? (
+            <Box
               sx={{
-                mt: 2,
-                bgcolor: "#4CAF50",
-                "&:hover": { bgcolor: "#388E3C" },
+                mt: 6,
+                p: 4,
+                bgcolor: "#ffffff",
+                borderRadius: "12px",
+                boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+                border: "1px solid #e5e7eb",
               }}
             >
-              Enviar reseña
-            </Button>
-          </Box>
-        )}
-      </Container>
+              <Typography
+                variant="h6"
+                sx={{ color: "#1a1a1a", mb: 3, fontWeight: 600 }}
+              >
+                Deja tu reseña
+              </Typography>
+              <TextField
+                fullWidth
+                multiline
+                rows={4}
+                variant="outlined"
+                placeholder="Escribe tu reseña aquí..."
+                value={newReseña}
+                onChange={(e) => setNewReseña(e.target.value)}
+                sx={{
+                  backgroundColor: "#ffffff",
+                  borderRadius: "8px",
+                  "& .MuiInputLabel-root": {
+                    color: "#065f46",
+                    fontWeight: "bold",
+                  },
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: "#065f46",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": { borderColor: "#e5e7eb" },
+                    "&:hover fieldset": { borderColor: "#064e3b" },
+                    "&.Mui-focused fieldset": { borderColor: "#065f46" },
+                    transition: "all 0.3s ease",
+                  },
+                  mb: 2,
+                }}
+              />
+              <Button
+                variant="contained"
+                startIcon={<SendIcon />}
+                onClick={handleSubmitReseña}
+                sx={{
+                  mt: 2,
+                  py: 1.5,
+                  bgcolor: "#065f46",
+                  "&:hover": {
+                    bgcolor: "#047857",
+                    transform: "scale(1.02)",
+                    boxShadow: "0 4px 15px rgba(6, 95, 70, 0.3)",
+                  },
+                  textTransform: "none",
+                  fontWeight: "bold",
+                  fontSize: "1rem",
+                  transition: "all 0.3s ease",
+                  borderRadius: 2,
+                }}
+              >
+                Enviar reseña
+              </Button>
+            </Box>
+          ) : (
+            <Box sx={{ mt: 6, textAlign: "center" }}>
+              <Alert
+                severity="info"
+                sx={{
+                  bgcolor: "#e6f3f7",
+                  color: "#065f46",
+                  borderRadius: 2,
+                  boxShadow: "0 1px 5px rgba(0,0,0,0.1)",
+                }}
+              >
+                Debes iniciar sesión para dejar una reseña.{" "}
+                <Button
+                  variant="text"
+                  onClick={() => navigate("/login")}
+                  sx={{ color: "#065f46", "&:hover": { color: "#047857" } }}
+                >
+                  Inicia sesión aquí
+                </Button>
+              </Alert>
+            </Box>
+          )}
+        </Container>
+      </Fade>
     </Box>
   );
 }

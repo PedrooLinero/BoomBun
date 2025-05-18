@@ -1,295 +1,344 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Container,
   Typography,
   Grid,
   Paper,
-  Divider,
   IconButton,
-  useMediaQuery,
+  Button,
 } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
-import { ChevronRight, ChevronLeft } from "@mui/icons-material";
+import AwardIcon from "@mui/icons-material/EmojiEvents";
+import TimerIcon from "@mui/icons-material/Timer";
+import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
+import ChevronLeft from "@mui/icons-material/ChevronLeft";
+import ChevronRight from "@mui/icons-material/ChevronRight";
 
-const pedroImage1 =
-  "https://images.unsplash.com/photo-1571167366136-b57e07761625?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80";
+// Imágenes locales
+import pedro3 from "../assets/pedro3.jpg";
+import tartessos from "../assets/tartessos.png";
+import jamon1 from "../assets/jamon1.jpg";
+import jamon2 from "../assets/jamon2.jpg";
+import jamon4 from "../assets/jamon4.jpg";
+import jamon5 from "../assets/jamon5.jpg";
+import jamon6 from "../assets/jamon6.jpg";
+import jamon7 from "../assets/jamon7.jpg";
+import tartessosLogo from "../assets/tartessosLogo.jpeg";
+// Vídeo vertical
+import video1 from "../assets/video1.mp4";
 
-const jamonImages = [
-  {
-    id: 1,
-    src: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-    alt: "Jamón cortado finamente",
-    caption: "Corte perfecto de jamón ibérico",
-  },
-  {
-    id: 2,
-    src: "https://images.unsplash.com/photo-1625938145744-533e96b610be?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-    alt: "Tabla de chacinas",
-    caption: "Selección de embutidos premium",
-  },
-  {
-    id: 3,
-    src: "https://images.unsplash.com/photo-1632487279342-56f219a88c08?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-    alt: "Detalle de lonchas",
-    caption: "Arte en cada loncha",
-  },
-];
+const jamonImages = [jamon1, jamon2, jamon4, jamon5, jamon6, jamon7];
 
-function JamonSection() {
-    const [activeIndex, setActiveIndex] = useState(0);
-    const timeoutRef = useRef(null);
-  
-    const resetTimeout = () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-  
-    useEffect(() => {
-      resetTimeout();
-      timeoutRef.current = setTimeout(() => {
-        setActiveIndex((prevIndex) => (prevIndex === jamonImages.length - 1 ? 0 : prevIndex + 1));
-      }, 4000);
-      return () => resetTimeout();
-    }, [activeIndex]);
-  
-    const handleNext = () => {
-      resetTimeout();
-      setActiveIndex((prev) => (prev + 1) % jamonImages.length);
-    };
-  
-    const handlePrev = () => {
-      resetTimeout();
-      setActiveIndex((prev) => (prev === 0 ? jamonImages.length - 1 : prev - 1));
-    };
-  
-    const activeImage = jamonImages[activeIndex];
-  
-    const theme = useTheme();
-    const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
-  
-    return (
-      <Box>
-        {/* Header con fondo blanco y texto negro para variar */}
-        <Box sx={{ backgroundColor: "#fff", py: 6 }}>
-          <Container maxWidth="lg">
-            <Box sx={{ textAlign: "center", mb: 6, position: "relative" }}>
-              <Divider
+export default function JamonSection() {
+  const [idx, setIdx] = useState(0);
+
+  // autoplay slider
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIdx((i) => (i + 1) % jamonImages.length);
+    }, 3500);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <Box>
+      {/* 1. Hero */}
+      <Box
+        sx={{
+          height: 500,
+          backgroundImage: `url(${tartessos})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          position: "relative",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          "&::before": {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            bgcolor: "rgba(0,0,0,0.5)",
+          },
+        }}
+      >
+        <Paper
+          elevation={4}
+          sx={{
+            position: "relative",
+            zIndex: 1,
+            bgcolor: "rgba(255,255,255,0.9)",
+            p: 4,
+            textAlign: "center",
+            maxWidth: 600,
+            mx: 2,
+          }}
+        >
+          <Typography variant="h3" gutterBottom>
+            El Arte del{" "}
+            <Box component="span" color="error.main">
+              Jamón
+            </Box>
+          </Typography>
+          <Typography>Maestría, pasión y tradición en cada loncha</Typography>
+        </Paper>
+      </Box>
+
+      {/* 2. Sobre Pedro reorganizado */}
+      <Box sx={{ backgroundColor: "#fafafa", py: 8 }}>
+        <Container maxWidth="lg">
+          <Grid container spacing={6} alignItems="flex-start">
+            {/* Columna izquierda: foto arriba, texto abajo */}
+            <Grid item xs={12} md={7}>
+              <Box sx={{ mb: 4 }}>
+                <Box
+                  component="img"
+                  src={pedro3}
+                  alt="Pedro cortando jamón"
+                  sx={{
+                    width: "100%",
+                    borderRadius: 2,
+                    transition: "transform .5s",
+                    "&:hover": { transform: "scale(1.03)" },
+                  }}
+                />
+              </Box>
+              <Typography variant="h4" gutterBottom>
+                Pedro Luis Linero
+              </Typography>
+              <Typography paragraph>
+                Nuestro maestro cortador, con más de <strong>20 años</strong> de
+                experiencia y galardonado internacionalmente, hace de cada
+                servicio un espectáculo gourmet.
+              </Typography>
+
+              {/* Estadísticas */}
+              <Grid container spacing={2} sx={{ mb: 3 }}>
+                <Grid item xs={4}>
+                  <Box textAlign="center">
+                    <AwardIcon color="error" sx={{ fontSize: 40 }} />
+                    <Typography variant="h6">10+</Typography>
+                    <Typography variant="caption">Premios</Typography>
+                  </Box>
+                </Grid>
+                <Grid item xs={4}>
+                  <Box textAlign="center">
+                    <TimerIcon color="error" sx={{ fontSize: 40 }} />
+                    <Typography variant="h6">20 años</Typography>
+                    <Typography variant="caption">Experiencia</Typography>
+                  </Box>
+                </Grid>
+                <Grid item xs={4}>
+                  <Box textAlign="center">
+                    <RestaurantMenuIcon color="error" sx={{ fontSize: 40 }} />
+                    <Typography variant="h6">50+</Typography>
+                    <Typography variant="caption">Técnicas</Typography>
+                  </Box>
+                </Grid>
+              </Grid>
+
+              {/* Puntos clave */}
+              <Box component="ul" sx={{ pl: 2, mb: 3 }}>
+                <Typography component="li">
+                  Experto en jamón ibérico 100% de bellota.
+                </Typography>
+                <Typography component="li">
+                  Participante habitual en ferias gastronómicas.
+                </Typography>
+                <Typography component="li">
+                  Formación continua en corte y presentación.
+                </Typography>
+              </Box>
+            </Grid>
+
+            {/* Columna derecha: vídeo vertical */}
+            <Grid item xs={12} md={5}>
+              <Box
+                sx={{
+                  position: "relative",
+                  paddingTop: "177%", // aspecto vertical 9:16
+                  borderRadius: 2,
+                  overflow: "hidden",
+                }}
+              >
+                <video
+                  src={video1}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    width: "auto",
+                    height: "100%",
+                  }}
+                />
+              </Box>
+            </Grid>
+          </Grid>
+        </Container>
+      </Box>
+
+      {/* 3. Galería de platos mejorada con cabecera y aspecto uniforme */}
+      <Box sx={{ backgroundColor: "#1E272E", color: "#fff", py: 10 }}>
+        <Container maxWidth="lg">
+          {/* Línea + Encabezado */}
+          <Box sx={{ textAlign: "center", mb: 6 }}>
+            <Box
+              sx={{
+                width: 60,
+                height: 4,
+                backgroundColor: "error.main",
+                margin: "0 auto 12px auto",
+                borderRadius: 2,
+              }}
+            />
+            <Typography variant="h4" fontWeight="bold">
+              Galería de platos
+            </Typography>
+            <Box
+              sx={{
+                width: 60,
+                height: 4,
+                backgroundColor: "error.main",
+                margin: "12px auto 0 auto",
+                borderRadius: 2,
+              }}
+            />
+          </Box>
+
+          {/* Carrusel */}
+          <Box sx={{ position: "relative", maxWidth: 800, mx: "auto" }}>
+            {/* Aspect Ratio fijo 16:9 */}
+            <Box
+              sx={{
+                position: "relative",
+                width: "100%",
+                pt: "56.25%",
+                borderRadius: 2,
+                overflow: "hidden",
+                backgroundColor: "#000", // fondo negro por si hay márgenes
+                boxShadow: 4,
+              }}
+            >
+              <Box
+                component="img"
+                src={jamonImages[idx]}
+                alt={`Plato ${idx + 1}`}
                 sx={{
                   position: "absolute",
-                  top: "50%",
+                  top: 0,
                   left: 0,
-                  right: 0,
-                  bgcolor: "transparent",
-                  "&::before": {
-                    content: '""',
-                    position: "absolute",
-                    left: 0,
-                    right: 0,
-                    top: 0,
-                    height: "1px",
-                    bgcolor: "grey.400",
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  transition: "opacity .6s ease-in-out",
+                  opacity: 0,
+                  animation: "fadeIn .6s forwards",
+                  "@keyframes fadeIn": {
+                    to: { opacity: 1 },
                   },
                 }}
               />
-              <Typography
-                variant={isDesktop ? "h1" : "h3"}
-                component="h1"
-                sx={{
-                  display: "inline-block",
-                  bgcolor: "#fff",
-                  px: 2,
-                  position: "relative",
-                  zIndex: 1,
-                  fontWeight: 900,
-                  color: "#1E272E",
-                }}
-              >
-                El Arte del <Box component="span" sx={{ color: "error.main" }}>Jamón</Box>
-              </Typography>
             </Box>
+
+            {/* Caption */}
             <Typography
-              variant={isDesktop ? "h5" : "body1"}
-              align="center"
-              sx={{ fontStyle: "italic", color: "grey.700", mb: 8 }}
-            >
-              "La perfección está en el detalle, y cada corte es una expresión de pasión y tradición."
-            </Typography>
-          </Container>
-        </Box>
-  
-        {/* Sección Maestro Cortador con fondo gris claro */}
-        <Box sx={{ backgroundColor: "#f7f7f7", py: 8 }}>
-          <Container maxWidth="lg">
-            <Grid container spacing={6} alignItems="center">
-              <Grid item xs={12} md={6}>
-                <Paper elevation={4} sx={{ overflow: "hidden", borderRadius: 3 }}>
-                  <Box sx={{ position: "relative" }}>
-                    <Box
-                      component="img"
-                      src={pedroImage1}
-                      alt="Pedro cortando jamón"
-                      sx={{
-                        width: "100%",
-                        height: isDesktop ? 450 : 300,
-                        objectFit: "cover",
-                      }}
-                    />
-                    <Box
-                      sx={{
-                        position: "absolute",
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        p: 2,
-                        bgcolor: "rgba(0,0,0,0.6)",
-                      }}
-                    >
-                      <Typography variant="subtitle1" sx={{ color: "error.light" }}>
-                        Maestro Cortador Certificado
-                      </Typography>
-                    </Box>
-                  </Box>
-                </Paper>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <Typography variant="h3" sx={{ fontWeight: "bold", mb: 3, color: "#1E272E" }}>
-                  Pedro Luis Linero
-                </Typography>
-                <Typography sx={{ mb: 3, fontSize: isDesktop ? 18 : 14 }}>
-                  Maestro cortador de jamón con más de 20 años de experiencia, patrocinado por <Box component="span" sx={{ color: "error.light", fontWeight: "bold" }}>Tartessos</Box>.
-                </Typography>
-                <Typography sx={{ fontSize: isDesktop ? 16 : 14 }}>
-                  La precisión del corte, el grosor perfecto y la presentación inmaculada son el sello de un verdadero artesano.
-                </Typography>
-              </Grid>
-            </Grid>
-          </Container>
-        </Box>
-  
-        {/* Carrusel con fondo oscuro para contraste */}
-        <Box sx={{ backgroundColor: "#1E272E", color: "#E0E0E0", py: 8 }}>
-          <Container maxWidth="md" sx={{ textAlign: "center" }}>
-            <Typography variant={isDesktop ? "h4" : "h5"} sx={{ fontWeight: "bold", mb: 2 }}>
-              Nuestra Selección <Box component="span" sx={{ color: "error.main" }}>Premium</Box>
-            </Typography>
-            <Typography sx={{ color: "grey.300", mb: 4, fontSize: isDesktop ? 18 : 14 }}>
-              Descubra nuestra selección de jamones y embutidos de la más alta calidad.
-            </Typography>
-  
-            <Box
-              component="img"
-              src={activeImage.src}
-              alt={activeImage.alt}
+              variant="subtitle2"
               sx={{
-                width: "100%",
-                height: isDesktop ? 450 : 300,
-                objectFit: "cover",
-                borderRadius: 3,
-                boxShadow: 4,
-                mb: 2,
-                userSelect: "none",
-              }}
-              draggable={false}
-            />
-  
-            <Typography
-              variant="subtitle1"
-              sx={{ color: "grey.400", fontStyle: "italic", mb: 4, fontSize: isDesktop ? 16 : 12 }}
-            >
-              {activeImage.caption}
-            </Typography>
-  
-            <Box sx={{ display: "flex", justifyContent: "center", gap: 4 }}>
-              <IconButton
-                onClick={handlePrev}
-                aria-label="imagen anterior"
-                sx={{
-                  bgcolor: "error.main",
-                  "&:hover": { bgcolor: "error.dark" },
-                  color: "white",
-                  width: 48,
-                  height: 48,
-                }}
-              >
-                <ChevronLeft />
-              </IconButton>
-              <IconButton
-                onClick={handleNext}
-                aria-label="imagen siguiente"
-                sx={{
-                  bgcolor: "error.main",
-                  "&:hover": { bgcolor: "error.dark" },
-                  color: "white",
-                  width: 48,
-                  height: 48,
-                }}
-              >
-                <ChevronRight />
-              </IconButton>
-            </Box>
-          </Container>
-        </Box>
-  
-        {/* Sección final con fondo blanco y bordes */}
-        <Box sx={{ backgroundColor: "#fff", py: 6 }}>
-          <Container maxWidth="lg">
-            <Box
-              sx={{
-                borderRadius: 3,
-                p: 4,
-                borderLeft: "6px solid",
-                borderColor: "success.main",
-                display: "flex",
-                flexDirection: { xs: "column", md: "row" },
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: 3,
+                position: "absolute",
+                bottom: 16,
+                left: 16,
+                bgcolor: "rgba(0,0,0,0.6)",
+                px: 2,
+                py: 0.5,
+                borderRadius: 1,
+                fontStyle: "italic",
+                fontSize: 14,
               }}
             >
-              <Box sx={{ flex: 2 }}>
-                <Typography variant={isDesktop ? "h4" : "h5"} fontWeight="bold" color="text.primary" mb={2}>
-                  La Excelencia de Tartessos
-                </Typography>
-                <Typography color="text.secondary" fontSize={isDesktop ? 16 : 14}>
-                  Tartessos representa la excelencia en el mundo del jamón ibérico. Con
-                  una tradición centenaria en la cría de cerdos ibéricos y un proceso de
-                  curación meticuloso, cada pieza es una joya gastronómica que refleja el
-                  terroir único de su origen.
-                </Typography>
-              </Box>
-              <Box
-                sx={{
-                  flex: 1,
-                  display: "flex",
-                  justifyContent: "center",
-                }}
-              >
-                <Box
-                  sx={{
-                    width: 128,
-                    height: 128,
-                    borderRadius: "50%",
-                    background: "linear-gradient(135deg, #064e3b, #047857)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Typography
-                    variant="h6"
-                    fontWeight="bold"
-                    color="common.white"
-                    sx={{ userSelect: "none" }}
-                  >
-                    TARTESSOS
-                  </Typography>
-                </Box>
-              </Box>
-            </Box>
-          </Container>
-        </Box>
+              {`Plato ${idx + 1} de ${jamonImages.length}`}
+            </Typography>
+
+            {/* Flechas */}
+            <IconButton
+              onClick={() =>
+                setIdx((i) => (i - 1 + jamonImages.length) % jamonImages.length)
+              }
+              sx={{
+                position: "absolute",
+                top: "50%",
+                left: 8,
+                transform: "translateY(-50%)",
+                bgcolor: "error.main",
+                boxShadow: 3,
+                "&:hover": { bgcolor: "error.dark" },
+                color: "#fff",
+              }}
+            >
+              <ChevronLeft />
+            </IconButton>
+            <IconButton
+              onClick={() => setIdx((i) => (i + 1) % jamonImages.length)}
+              sx={{
+                position: "absolute",
+                top: "50%",
+                right: 8,
+                transform: "translateY(-50%)",
+                bgcolor: "error.main",
+                boxShadow: 3,
+                "&:hover": { bgcolor: "error.dark" },
+                color: "#fff",
+              }}
+            >
+              <ChevronRight />
+            </IconButton>
+          </Box>
+        </Container>
       </Box>
-    );
-  }
-  
-  export default JamonSection;
+
+      {/* 4. Tartessos */}
+      <Box sx={{ backgroundColor: "#fff5f5", py: 10 }}>
+        <Container maxWidth="sm" sx={{ textAlign: "center" }}>
+          <Box
+            component="img"
+            src={tartessosLogo}
+            alt="Logo Tartessos"
+            sx={{
+              width: 140,
+              mb: 3,
+              mx: "auto",
+              borderRadius: 2,
+              boxShadow: 3,
+            }}
+          />
+
+          <Typography variant="h4" fontWeight="bold" sx={{ mb: 1 }}>
+            La Excelencia de Tartessos
+          </Typography>
+
+          <Box
+            sx={{
+              width: 60,
+              height: 4,
+              backgroundColor: "error.main",
+              margin: "0 auto 24px auto",
+              borderRadius: 2,
+            }}
+          />
+
+          <Typography variant="body1" sx={{ fontSize: 18, color: "#4a4a4a" }}>
+            Con tradición centenaria y curación impecable,
+            <br />
+            Tartessos ofrece el jamón ibérico más refinado.
+          </Typography>
+        </Container>
+      </Box>
+    </Box>
+  );
+}

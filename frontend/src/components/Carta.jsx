@@ -30,7 +30,10 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import SearchIcon from "@mui/icons-material/Search";
 import ShareIcon from "@mui/icons-material/Share";
 import AddIcon from "@mui/icons-material/Add";
-import LocalOfferIcon from "@mui/icons-material/LocalOffer";
+import LocalBarIcon from "@mui/icons-material/LocalBar"; // Para Cervezas
+import RestaurantIcon from "@mui/icons-material/Restaurant"; // Para Tapas
+import DinnerDiningIcon from "@mui/icons-material/DinnerDining"; // Para Platos
+import IcecreamIcon from "@mui/icons-material/Icecream"; // Para Postres
 import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/material/styles";
 
@@ -121,6 +124,14 @@ const CartaCompleta = () => {
   const [openErrorSnackbar, setOpenErrorSnackbar] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
+  // Mapa de íconos por categoría (ajusta según tus categorías reales)
+  const categoryIcons = {
+    "Cervezas": <LocalBarIcon sx={{ mr: 2, fontSize: "2rem" }} />,
+    "Tapas": <RestaurantIcon sx={{ mr: 2, fontSize: "2rem" }} />,
+    "Platos": <DinnerDiningIcon sx={{ mr: 2, fontSize: "2rem" }} />,
+    "Postres": <IcecreamIcon sx={{ mr: 2, fontSize: "2rem" }} />,
+  };
+
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -178,9 +189,7 @@ const CartaCompleta = () => {
     }
 
     if (selectedCategory) {
-      filtered = filtered.filter(
-        (prod) => prod.ID_Categoria == selectedCategory
-      );
+      filtered = filtered.filter((prod) => prod.ID_Categoria == selectedCategory);
     }
 
     setFilteredProductos(filtered);
@@ -215,9 +224,7 @@ const CartaCompleta = () => {
         setSuccessMessage(data.mensaje);
         setOpenSuccessSnackbar(true);
         setProductos(
-          productos.filter(
-            (prod) => prod.ID_Producto !== productToDelete.ID_Producto
-          )
+          productos.filter((prod) => prod.ID_Producto !== productToDelete.ID_Producto)
         );
       } else {
         throw new Error(data.mensaje || "Error al eliminar el producto");
@@ -263,7 +270,7 @@ const CartaCompleta = () => {
           justifyContent: "center",
           alignItems: "center",
           minHeight: "100vh",
-          backgroundColor: "#1E272E",
+          backgroundColor: "#F5F5F5", // Fondo claro durante carga
         }}
       >
         <CircularProgress size={60} sx={{ color: "#065f46" }} />
@@ -277,7 +284,7 @@ const CartaCompleta = () => {
         maxWidth="sm"
         sx={{
           py: 10,
-          backgroundColor: "#1E272E",
+          backgroundColor: "#F5F5F5", // Fondo claro para error
         }}
       >
         <Alert
@@ -305,7 +312,8 @@ const CartaCompleta = () => {
   }
 
   return (
-    <Box sx={{ backgroundColor: "#1E272E", minHeight: "100vh", pb: 10 }}>
+    <Box sx={{ backgroundColor: "#F5F5F5", minHeight: "100vh", pb: 10 }}>
+      {/* Banner promocional */}
       <Box
         sx={{
           background: "linear-gradient(135deg, #065f46 0%, #047857 100%)",
@@ -336,20 +344,13 @@ const CartaCompleta = () => {
             fontSize: { xs: "0.9rem", md: "1rem" },
           }}
         >
-          Descubre las mejores cervezas artesanales, tapas y platos en
-          Cervecería Boom Bun.
+          Descubre las mejores cervezas artesanales, tapas y platos en Cervecería Boom Bun.
         </Typography>
       </Box>
 
       <Container maxWidth="xl" sx={{ py: 4 }}>
-        <Box
-          sx={{
-            mb: 4,
-            display: "flex",
-            flexDirection: { xs: "column", md: "row" },
-            gap: 2,
-          }}
-        >
+        {/* Barra de búsqueda y filtros */}
+        <Box sx={{ mb: 4, display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 2 }}>
           <TextField
             fullWidth
             variant="outlined"
@@ -368,8 +369,8 @@ const CartaCompleta = () => {
               borderRadius: "8px",
               "& .MuiOutlinedInput-root": {
                 "& fieldset": { borderColor: "#e5e7eb" },
-                "&:hover fieldset": { borderColor: "#e5e7eb" },
-                "&.Mui-focused fieldset": { borderColor: "#e5e7eb" },
+                "&:hover fieldset": { borderColor: "#065f46" },
+                "&.Mui-focused fieldset": { borderColor: "#065f46" },
               },
             }}
           />
@@ -383,12 +384,13 @@ const CartaCompleta = () => {
             }}
           >
             <InputLabel id="category-select-label" sx={{ color: "#6b7280" }}>
+              Selecciona una categoría
             </InputLabel>
             <Select
               labelId="category-select-label"
               value={selectedCategory}
+              label="Selecciona una categoría"
               onChange={(e) => setSelectedCategory(e.target.value)}
-              displayEmpty
               sx={{
                 "& .MuiSelect-select": {
                   color: selectedCategory ? "#1a1a1a" : "#6b7280",
@@ -398,15 +400,15 @@ const CartaCompleta = () => {
                   borderColor: "#e5e7eb",
                 },
                 "&:hover .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "#e5e7eb",
+                  borderColor: "#065f46",
                 },
                 "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "#e5e7eb",
+                  borderColor: "#065f46",
                 },
               }}
             >
-              <MenuItem value="" disabled>
-                <em>Selecciona una categoría</em>
+              <MenuItem value="">
+                <em>Todas las categorías</em>
               </MenuItem>
               {categorias.map((cat) => (
                 <MenuItem key={cat.ID_Categoria} value={cat.ID_Categoria}>
@@ -428,7 +430,7 @@ const CartaCompleta = () => {
           <Fade in timeout={1000}>
             <Box sx={{ mb: 6 }}>
               <CategoryHeader>
-                <LocalOfferIcon sx={{ mr: 2, fontSize: "2rem" }} />
+                {categoryIcons[categorias.find((c) => c.ID_Categoria == selectedCategory)?.Nombre] || <LocalBarIcon sx={{ mr: 2, fontSize: "2rem" }} />}
                 <Typography
                   variant="h5"
                   sx={{
@@ -436,22 +438,12 @@ const CartaCompleta = () => {
                     fontSize: { xs: "1.25rem", md: "1.75rem" },
                   }}
                 >
-                  {
-                    categorias.find((c) => c.ID_Categoria == selectedCategory)
-                      ?.Nombre
-                  }
+                  {categorias.find((c) => c.ID_Categoria == selectedCategory)?.Nombre}
                 </Typography>
               </CategoryHeader>
               <Grid container spacing={{ xs: 2, md: 3 }}>
                 {getProductosPorCategoria(selectedCategory).map((producto) => (
-                  <Grid
-                    item
-                    xs={12}
-                    sm={6}
-                    md={4}
-                    lg={3}
-                    key={producto.ID_Producto}
-                  >
+                  <Grid item xs={12} sm={6} md={4} lg={3} key={producto.ID_Producto}>
                     <ProductCard>
                       <CardMedia
                         component="img"
@@ -486,9 +478,7 @@ const CartaCompleta = () => {
                         <DeleteIcon fontSize="small" />
                       </IconButton>
                       <CardContent sx={{ flexGrow: 1, p: 2 }}>
-                        <Box
-                          sx={{ display: "flex", alignItems: "center", mb: 1 }}
-                        >
+                        <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
                           <Typography
                             variant="h6"
                             sx={{
@@ -500,9 +490,7 @@ const CartaCompleta = () => {
                           >
                             {producto.Nombre}
                           </Typography>
-                          {producto.Precios?.some(
-                            (p) => p.Formato === "Nuevo"
-                          ) && (
+                          {producto.Precios?.some((p) => p.Formato === "Nuevo") && (
                             <Chip
                               label="Nuevo"
                               size="small"
@@ -529,14 +517,7 @@ const CartaCompleta = () => {
                             {producto.Descripcion}
                           </Typography>
                         )}
-                        <Box
-                          sx={{
-                            display: "flex",
-                            flexWrap: "wrap",
-                            gap: 1,
-                            mb: 1,
-                          }}
-                        >
+                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 1 }}>
                           {producto.Precios?.map((precio, idx) => (
                             <PriceTag
                               key={idx}
@@ -563,16 +544,14 @@ const CartaCompleta = () => {
           </Fade>
         ) : (
           categorias.map((categoria) => {
-            const productosCategoria = getProductosPorCategoria(
-              categoria.ID_Categoria
-            );
+            const productosCategoria = getProductosPorCategoria(categoria.ID_Categoria);
             if (productosCategoria.length === 0) return null;
 
             return (
               <Fade in timeout={1000} key={categoria.ID_Categoria}>
                 <Box sx={{ mb: 6 }}>
                   <CategoryHeader>
-                    <LocalOfferIcon sx={{ mr: 2, fontSize: "2rem" }} />
+                    {categoryIcons[categoria.Nombre] || <LocalBarIcon sx={{ mr: 2, fontSize: "2rem" }} />}
                     <Typography
                       variant="h5"
                       sx={{
@@ -585,14 +564,7 @@ const CartaCompleta = () => {
                   </CategoryHeader>
                   <Grid container spacing={{ xs: 2, md: 3 }}>
                     {productosCategoria.map((producto) => (
-                      <Grid
-                        item
-                        xs={12}
-                        sm={6}
-                        md={4}
-                        lg={3}
-                        key={producto.ID_Producto}
-                      >
+                      <Grid item xs={12} sm={6} md={4} lg={3} key={producto.ID_Producto}>
                         <ProductCard>
                           <CardMedia
                             component="img"
@@ -627,13 +599,7 @@ const CartaCompleta = () => {
                             <DeleteIcon fontSize="small" />
                           </IconButton>
                           <CardContent sx={{ flexGrow: 1, p: 2 }}>
-                            <Box
-                              sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                mb: 1,
-                              }}
-                            >
+                            <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
                               <Typography
                                 variant="h6"
                                 sx={{
@@ -645,9 +611,7 @@ const CartaCompleta = () => {
                               >
                                 {producto.Nombre}
                               </Typography>
-                              {producto.Precios?.some(
-                                (p) => p.Formato === "Nuevo"
-                              ) && (
+                              {producto.Precios?.some((p) => p.Formato === "Nuevo") && (
                                 <Chip
                                   label="Nuevo"
                                   size="small"
@@ -674,14 +638,7 @@ const CartaCompleta = () => {
                                 {producto.Descripcion}
                               </Typography>
                             )}
-                            <Box
-                              sx={{
-                                display: "flex",
-                                flexWrap: "wrap",
-                                gap: 1,
-                                mb: 1,
-                              }}
-                            >
+                            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 1 }}>
                               {producto.Precios?.map((precio, idx) => (
                                 <PriceTag
                                   key={idx}
@@ -721,9 +678,7 @@ const CartaCompleta = () => {
           },
         }}
       >
-        <DialogTitle sx={{ fontWeight: 600 }}>
-          Confirmar eliminación
-        </DialogTitle>
+        <DialogTitle sx={{ fontWeight: 600 }}>Confirmar eliminación</DialogTitle>
         <DialogContent>
           <DialogContentText>
             ¿Estás seguro de eliminar el producto "{productToDelete?.Nombre}"?
@@ -775,10 +730,7 @@ const CartaCompleta = () => {
         </Alert>
       </Snackbar>
 
-      <AddButton
-        variant="contained"
-        onClick={() => navigate("/añadirProducto")}
-      >
+      <AddButton variant="contained" onClick={() => navigate("/añadirProducto")}>
         <AddIcon />
       </AddButton>
     </Box>
