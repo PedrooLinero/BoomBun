@@ -33,12 +33,13 @@ CREATE TABLE Precio_Producto (
     FOREIGN KEY (ID_Producto) REFERENCES Producto(ID_Producto) ON DELETE CASCADE
 );
 
--- Tabla Reseña
+-- Tabla Reseña (Modificada para incluir Puntuacion)
 CREATE TABLE Reseña (
     ID_Reseña INT AUTO_INCREMENT PRIMARY KEY,
     ID_Usuario INT NOT NULL,
     ID_Producto INT NOT NULL,
     Texto TEXT,
+    Puntuacion DECIMAL(3,1) NOT NULL CHECK (Puntuacion >= 1.0 AND Puntuacion <= 5.0),
     Fecha DATE NOT NULL,
     FOREIGN KEY (ID_Usuario) REFERENCES Usuario(ID_Usuario) ON DELETE CASCADE,
     FOREIGN KEY (ID_Producto) REFERENCES Producto(ID_Producto) ON DELETE CASCADE
@@ -77,7 +78,7 @@ INSERT INTO Usuario (Nombre, Correo, Contraseña, Tipo) VALUES
 INSERT INTO Categoria (Nombre, Orden) VALUES
 ('Chacinas y Mariscos', 1);
 
--- 2. Insertar Todos los Alérgenos (sin cambios)
+-- 2. Insertar Todos los Alérgenos
 INSERT INTO Alergeno (Nombre, Imagen) VALUES
 ('Cereales con gluten', NULL),
 ('Leche y derivados', NULL),
@@ -96,35 +97,35 @@ INSERT INTO Alergeno (Nombre, Imagen) VALUES
 
 -- 3. Insertar Productos (incluyendo nuevos)
 INSERT INTO Producto (Nombre, Descripcion, Foto, ID_Categoria) VALUES
-('Jamón ibérico', NULL, NULL, 1),           -- Nuevo orden (primero)
+('Jamón ibérico', NULL, NULL, 1),
 ('Queso puro de oveja', NULL, NULL, 1),
 ('Caña de lomo', NULL, NULL, 1),
 ('Chicharrón de Cádiz', NULL, NULL, 1),
 ('Jamón y queso', 'Jamón, queso y caña de lomo', NULL, 1),
-('Tabla ibérica', NULL, NULL, 1),            -- Nuevo
-('Mojama de atún', NULL, NULL, 1),           -- Nuevo
+('Tabla ibérica', NULL, NULL, 1),
+('Mojama de atún', NULL, NULL, 1),
 ('Gambas al ajillo', NULL, NULL, 1),
 ('Gambas cocidas', NULL, NULL, 1);
 
--- 4. Insertar Precios (actualizados)
+-- 4. Insertar Precios
 INSERT INTO Precio_Producto (ID_Producto, Formato, Precio) VALUES
-(1, 'Tapa', 3.25), (1, 'Plato', 11.00),     -- Jamón ibérico
-(2, 'Tapa', 3.25), (2, 'Plato', 8.50),      -- Queso puro de oveja
-(3, 'Tapa', 3.25), (3, 'Plato', 8.50),      -- Caña de lomo
-(4, 'Tapa', 3.25), (4, 'Plato', 8.50),      -- Chicharrón de Cádiz
-(5, 'Plato', 13.00),                         -- Jamón y queso
-(6, 'Plato', 16.00),                         -- Tabla ibérica
-(7, 'Tapa', 3.25), (7, 'Plato', 8.50),      -- Mojama de atún
-(8, 'Tapa', 4.50), (8, 'Plato', 10.00),     -- Gambas al ajillo
-(9, 'Tapa', 3.75), (9, 'Media', 6.50), (9, 'Plato', 13.00); -- Gambas cocidas
+(1, 'Tapa', 3.25), (1, 'Plato', 11.00),
+(2, 'Tapa', 3.25), (2, 'Plato', 8.50),
+(3, 'Tapa', 3.25), (3, 'Plato', 8.50),
+(4, 'Tapa', 3.25), (4, 'Plato', 8.50),
+(5, 'Plato', 13.00),
+(6, 'Plato', 16.00),
+(7, 'Tapa', 3.25), (7, 'Plato', 8.50),
+(8, 'Tapa', 4.50), (8, 'Plato', 10.00),
+(9, 'Tapa', 3.75), (9, 'Media', 6.50), (9, 'Plato', 13.00);
 
--- 5. Insertar Relaciones Producto-Alergeno (actualizados)
+-- 5. Insertar Relaciones Producto-Alergeno
 INSERT INTO Producto_Alergeno (ID_Producto, ID_Alergeno) VALUES
-(2, 2), -- Queso puro de oveja: Leche y derivados (ID_Alergeno: 2)
-(5, 2), -- Jamón y queso: Leche y derivados (ID_Alergeno: 2)
-(7, 6), -- Mojama de atún: Pescado (ID_Alergeno: 6)
-(8, 4), -- Gambas al ajillo: Crustáceos (ID_Alergeno: 4)
-(9, 4); -- Gambas cocidas: Crustáceos (ID_Alergeno: 4)
+(2, 2),
+(5, 2),
+(7, 6),
+(8, 4),
+(9, 4);
 
 -- 1. Insertar Categoría
 INSERT INTO Categoria (Nombre, Orden) VALUES
@@ -139,23 +140,23 @@ INSERT INTO Producto (Nombre, Descripcion, Foto, ID_Categoria) VALUES
 ('Salmorejo', NULL, NULL, 2),
 ('Aceitunas', NULL, NULL, 2);
 
--- 3. Insertar Precios (Ajustado: Cóctel de marisco sin Plato)
+-- 3. Insertar Precios
 INSERT INTO Precio_Producto (ID_Producto, Formato, Precio) VALUES
-(10, 'Tapa', 3.25), (10, 'Plato', 6.25),    -- Ensaladilla rusa
-(11, 'Tapa', 3.25), (11, 'Plato', 6.25),    -- Patatas alioli
-(12, 'Tapa', 3.25), (12, 'Plato', 6.25),    -- Aliño de gambas
-(13, 'Tapa', 3.50),                          -- Cóctel de marisco (sin Plato)
-(14, 'Plato', 3.00),                         -- Salmorejo
-(15, 'Plato', 1.50);                         -- Aceitunas
+(10, 'Tapa', 3.25), (10, 'Plato', 6.25),
+(11, 'Tapa', 3.25), (11, 'Plato', 6.25),
+(12, 'Tapa', 3.25), (12, 'Plato', 6.25),
+(13, 'Tapa', 3.50),
+(14, 'Plato', 3.00),
+(15, 'Plato', 1.50);
 
--- 4. Insertar Relaciones Producto-Alergeno (Ajustado)
+-- 4. Insertar Relaciones Producto-Alergeno
 INSERT INTO Producto_Alergeno (ID_Producto, ID_Alergeno) VALUES
-(10, 1), (10, 3), (10, 14), -- Ensaladilla rusa: Cereales con gluten (1), Huevos (3), Sulfitos (14)
-(11, 3), (11, 14), -- Patatas alioli: Huevos (3), Sulfitos (14)
-(12, 4), (12, 14), -- Aliño de gambas: Crustáceos (4), Sulfitos (14)
-(13, 3), (13, 4), (13, 6), (13, 14), -- Cóctel de marisco: Huevos (3), Crustáceos (4), Pescado (6), Sulfitos (14)
-(14, 1), (14, 3), (14, 14), -- Salmorejo: Cereales con gluten (1), Huevos (3), Sulfitos (14)
-(15, 14); -- Aceitunas: Sulfitos (14)
+(10, 1), (10, 3), (10, 14),
+(11, 3), (11, 14),
+(12, 4), (12, 14),
+(13, 3), (13, 4), (13, 6), (13, 14),
+(14, 1), (14, 3), (14, 14),
+(15, 14);
 
 -- 1. Insertar Categoría
 INSERT INTO Categoria (Nombre, Orden) VALUES
@@ -169,43 +170,43 @@ INSERT INTO Producto (Nombre, Descripcion, Foto, ID_Categoria) VALUES
 ('Montadito de gambas al ajillo', NULL, NULL, 3),
 ('Mini serranito de cabeza de lomo y pollo', NULL, NULL, 3);
 
--- 3. Insertar Precios (Formato cambiado a Unidad, Mini serranito ajustado)
+-- 3. Insertar Precios
 INSERT INTO Precio_Producto (ID_Producto, Formato, Precio) VALUES
-(16, 'Unidad', 3.25),    -- Montadito de cabeza de lomo y pollo
-(17, 'Unidad', 3.75),    -- Montadito de cabeza de lomo y pollo con jamón
-(18, 'Unidad', 3.50),    -- Montadito de melva y pimiento
-(19, 'Unidad', 3.50),    -- Montadito de gambas al ajillo
-(20, 'Unidad', 4.00);    -- Mini serranito de cabeza de lomo y pollo (ajustado a 4.00€)
+(16, 'Unidad', 3.25),
+(17, 'Unidad', 3.75),
+(18, 'Unidad', 3.50),
+(19, 'Unidad', 3.50),
+(20, 'Unidad', 4.00);
 
--- 4. Insertar Relaciones Producto-Alergeno (Ajustado)
+-- 4. Insertar Relaciones Producto-Alergeno
 INSERT INTO Producto_Alergeno (ID_Producto, ID_Alergeno) VALUES
-(16, 1), -- Montadito de cabeza de lomo y pollo: Cereales con gluten (ID_Alergeno: 1)
-(17, 1), -- Montadito de cabeza de lomo y pollo con jamón: Cereales con gluten (ID_Alergeno: 1)
-(18, 1), (18, 6), -- Montadito de melva y pimiento: Cereales con gluten (1), Pescado (6)
-(19, 1), (19, 3), (19, 4), -- Montadito de gambas al ajillo: Cereales con gluten (1), Huevos (3), Crustáceos (4)
-(20, 1), (20, 14); -- Mini serranito de cabeza de lomo y pollo: Cereales con gluten (1), Sulfitos (14)
+(16, 1),
+(17, 1),
+(18, 1), (18, 6),
+(19, 1), (19, 3), (19, 4),
+(20, 1), (20, 14);
 
 -- 1. Insertar Categoría
 INSERT INTO Categoria (Nombre, Orden) VALUES
 ('Guisos Caseros', 4);
 
--- 2. Insertar Productos (Eliminado Arroz)
+-- 2. Insertar Productos
 INSERT INTO Producto (Nombre, Descripcion, Foto, ID_Categoria) VALUES
 ('Menudo', NULL, NULL, 4),
 ('Carne con tomate', NULL, NULL, 4),
 ('Carrillada', NULL, NULL, 4);
 
--- 3. Insertar Precios (Eliminado Arroz)
+-- 3. Insertar Precios
 INSERT INTO Precio_Producto (ID_Producto, Formato, Precio) VALUES
-(21, 'Tapa', 3.25), (21, 'Plato', 8.25),    -- Menudo
-(22, 'Tapa', 3.25), (22, 'Plato', 8.25),    -- Carne con tomate
-(23, 'Tapa', 3.75), (23, 'Plato', 9.50);    -- Carrillada
+(21, 'Tapa', 3.25), (21, 'Plato', 8.25),
+(22, 'Tapa', 3.25), (22, 'Plato', 8.25),
+(23, 'Tapa', 3.75), (23, 'Plato', 9.50);
 
--- 4. Insertar Relaciones Producto-Alergeno (Sin cambios, Arroz no tenía alérgenos)
+-- 4. Insertar Relaciones Producto-Alergeno
 INSERT INTO Producto_Alergeno (ID_Producto, ID_Alergeno) VALUES
-(21, 1), (21, 14), -- Menudo: Cereales con gluten (ID_Alergeno: 1), Sulfitos (ID_Alergeno: 14)
-(22, 1), (22, 14), -- Carne con tomate: Cereales con gluten (ID_Alergeno: 1), Sulfitos (ID_Alergeno: 14)
-(23, 1), (23, 14); -- Carrillada: Cereales con gluten (ID_Alergeno: 1), Sulfitos (ID_Alergeno: 14)
+(21, 1), (21, 14),
+(22, 1), (22, 14),
+(23, 1), (23, 14);
 
 -- 1. Insertar Categoría
 INSERT INTO Categoria (Nombre, Orden) VALUES
@@ -219,15 +220,15 @@ INSERT INTO Producto (Nombre, Descripcion, Foto, ID_Categoria) VALUES
 
 -- 3. Insertar Precios
 INSERT INTO Precio_Producto (ID_Producto, Formato, Precio) VALUES
-(24, 'Plato', 8.25),    -- Revuelto de gambas
-(25, 'Plato', 7.25),    -- Revuelto de champiñones
-(26, 'Plato', 7.25);    -- Revuelto de espárragos
+(24, 'Plato', 8.25),
+(25, 'Plato', 7.25),
+(26, 'Plato', 7.25);
 
--- 4. Insertar Relaciones Producto-Alergeno (Ajustado)
+-- 4. Insertar Relaciones Producto-Alergeno
 INSERT INTO Producto_Alergeno (ID_Producto, ID_Alergeno) VALUES
-(24, 3), (24, 4), (24, 14), -- Revuelto de gambas: Huevos (3), Crustáceos (4), Sulfitos (14)
-(25, 3), (25, 14), -- Revuelto de champiñones: Huevos (3), Sulfitos (14)
-(26, 3), (26, 14); -- Revuelto de espárragos: Huevos (3), Sulfitos (14)
+(24, 3), (24, 4), (24, 14),
+(25, 3), (25, 14),
+(26, 3), (26, 14);
 
 -- 1. Insertar Categoría
 INSERT INTO Categoria (Nombre, Orden) VALUES
@@ -246,25 +247,25 @@ INSERT INTO Producto (Nombre, Descripcion, Foto, ID_Categoria) VALUES
 
 -- 3. Insertar Precios
 INSERT INTO Precio_Producto (ID_Producto, Formato, Precio) VALUES
-(27, 'Tapa', 3.25), (27, 'Plato', 8.25),    -- Adobo
-(28, 'Tapa', 3.25), (28, 'Plato', 8.50),    -- Tiras de calamar frito
-(29, 'Tapa', 3.25), (29, 'Plato', 8.25),    -- Boquerones adobados
-(30, 'Tapa', 3.25), (30, 'Plato', 8.25),    -- Tortillita de camarones
-(31, 'Tapa', 3.50), (31, 'Plato', 9.00),    -- Chipirón a la plancha
-(32, 'Tapa', 3.25), (32, 'Plato', 8.25),    -- Rosada a la plancha
-(33, 'Tapa', 3.25), (33, 'Plato', 8.25),    -- Langostinos con bacon
-(34, 'Tapa', 3.25), (34, 'Plato', 8.25);    -- Pez espada a la plancha
+(27, 'Tapa', 3.25), (27, 'Plato', 8.25),
+(28, 'Tapa', 3.25), (28, 'Plato', 8.50),
+(29, 'Tapa', 3.25), (29, 'Plato', 8.25),
+(30, 'Tapa', 3.25), (30, 'Plato', 8.25),
+(31, 'Tapa', 3.50), (31, 'Plato', 9.00),
+(32, 'Tapa', 3.25), (32, 'Plato', 8.25),
+(33, 'Tapa', 3.25), (33, 'Plato', 8.25),
+(34, 'Tapa', 3.25), (34, 'Plato', 8.25);
 
--- 4. Insertar Relaciones Producto-Alergeno (Ajustado según especificación)
+-- 4. Insertar Relaciones Producto-Alergeno
 INSERT INTO Producto_Alergeno (ID_Producto, ID_Alergeno) VALUES
-(27, 1), (27, 6), (27, 14), -- Adobo: Cereales con gluten (1), Pescado (6), Sulfitos (14)
-(28, 1), (28, 6), (28, 14), -- Tiras de calamar frito: Cereales con gluten (1), Pescado (6), Sulfitos (14)
-(29, 1), (29, 6), (29, 14), -- Boquerones adobados: Cereales con gluten (1), Pescado (6), Sulfitos (14)
-(30, 1), (30, 3), (30, 4), (30, 6), (30, 14), -- Tortillita de camarones: Cereales con gluten (1), Huevos (3), Crustáceos (4), Pescado (6), Sulfitos (14)
-(31, 5), -- Chipirón a la plancha: Moluscos (5)
-(32, 6), (32, 14), -- Rosada a la plancha: Pescado (6), Sulfitos (14)
-(33, 4), (33, 14), -- Langostinos con bacon: Crustáceos (4), Sulfitos (14)
-(34, 6), (34, 14); -- Pez espada a la plancha: Pescado (6), Sulfitos (14)
+(27, 1), (27, 6), (27, 14),
+(28, 1), (28, 6), (28, 14),
+(29, 1), (29, 6), (29, 14),
+(30, 1), (30, 3), (30, 4), (30, 6), (30, 14),
+(31, 5),
+(32, 6), (32, 14),
+(33, 4), (33, 14),
+(34, 6), (34, 14);
 
 -- 1. Insertar Categoría
 INSERT INTO Categoria (Nombre, Orden) VALUES
@@ -291,40 +292,40 @@ INSERT INTO Producto (Nombre, Descripcion, Foto, ID_Categoria) VALUES
 
 -- 3. Insertar Precios
 INSERT INTO Precio_Producto (ID_Producto, Formato, Precio) VALUES
-(35, 'Tapa', 3.25), (35, 'Plato', 8.25),    -- Lagrimitas caseras
-(36, 'Tapa', 3.25), (36, 'Plato', 8.25),    -- Croquetas de puchero
-(37, 'Tapa', 3.50),                          -- Pincho de pollo
-(38, 'Plato', 3.50),                         -- Hamburguesa de pollo
-(39, 'Plato', 3.50),                         -- Hamburguesa de ternera
-(40, 'Plato', 5.25),                         -- Pechuga de pollo
-(41, 'Plato', 6.25),                         -- Churrasco de cerdo
-(42, 'Plato', 7.25),                         -- Punta de solomillo al whisky
-(43, 'Plato', 8.50),                         -- Punta de solomillo al jamón
-(44, 'Plato', 7.25),                         -- Punta de solomillo al roquefort
-(45, 'Plato', 7.25),                         -- Punta de solomillo a la pimienta
-(46, 'Plato', 7.25),                         -- Punta de solomillo salsa churrasco
-(47, 'Plato', 7.25),                         -- Punta de solomillo a la almendra
-(48, 'Tapa', 3.25),                          -- Lomito (cabeza de lomo) al jamón
-(49, 'Tapa', 3.25),                          -- Lomito (cabeza de lomo) a la almendra
-(50, 'Plato', 0.60);                         -- Extra de salsa
+(35, 'Tapa', 3.25), (35, 'Plato', 8.25),
+(36, 'Tapa', 3.25), (36, 'Plato', 8.25),
+(37, 'Tapa', 3.50),
+(38, 'Plato', 3.50),
+(39, 'Plato', 3.50),
+(40, 'Plato', 5.25),
+(41, 'Plato', 6.25),
+(42, 'Plato', 7.25),
+(43, 'Plato', 8.50),
+(44, 'Plato', 7.25),
+(45, 'Plato', 7.25),
+(46, 'Plato', 7.25),
+(47, 'Plato', 7.25),
+(48, 'Tapa', 3.25),
+(49, 'Tapa', 3.25),
+(50, 'Plato', 0.60);
 
 -- 4. Insertar Relaciones Producto-Alergeno
 INSERT INTO Producto_Alergeno (ID_Producto, ID_Alergeno) VALUES
-(35, 1), (35, 3), (35, 4), (35, 5), -- Lagrimitas caseras: Cereales con gluten (1), Huevos (3), Crustáceos (4), Moluscos (5)
-(36, 1), (36, 2), (36, 3), (36, 4), (36, 5), (36, 14), -- Croquetas de puchero: Cereales con gluten (1), Leche (2), Huevos (3), Crustáceos (4), Moluscos (5), Sulfitos (14)
-(37, 14), -- Pincho de pollo: Sulfitos (14)
-(38, 1), (38, 11), -- Hamburguesa de pollo: Cereales con gluten (1), Granos de sésamo (11)
-(39, 1), (39, 11), -- Hamburguesa de ternera: Cereales con gluten (1), Granos de sésamo (11)
-(40, 14), -- Pechuga de pollo: Sulfitos (14)
-(41, 14), -- Churrasco de cerdo: Sulfitos (14)
-(42, 1), (42, 14), -- Punta de solomillo al whisky: Cereales con gluten (1), Sulfitos (14)
-(43, 14), -- Punta de solomillo al jamón: Sulfitos (14)
-(44, 2), -- Punta de solomillo al roquefort: Leche (2)
-(45, 2), -- Punta de solomillo a la pimienta: Leche (2)
-(46, 14), -- Punta de solomillo salsa churrasco: Sulfitos (14)
-(47, 2), (47, 7), (47, 8), -- Punta de solomillo a la almendra: Leche (2), Frutos secos (7), Cacahuetes (8)
-(48, 14), -- Lomito (cabeza de lomo) al jamón: Sulfitos (14)
-(49, 2), (49, 7), (49, 8), (49, 14); -- Lomito (cabeza de lomo) a la almendra: Leche (2), Frutos secos (7), Cacahuetes (8), Sulfitos (14)
+(35, 1), (35, 3), (35, 4), (35, 5),
+(36, 1), (36, 2), (36, 3), (36, 4), (36, 5), (36, 14),
+(37, 14),
+(38, 1), (38, 11),
+(39, 1), (39, 11),
+(40, 14),
+(41, 14),
+(42, 1), (42, 14),
+(43, 14),
+(44, 2),
+(45, 2),
+(46, 14),
+(47, 2), (47, 7), (47, 8),
+(48, 14),
+(49, 2), (49, 7), (49, 8), (49, 14);
 
 -- 1. Insertar Categoría
 INSERT INTO Categoria (Nombre, Orden) VALUES
@@ -340,11 +341,11 @@ INSERT INTO Producto (Nombre, Descripcion, Foto, ID_Categoria) VALUES
 
 -- 3. Insertar Precios
 INSERT INTO Precio_Producto (ID_Producto, Formato, Precio) VALUES
-(51, 'Plato', 12.00),                       -- Mejillones Gigantes
-(52, 'Tapa', 4.50), (52, 'Plato', 9.50),    -- Churrasquito Boom Bun
-(53, 'Tapa', 4.00),                         -- Solomillo a la mostaza
-(54, 'Tapa', 3.75), (54, 'Plato', 7.50),    -- Pollo frito
-(55, 'Plato', 7.00);                        -- Patatas Boom Bun
+(51, 'Plato', 12.00),
+(52, 'Tapa', 4.50), (52, 'Plato', 9.50),
+(53, 'Tapa', 4.00),
+(54, 'Tapa', 3.75), (54, 'Plato', 7.50),
+(55, 'Plato', 7.00);
 
 -- 1. Insertar Categoría
 INSERT INTO Categoria (Nombre, Orden) VALUES
@@ -354,9 +355,9 @@ INSERT INTO Categoria (Nombre, Orden) VALUES
 INSERT INTO Producto (Nombre, Descripcion, Foto, ID_Categoria) VALUES
 ('Arroz', NULL, NULL, 9);
 
--- 3. Insertar Precios (Sin precio, como indicado)
+-- 3. Insertar Precios
 INSERT INTO Precio_Producto (ID_Producto, Formato, Precio) VALUES
-(56, 'Tapa', 4.50);  -- Arroz
+(56, 'Tapa', 4.50);
 
 -- 1. Insertar Categoría
 INSERT INTO Categoria (Nombre, Orden) VALUES
@@ -373,18 +374,18 @@ INSERT INTO Producto (Nombre, Descripcion, Foto, ID_Categoria) VALUES
 
 -- 3. Insertar Precios
 INSERT INTO Precio_Producto (ID_Producto, Formato, Precio) VALUES
-(57, 'Copa', 2.25), (57, 'Botella', 9.00),  -- Frizzante
-(58, 'Copa', 2.25), (58, 'Botella', 9.00),  -- Barbadillo
-(59, 'Copa', 2.25), (59, 'Botella', 10.00), -- Verdejo
-(60, 'Copa', 2.50), (60, 'Botella', 12.00), -- Solaz Coupage (Tempranillo y Sirah)
-(61, 'Copa', 2.25), (61, 'Botella', 12.00), -- Rioja
-(62, 'Copa', 2.50), (62, 'Botella', 12.00); -- Ribera del Duero
+(57, 'Copa', 2.25), (57, 'Botella', 9.00),
+(58, 'Copa', 2.25), (58, 'Botella', 9.00),
+(59, 'Copa', 2.25), (59, 'Botella', 10.00),
+(60, 'Copa', 2.50), (60, 'Botella', 12.00),
+(61, 'Copa', 2.25), (61, 'Botella', 12.00),
+(62, 'Copa', 2.50), (62, 'Botella', 12.00);
 
--- Insertar Reseñas (con fechas de ejemplo)
-INSERT INTO Reseña (ID_Usuario, ID_Producto, Texto, Fecha) VALUES
-(3, 1, '¡El Jamón ibérico es delicioso! Muy recomendable.', '2024-10-01'),
-(3, 10, 'La Ensaladilla rusa tiene un sabor fresco y equilibrado.', '2024-10-02'),
-(4, 15, 'Las Aceitunas son perfectas para picar.', '2024-10-03'),
-(4, 27, 'El Adobo es crujiente y sabroso, ¡me encanta!', '2024-10-04'),
-(5, 35, 'Las Lagrimitas caseras son una delicia, ¡volveré por más!', '2024-10-05'),
-(5, 50, 'La Extra de salsa es el toque perfecto para cualquier plato.', '2024-10-06');
+-- Insertar Reseñas (con fechas de ejemplo y puntuaciones)
+INSERT INTO Reseña (ID_Usuario, ID_Producto, Texto, Puntuacion, Fecha) VALUES
+(3, 1, '¡El Jamón ibérico es delicioso! Muy recomendable.', 4.5, '2024-10-01'),
+(3, 10, 'La Ensaladilla rusa tiene un sabor fresco y equilibrado.', 4.0, '2024-10-02'),
+(4, 15, 'Las Aceitunas son perfectas para picar.', 3.5, '2024-10-03'),
+(4, 27, 'El Adobo es crujiente y sabroso, ¡me encanta!', 4.8, '2024-10-04'),
+(5, 35, 'Las Lagrimitas caseras son una delicia, ¡volveré por más!', 5.0, '2024-10-05'),
+(5, 50, 'La Extra de salsa es el toque perfecto para cualquier plato.', 3.0, '2024-10-06');

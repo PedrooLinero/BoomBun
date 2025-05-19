@@ -3,3 +3,13 @@
 GET http://localhost:3000/api/resenas
 Accept: application/json
 
+###crear una reseña
+POST http://localhost:3000/api/resenas
+Content-Type: application/json
+
+{
+"ID_Usuario": 2,
+  "ID_Producto": 22,
+  "Texto": "¡Excelente producto!",
+  "Puntuacion": 5
+}

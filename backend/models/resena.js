@@ -32,6 +32,15 @@ module.exports = function(sequelize, DataTypes) {
         allowNull: true,
         field: 'Texto'
       },
+      Puntuacion: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        field: 'Puntuacion',
+        validate: {
+          min: 1,
+          max: 5
+        }
+      },
       Fecha: {
         type: DataTypes.DATEONLY,
         allowNull: false,
