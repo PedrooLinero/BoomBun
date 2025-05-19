@@ -188,8 +188,8 @@ function HomeContent() {
               >
                 Cervecería Boom Bun es el destino ideal para los amantes de la
                 buena cerveza Cruzcampo y el tapeo más auténtico. Nuestro bar
-                fusiona la pasión por las cervezas artesanales con una selección
-                de tapas irresistibles, creando un ambiente acogedor y moderno
+                fusiona la pasión por la mejor cerveza con una selección de
+                tapas irresistibles, creando un ambiente acogedor y moderno
                 donde disfrutar de una experiencia gastronómica única. ¡Ven a
                 saborear la tradición con un toque contemporáneo!
               </Typography>
@@ -219,7 +219,7 @@ function HomeContent() {
                     sx={{ color: "#065f46", mr: 1, fontSize: "24px" }}
                   />
                   <Typography variant="body2" sx={{ color: "black" }}>
-                    Calle Principal 123, Ciudad
+                    Av. Juan Pablo II, 22P3, 41702 Dos Hermanas, Sevilla
                   </Typography>
                 </Box>
                 <Box
@@ -234,22 +234,8 @@ function HomeContent() {
                     sx={{ color: "#065f46", mr: 1, fontSize: "24px" }}
                   />
                   <Typography variant="body2" sx={{ color: "black" }}>
-                    Lun-Jue: 16:00-00:00, Vie-Dom: 16:00-02:00
-                  </Typography>
-                </Box>
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    mb: 2,
-                    justifyContent: { xs: "center", lg: "start" },
-                  }}
-                >
-                  <PhoneIcon
-                    sx={{ color: "#065f46", mr: 1, fontSize: "24px" }}
-                  />
-                  <Typography variant="body2" sx={{ color: "black" }}>
-                    +34 123 456 789
+                    Lunes: Cerrado / Martes: 12:00–17:30 / Miércoles - Domingo:
+                    12:00–24:00
                   </Typography>
                 </Box>
               </Box>
@@ -271,7 +257,7 @@ function HomeContent() {
               color: "#ffffff",
             }}
           >
-            Nuestra Galería
+            Nuestro Rincón
           </Typography>
           <Box sx={{ position: "relative", maxWidth: "800px", mx: "auto" }}>
             <Box

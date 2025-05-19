@@ -111,9 +111,10 @@ export default function JamonSection() {
                 Pedro Luis Linero
               </Typography>
               <Typography paragraph>
-                Nuestro cortador profesional, actualemente como{" "}
+                Nuestro cortador profesional, actualmente como{" "}
                 <strong>3º mejor cortador de Andalucía</strong>, es el que pone
-                su toque en cada plato de jamón ibérico que servimos.
+                su toque en cada plato de jamón ibérico que servimos. Disfruta
+                del jamón recién cortado en directo aquí en nuestra cervecería.
               </Typography>
 
               {/* Estadísticas */}
@@ -144,7 +145,7 @@ export default function JamonSection() {
               {/* Puntos clave */}
               <Box component="ul" sx={{ pl: 2, mb: 3 }}>
                 <Typography component="li">
-                  Cortador de jamonería Tartessos.
+                  Cortador de jamones Tartessos.
                 </Typography>
                 <Typography component="li">
                   Participante de la Liga Nacional de Cortadores.
