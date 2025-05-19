@@ -10,6 +10,7 @@ import {
   Snackbar,
   InputAdornment,
   Fade,
+  Grid,
 } from "@mui/material";
 import {
   Mail as MailIcon,
@@ -59,7 +60,6 @@ function Login() {
       );
 
       window.dispatchEvent(new Event("storage"));
-
       setShowWelcome(true);
 
       setTimeout(() => {
@@ -80,7 +80,7 @@ function Login() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "linear-gradient(to bottom right, #F5F5F5, #E0E0E0)", // Fondo claro con degradado sutil
+        background: "linear-gradient(to bottom right, #F5F5F5, #E0E0E0)",
         p: { xs: 2, sm: 4 },
       }}
     >
@@ -88,7 +88,7 @@ function Login() {
         <Box
           sx={{
             width: "100%",
-            maxWidth: 450,
+            maxWidth: 900, // Increased width to match Register form
             bgcolor: "white",
             borderRadius: 4,
             boxShadow: "0 6px 25px rgba(0, 0, 0, 0.15)",
@@ -148,75 +148,81 @@ function Login() {
               </Alert>
             )}
 
-            <TextField
-              fullWidth
-              label="Correo electrónico"
-              value={credentials.Correo}
-              onChange={(e) =>
-                setCredentials({ ...credentials, Correo: e.target.value })
-              }
-              margin="normal"
-              required
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <MailIcon sx={{ color: "#6b7280" }} />
-                  </InputAdornment>
-                ),
-              }}
-              sx={{
-                "& .MuiInputLabel-root": {
-                  color: "#065f46",
-                  fontWeight: "bold",
-                },
-                "& .MuiInputLabel-root.Mui-focused": {
-                  color: "#065f46",
-                },
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": { borderColor: "#e5e7eb" },
-                  "&:hover fieldset": { borderColor: "#064e3b" },
-                  "&.Mui-focused fieldset": { borderColor: "#065f46" },
-                  transition: "all 0.3s ease",
-                },
-                mb: 2,
-              }}
-            />
+            {/* Campos en fila en desktop y en columna en móvil */}
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Correo electrónico"
+                  value={credentials.Correo}
+                  onChange={(e) =>
+                    setCredentials({ ...credentials, Correo: e.target.value })
+                  }
+                  required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <MailIcon sx={{ color: "#6b7280" }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiInputLabel-root": {
+                      color: "#065f46",
+                      fontWeight: "bold",
+                    },
+                    "& .MuiInputLabel-root.Mui-focused": {
+                      color: "#065f46",
+                    },
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": { borderColor: "#e5e7eb" },
+                      "&:hover fieldset": { borderColor: "#064e3b" },
+                      "&.Mui-focused fieldset": { borderColor: "#065f46" },
+                      transition: "all 0.3s ease",
+                    },
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Contraseña"
+                  type="password"
+                  value={credentials.Contraseña}
+                  onChange={(e) =>
+                    setCredentials({
+                      ...credentials,
+                      Contraseña: e.target.value,
+                    })
+                  }
+                  required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <LockIcon sx={{ color: "#6b7280" }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiInputLabel-root": {
+                      color: "#065f46",
+                      fontWeight: "bold",
+                    },
+                    "& .MuiInputLabel-root.Mui-focused": {
+                      color: "#065f46",
+                    },
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": { borderColor: "#e5e7eb" },
+                      "&:hover fieldset": { borderColor: "#064e3b" },
+                      "&.Mui-focused fieldset": { borderColor: "#065f46" },
+                      transition: "all 0.3s ease",
+                    },
+                  }}
+                />
+              </Grid>
+            </Grid>
 
-            <TextField
-              fullWidth
-              label="Contraseña"
-              type="password"
-              value={credentials.Contraseña}
-              onChange={(e) =>
-                setCredentials({ ...credentials, Contraseña: e.target.value })
-              }
-              margin="normal"
-              required
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <LockIcon sx={{ color: "#6b7280" }} />
-                  </InputAdornment>
-                ),
-              }}
-              sx={{
-                "& .MuiInputLabel-root": {
-                  color: "#065f46",
-                  fontWeight: "bold",
-                },
-                "& .MuiInputLabel-root.Mui-focused": {
-                  color: "#065f46",
-                },
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": { borderColor: "#e5e7eb" },
-                  "&:hover fieldset": { borderColor: "#064e3b" },
-                  "&.Mui-focused fieldset": { borderColor: "#065f46" },
-                  transition: "all 0.3s ease",
-                },
-                mb: 3,
-              }}
-            />
-
+            {/* Botón debajo de los inputs */}
             <Button
               type="submit"
               fullWidth
@@ -224,7 +230,7 @@ function Login() {
               disabled={loading}
               startIcon={loading ? null : <LogInIcon />}
               sx={{
-                mt: 1,
+                mt: 4,
                 py: 1.5,
                 bgcolor: "#065f46",
                 "&:hover": {
@@ -246,6 +252,7 @@ function Login() {
               )}
             </Button>
 
+            {/* Recuperar contraseña */}
             <Typography
               variant="body2"
               sx={{ mt: 3, textAlign: "center", color: "#6b7280" }}
@@ -253,7 +260,9 @@ function Login() {
               ¿Olvidaste tu contraseña?{" "}
               <Box
                 component="span"
-                onClick={() => alert("Funcionalidad de recuperación en desarrollo")}
+                onClick={() =>
+                  alert("Funcionalidad de recuperación en desarrollo")
+                }
                 sx={{
                   color: "#065f46",
                   cursor: "pointer",

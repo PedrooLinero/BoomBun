@@ -10,6 +10,7 @@ import {
   Snackbar,
   InputAdornment,
   Fade,
+  Grid,
 } from "@mui/material";
 import {
   Person as PersonIcon,
@@ -36,7 +37,6 @@ function Register() {
     setLoading(true);
     setError("");
 
-    // Validaciones básicas
     if (userData.Contraseña.length < 8) {
       setError("La contraseña debe tener al menos 8 caracteres");
       setLoading(false);
@@ -66,10 +66,7 @@ function Register() {
         throw new Error(data.mensaje || "Error al registrar usuario");
       }
 
-      // Mostrar mensaje de éxito
       setSuccess(true);
-
-      // Redirección tras un breve retraso
       setTimeout(() => {
         navigate("/login");
       }, 2000);
@@ -87,7 +84,7 @@ function Register() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "linear-gradient(to bottom right, #F5F5F5, #E0E0E0)", // Fondo claro con degradado sutil
+        background: "linear-gradient(to bottom right, #F5F5F5, #E0E0E0)",
         p: { xs: 2, sm: 4 },
       }}
     >
@@ -95,7 +92,7 @@ function Register() {
         <Box
           sx={{
             width: "100%",
-            maxWidth: 450,
+            maxWidth: 900, // Increased width for a more elongated horizontal form
             bgcolor: "white",
             borderRadius: 4,
             boxShadow: "0 6px 25px rgba(0, 0, 0, 0.15)",
@@ -155,151 +152,157 @@ function Register() {
               </Alert>
             )}
 
-            <TextField
-              fullWidth
-              label="Nombre completo"
-              value={userData.Nombre}
-              onChange={(e) =>
-                setUserData({ ...userData, Nombre: e.target.value })
-              }
-              margin="normal"
-              required
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <PersonIcon sx={{ color: "#6b7280" }} />
-                  </InputAdornment>
-                ),
-              }}
-              sx={{
-                "& .MuiInputLabel-root": {
-                  color: "#065f46",
-                  fontWeight: "bold",
-                },
-                "& .MuiInputLabel-root.Mui-focused": {
-                  color: "#065f46",
-                },
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": { borderColor: "#e5e7eb" },
-                  "&:hover fieldset": { borderColor: "#064e3b" },
-                  "&.Mui-focused fieldset": { borderColor: "#065f46" },
-                  transition: "all 0.3s ease",
-                },
-                mb: 2,
-              }}
-            />
+            <Grid container spacing={3}>
+              {/* Primera fila: Nombre y Correo */}
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  label="Nombre completo"
+                  value={userData.Nombre}
+                  onChange={(e) =>
+                    setUserData({ ...userData, Nombre: e.target.value })
+                  }
+                  margin="normal"
+                  required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <PersonIcon sx={{ color: "#6b7280" }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiInputLabel-root": {
+                      color: "#065f46",
+                      fontWeight: "bold",
+                    },
+                    "& .MuiInputLabel-root.Mui-focused": {
+                      color: "#065f46",
+                    },
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": { borderColor: "#e5e7eb" },
+                      "&:hover fieldset": { borderColor: "#064e3b" },
+                      "&.Mui-focused fieldset": { borderColor: "#065f46" },
+                      transition: "all 0.3s ease",
+                    },
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  label="Correo electrónico"
+                  type="email"
+                  value={userData.Correo}
+                  onChange={(e) =>
+                    setUserData({ ...userData, Correo: e.target.value })
+                  }
+                  margin="normal"
+                  required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <MailIcon sx={{ color: "#6b7280" }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiInputLabel-root": {
+                      color: "#065f46",
+                      fontWeight: "bold",
+                    },
+                    "& .MuiInputLabel-root.Mui-focused": {
+                      color: "#065f46",
+                    },
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": { borderColor: "#e5e7eb" },
+                      "&:hover fieldset": { borderColor: "#064e3b" },
+                      "&.Mui-focused fieldset": { borderColor: "#065f46" },
+                      transition: "all 0.3s ease",
+                    },
+                  }}
+                />
+              </Grid>
 
-            <TextField
-              fullWidth
-              label="Correo electrónico"
-              type="email"
-              value={userData.Correo}
-              onChange={(e) =>
-                setUserData({ ...userData, Correo: e.target.value })
-              }
-              margin="normal"
-              required
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <MailIcon sx={{ color: "#6b7280" }} />
-                  </InputAdornment>
-                ),
-              }}
-              sx={{
-                "& .MuiInputLabel-root": {
-                  color: "#065f46",
-                  fontWeight: "bold",
-                },
-                "& .MuiInputLabel-root.Mui-focused": {
-                  color: "#065f46",
-                },
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": { borderColor: "#e5e7eb" },
-                  "&:hover fieldset": { borderColor: "#064e3b" },
-                  "&.Mui-focused fieldset": { borderColor: "#065f46" },
-                  transition: "all 0.3s ease",
-                },
-                mb: 2,
-              }}
-            />
-
-            <TextField
-              fullWidth
-              label="Contraseña"
-              type="password"
-              value={userData.Contraseña}
-              onChange={(e) =>
-                setUserData({ ...userData, Contraseña: e.target.value })
-              }
-              margin="normal"
-              required
-              helperText="Mínimo 8 caracteres"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <LockIcon sx={{ color: "#6b7280" }} />
-                  </InputAdornment>
-                ),
-              }}
-              sx={{
-                "& .MuiInputLabel-root": {
-                  color: "#065f46",
-                  fontWeight: "bold",
-                },
-                "& .MuiInputLabel-root.Mui-focused": {
-                  color: "#065f46",
-                },
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": { borderColor: "#e5e7eb" },
-                  "&:hover fieldset": { borderColor: "#064e3b" },
-                  "&.Mui-focused fieldset": { borderColor: "#065f46" },
-                  transition: "all 0.3s ease",
-                },
-                "& .MuiFormHelperText-root": {
-                  color: "#6b7280",
-                },
-                mb: 2,
-              }}
-            />
-
-            <TextField
-              fullWidth
-              label="Confirmar contraseña"
-              type="password"
-              value={userData.ConfirmarContraseña}
-              onChange={(e) =>
-                setUserData({
-                  ...userData,
-                  ConfirmarContraseña: e.target.value,
-                })
-              }
-              margin="normal"
-              required
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <LockIcon sx={{ color: "#6b7280" }} />
-                  </InputAdornment>
-                ),
-              }}
-              sx={{
-                "& .MuiInputLabel-root": {
-                  color: "#065f46",
-                  fontWeight: "bold",
-                },
-                "& .MuiInputLabel-root.Mui-focused": {
-                  color: "#065f46",
-                },
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": { borderColor: "#e5e7eb" },
-                  "&:hover fieldset": { borderColor: "#064e3b" },
-                  "&.Mui-focused fieldset": { borderColor: "#065f46" },
-                  transition: "all 0.3s ease",
-                },
-                mb: 3,
-              }}
-            />
+              {/* Segunda fila: Contraseña y ConfirmarContraseña */}
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  label="Contraseña"
+                  type="password"
+                  value={userData.Contraseña}
+                  onChange={(e) =>
+                    setUserData({ ...userData, Contraseña: e.target.value })
+                  }
+                  margin="normal"
+                  required
+                  helperText="Mínimo 8 caracteres"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <LockIcon sx={{ color: "#6b7280" }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiInputLabel-root": {
+                      color: "#065f46",
+                      fontWeight: "bold",
+                    },
+                    "& .MuiInputLabel-root.Mui-focused": {
+                      color: "#065f46",
+                    },
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": { borderColor: "#e5e7eb" },
+                      "&:hover fieldset": { borderColor: "#064e3b" },
+                      "&.Mui-focused fieldset": { borderColor: "#065f46" },
+                      transition: "all 0.3s ease",
+                    },
+                    "& .MuiFormHelperText-root": {
+                      color: "#6b7280",
+                    },
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  label="Confirmar contraseña"
+                  type="password"
+                  value={userData.ConfirmarContraseña}
+                  onChange={(e) =>
+                    setUserData({
+                      ...userData,
+                      ConfirmarContraseña: e.target.value,
+                    })
+                  }
+                  margin="normal"
+                  required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <LockIcon sx={{ color: "#6b7280" }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiInputLabel-root": {
+                      color: "#065f46",
+                      fontWeight: "bold",
+                    },
+                    "& .MuiInputLabel-root.Mui-focused": {
+                      color: "#065f46",
+                    },
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": { borderColor: "#e5e7eb" },
+                      "&:hover fieldset": { borderColor: "#064e3b" },
+                      "&.Mui-focused fieldset": { borderColor: "#065f46" },
+                      transition: "all 0.3s ease",
+                    },
+                  }}
+                />
+              </Grid>
+            </Grid>
 
             <Button
               type="submit"
@@ -308,7 +311,7 @@ function Register() {
               disabled={loading}
               startIcon={loading ? null : <LoginIcon />}
               sx={{
-                mt: 1,
+                mt: 3,
                 py: 1.5,
                 bgcolor: "#065f46",
                 "&:hover": {

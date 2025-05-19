@@ -1,12 +1,18 @@
 import React from "react";
-import { AppBar, Toolbar, Typography, Box, IconButton, Divider } from "@mui/material";
-import FacebookIcon from "@mui/icons-material/Facebook";
-import TwitterIcon from "@mui/icons-material/Twitter";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Box,
+  IconButton,
+  Divider,
+  Link as MuiLink,
+} from "@mui/material";
 import InstagramIcon from "@mui/icons-material/Instagram";
-import PlaceIcon from "@mui/icons-material/Place"; // Para el ícono de ubicación
-import PhoneIcon from "@mui/icons-material/Phone"; // Para el ícono de teléfono
-import EmailIcon from "@mui/icons-material/Email"; // Para el ícono de correo
-import 'bootstrap/dist/css/bootstrap.min.css'; // Importar Bootstrap para el grid y estilos
+import PlaceIcon from "@mui/icons-material/Place";
+import RoomServiceIcon from "@mui/icons-material/RoomService";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { Link } from "react-router-dom"; // For internal navigation links
 
 function Footer() {
   return (
@@ -15,15 +21,14 @@ function Footer() {
       sx={{
         top: "auto",
         bottom: 0,
-        backgroundColor: "#24221e", // Fondo oscuro similar al original
-        padding: { xs: 2, md: 4 }, // Padding responsivo
+        backgroundColor: "#24221e",
+        padding: { xs: 2, md: 4 },
         boxShadow: "0px -2px 10px rgba(0, 0, 0, 0.3)",
       }}
     >
       <Toolbar sx={{ flexDirection: "column" }}>
-        {/* Contenedor principal con grid de Bootstrap */}
         <Box sx={{ width: "100%", maxWidth: "1200px", mx: "auto" }}>
-          <div className="row g-4"> {/* Usamos el grid de Bootstrap */}
+          <div className="row g-4">
             {/* Sección 1: Información de Boom Bun */}
             <div className="col-12 col-md-4 text-center text-md-start">
               <Typography
@@ -39,36 +44,27 @@ function Footer() {
               <Typography
                 variant="body2"
                 sx={{
-                  color: "#b0b0b0", // Gris claro para el texto
+                  color: "#b0b0b0",
                   mb: 2,
                 }}
               >
-                El lugar perfecto para disfrutar de las mejores cervezas artesanales y un ambiente único.
+                Disfruta de una experiencia única con la mejor cerveza, tapas y
+                un ambiente acogedor.
               </Typography>
-              <Box sx={{ display: "flex", justifyContent: { xs: "center", md: "start" }, gap: 1 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: { xs: "center", md: "start" },
+                  gap: 1,
+                }}
+              >
                 <IconButton
                   color="inherit"
-                  href="https://www.facebook.com"
-                  target="_blank"
-                  sx={{ "&:hover": { color: "#4CAF50" } }} // Verde al pasar el mouse
-                >
-                  <FacebookIcon />
-                </IconButton>
-                <IconButton
-                  color="inherit"
-                  href="https://www.instagram.com"
+                  href="https://www.instagram.com/newboom_bun/"
                   target="_blank"
                   sx={{ "&:hover": { color: "#4CAF50" } }}
                 >
                   <InstagramIcon />
-                </IconButton>
-                <IconButton
-                  color="inherit"
-                  href="https://www.twitter.com"
-                  target="_blank"
-                  sx={{ "&:hover": { color: "#4CAF50" } }}
-                >
-                  <TwitterIcon />
                 </IconButton>
               </Box>
             </div>
@@ -83,24 +79,35 @@ function Footer() {
                   mb: 2,
                 }}
               >
-                Contacto
+                Localización
               </Typography>
-              <Box sx={{ display: "flex", alignItems: "center", mb: 1, justifyContent: { xs: "center", md: "start" } }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+
+                  mb: 1,
+                  justifyContent: { xs: "center", md: "start" },
+                }}
+              >
                 <PlaceIcon sx={{ color: "#4CAF50", mr: 1, fontSize: "20px" }} />
                 <Typography variant="body2" sx={{ color: "#b0b0b0" }}>
-                  Calle Principal 123, Ciudad
+                  Av. Juan Pablo II, 22P3, 41702 Dos Hermanas, Sevilla
                 </Typography>
               </Box>
-              <Box sx={{ display: "flex", alignItems: "center", mb: 1, justifyContent: { xs: "center", md: "start" } }}>
-                <PhoneIcon sx={{ color: "#4CAF50", mr: 1, fontSize: "20px" }} />
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  mb: 1,
+                  justifyContent: { xs: "center", md: "start" },
+                }}
+              >
+                <RoomServiceIcon
+                  sx={{ color: "#4CAF50", mr: 1, fontSize: "20px" }}
+                />
                 <Typography variant="body2" sx={{ color: "#b0b0b0" }}>
-                  +34 123 456 789
-                </Typography>
-              </Box>
-              <Box sx={{ display: "flex", alignItems: "center", mb: 1, justifyContent: { xs: "center", md: "start" } }}>
-                <EmailIcon sx={{ color: "#4CAF50", mr: 1, fontSize: "20px" }} />
-                <Typography variant="body2" sx={{ color: "#b0b0b0" }}>
-                  info@boombun.com
+                  Opciones de servicio: Tiene terraza · Sirve cenas
                 </Typography>
               </Box>
             </div>
@@ -118,10 +125,13 @@ function Footer() {
                 Horario
               </Typography>
               <Typography variant="body2" sx={{ color: "#b0b0b0", mb: 1 }}>
-                Lunes - Jueves: 16:00 - 00:00
+                Lunes: Cerrado
               </Typography>
-              <Typography variant="body2" sx={{ color: "#b0b0b0" }}>
-                Viernes - Domingo: 16:00 - 02:00
+              <Typography variant="body2" sx={{ color: "#b0b0b0", mb: 1 }}>
+                Martes: 12:00–17:30
+              </Typography>
+              <Typography variant="body2" sx={{ color: "#b0b0b0", mb: 1 }}>
+                Miércoles - Domingo: 12:00–24:00
               </Typography>
             </div>
           </div>
@@ -133,7 +143,8 @@ function Footer() {
               variant="body2"
               sx={{ color: "#757575", fontSize: "0.875rem" }}
             >
-              © {new Date().getFullYear()} Cervecería Boom Bun. Todos los derechos reservados.
+              © {new Date().getFullYear()} Cervecería Boom Bun. Todos los
+              derechos reservados.
             </Typography>
           </Box>
         </Box>

@@ -35,7 +35,7 @@ function AppMenu() {
       : { isAuthenticated: false, user: null };
   });
 
-  const menuItems = ["Inicio", "Carta", "Jamón", "Reseñas", "Contacto"];
+  const menuItems = ["Inicio", "Carta", "Jamón", "Reseñas"];
 
   useEffect(() => {
     const syncAuthState = () => {

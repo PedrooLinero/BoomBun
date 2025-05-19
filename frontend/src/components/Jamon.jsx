@@ -82,7 +82,9 @@ export default function JamonSection() {
               Jamón
             </Box>
           </Typography>
-          <Typography>Maestría, pasión y tradición en cada loncha</Typography>
+          <Typography>
+            Una parte esencial en nuestra Cervecería Boom Bun
+          </Typography>
         </Paper>
       </Box>
 
@@ -109,9 +111,9 @@ export default function JamonSection() {
                 Pedro Luis Linero
               </Typography>
               <Typography paragraph>
-                Nuestro maestro cortador, con más de <strong>20 años</strong> de
-                experiencia y galardonado internacionalmente, hace de cada
-                servicio un espectáculo gourmet.
+                Nuestro cortador profesional, actualemente como{" "}
+                <strong>3º mejor cortador de Andalucía</strong>, es el que pone
+                su toque en cada plato de jamón ibérico que servimos.
               </Typography>
 
               {/* Estadísticas */}
@@ -119,22 +121,22 @@ export default function JamonSection() {
                 <Grid item xs={4}>
                   <Box textAlign="center">
                     <AwardIcon color="error" sx={{ fontSize: 40 }} />
-                    <Typography variant="h6">10+</Typography>
+                    <Typography variant="h6">+25</Typography>
                     <Typography variant="caption">Premios</Typography>
                   </Box>
                 </Grid>
                 <Grid item xs={4}>
                   <Box textAlign="center">
                     <TimerIcon color="error" sx={{ fontSize: 40 }} />
-                    <Typography variant="h6">20 años</Typography>
+                    <Typography variant="h6">+10 años</Typography>
                     <Typography variant="caption">Experiencia</Typography>
                   </Box>
                 </Grid>
                 <Grid item xs={4}>
                   <Box textAlign="center">
                     <RestaurantMenuIcon color="error" sx={{ fontSize: 40 }} />
-                    <Typography variant="h6">50+</Typography>
-                    <Typography variant="caption">Técnicas</Typography>
+                    <Typography variant="h6">+25</Typography>
+                    <Typography variant="caption">Concursos</Typography>
                   </Box>
                 </Grid>
               </Grid>
@@ -142,13 +144,13 @@ export default function JamonSection() {
               {/* Puntos clave */}
               <Box component="ul" sx={{ pl: 2, mb: 3 }}>
                 <Typography component="li">
-                  Experto en jamón ibérico 100% de bellota.
+                  Cortador de jamonería Tartessos.
                 </Typography>
                 <Typography component="li">
-                  Participante habitual en ferias gastronómicas.
+                  Participante de la Liga Nacional de Cortadores.
                 </Typography>
                 <Typography component="li">
-                  Formación continua en corte y presentación.
+                  Contacta para eventos privados y catas.
                 </Typography>
               </Box>
             </Grid>

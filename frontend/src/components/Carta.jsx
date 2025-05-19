@@ -115,6 +115,7 @@ const CartaCompleta = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [isJefe, setIsJefe] = useState(false); // State to track if user is Jefe
   const navigate = useNavigate();
 
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
@@ -131,6 +132,43 @@ const CartaCompleta = () => {
     "Platos": <DinnerDiningIcon sx={{ mr: 2, fontSize: "2rem" }} />,
     "Postres": <IcecreamIcon sx={{ mr: 2, fontSize: "2rem" }} />,
   };
+
+  // Check if user is logged in and has the role "Jefe"
+useEffect(() => {
+  const checkAuth = () => {
+    const authData = localStorage.getItem("auth");
+    console.log("authData:", authData);
+    if (authData) {
+      try {
+        const parsedData = JSON.parse(authData);
+        console.log("parsedData:", parsedData);
+        const { isAuthenticated, user } = parsedData;
+        console.log("isAuthenticated:", isAuthenticated);
+        console.log("user:", user);
+        if (user) {
+          console.log("user.tipo:", user.tipo); // Log the correct field
+        }
+        if (isAuthenticated && user && user.tipo === "Jefe") {
+          setIsJefe(true);
+        } else {
+          setIsJefe(false);
+        }
+      } catch (err) {
+        console.error("Error parsing auth data:", err);
+        setIsJefe(false);
+      }
+    } else {
+      setIsJefe(false);
+    }
+  };
+
+  checkAuth(); // Initial check
+  window.addEventListener("storage", checkAuth); // Listen for storage changes
+
+  return () => {
+    window.removeEventListener("storage", checkAuth); // Cleanup
+  };
+}, []);
 
   const fetchData = async () => {
     try {
@@ -270,7 +308,7 @@ const CartaCompleta = () => {
           justifyContent: "center",
           alignItems: "center",
           minHeight: "100vh",
-          backgroundColor: "#F5F5F5", // Fondo claro durante carga
+          backgroundColor: "#F5F5F5",
         }}
       >
         <CircularProgress size={60} sx={{ color: "#065f46" }} />
@@ -284,7 +322,7 @@ const CartaCompleta = () => {
         maxWidth="sm"
         sx={{
           py: 10,
-          backgroundColor: "#F5F5F5", // Fondo claro para error
+          backgroundColor: "#F5F5F5",
         }}
       >
         <Alert
@@ -461,22 +499,24 @@ const CartaCompleta = () => {
                           },
                         }}
                       />
-                      <IconButton
-                        aria-label="delete"
-                        onClick={() => handleOpenDeleteDialog(producto)}
-                        sx={{
-                          position: "absolute",
-                          right: 8,
-                          top: 8,
-                          color: "#ffffff",
-                          backgroundColor: "rgba(0,0,0,0.5)",
-                          "&:hover": {
-                            backgroundColor: "rgba(0,0,0,0.7)",
-                          },
-                        }}
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
+                      {isJefe && (
+                        <IconButton
+                          aria-label="delete"
+                          onClick={() => handleOpenDeleteDialog(producto)}
+                          sx={{
+                            position: "absolute",
+                            right: 8,
+                            top: 8,
+                            color: "#ffffff",
+                            backgroundColor: "rgba(0,0,0,0.5)",
+                            "&:hover": {
+                              backgroundColor: "rgba(0,0,0,0.7)",
+                            },
+                          }}
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      )}
                       <CardContent sx={{ flexGrow: 1, p: 2 }}>
                         <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
                           <Typography
@@ -582,22 +622,24 @@ const CartaCompleta = () => {
                               },
                             }}
                           />
-                          <IconButton
-                            aria-label="delete"
-                            onClick={() => handleOpenDeleteDialog(producto)}
-                            sx={{
-                              position: "absolute",
-                              right: 8,
-                              top: 8,
-                              color: "#ffffff",
-                              backgroundColor: "rgba(0,0,0,0.5)",
-                              "&:hover": {
-                                backgroundColor: "rgba(0,0,0,0.7)",
-                              },
-                            }}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
+                          {isJefe && (
+                            <IconButton
+                              aria-label="delete"
+                              onClick={() => handleOpenDeleteDialog(producto)}
+                              sx={{
+                                position: "absolute",
+                                right: 8,
+                                top: 8,
+                                color: "#ffffff",
+                                backgroundColor: "rgba(0,0,0,0.5)",
+                                "&:hover": {
+                                  backgroundColor: "rgba(0,0,0,0.7)",
+                                },
+                              }}
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          )}
                           <CardContent sx={{ flexGrow: 1, p: 2 }}>
                             <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
                               <Typography
@@ -730,9 +772,11 @@ const CartaCompleta = () => {
         </Alert>
       </Snackbar>
 
-      <AddButton variant="contained" onClick={() => navigate("/añadirProducto")}>
-        <AddIcon />
-      </AddButton>
+      {isJefe && (
+        <AddButton variant="contained" onClick={() => navigate("/añadirProducto")}>
+          <AddIcon />
+        </AddButton>
+      )}
     </Box>
   );
 };
