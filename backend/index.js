@@ -6,6 +6,7 @@ const productoRoutes = require("./routes/productoRoutes");
 const categoriaRoutes = require("./routes/categoriaRoutes");
 const resenaRoutes = require("./routes/resenaRoutes"); // Asegúrate de importar las rutas de reseñas
 const config = require("./config/config");
+const path = require("path"); // Importar el módulo path
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -18,6 +19,9 @@ app.use(cors({
 
 app.use(express.json());
 app.use(cookieParser());
+
+// Configurar la carpeta images como estática para servir imágenes
+app.use("/images", express.static(path.join(__dirname, "images")));
 
 // Configurar rutas de la API
 app.use("/api", usuarioRoutes);

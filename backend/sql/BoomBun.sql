@@ -80,20 +80,20 @@ INSERT INTO Categoria (Nombre, Orden) VALUES
 
 -- 2. Insertar Todos los Alérgenos
 INSERT INTO Alergeno (Nombre, Imagen) VALUES
-('Cereales con gluten', NULL),
-('Leche y derivados', NULL),
-('Huevos y derivados', NULL),
-('Crustáceos', NULL),
-('Moluscos y derivados', NULL),
-('Pescado y derivados', NULL),
-('Frutos de cáscara', NULL),
-('Cacahuetes', NULL),
-('Soja', NULL),
-('Apio y derivados', NULL),
-('Granos de sésamo', NULL),
-('Mostaza', NULL),
-('Altramuces', NULL),
-('Dióxido de azufre y sulfitos', NULL);
+('Cereales con gluten', 'images/cereales.png'),
+('Leche y derivados', 'images/leche.png'),
+('Huevos y derivados', 'images/huevos.png'),
+('Crustáceos', 'images/crustaceo.png'),
+('Moluscos y derivados', 'images/molusco.png'),
+('Pescado y derivados', 'images/pescado.png'),
+('Frutos de cáscara', 'images/frutos_secos.png'),
+('Cacahuetes', 'images/cacahuete.png'),
+('Soja', 'images/soja.png'),
+('Apio y derivados', 'images/apio.png'),
+('Granos de sésamo', 'images/sesamo.png'),
+('Mostaza', 'images/mostaza.png'),
+('Altramuces', 'images/altramuces.png'),
+('Dióxido de azufre y sulfitos', 'images/dioxido.png');
 
 -- 3. Insertar Productos (incluyendo nuevos)
 INSERT INTO Producto (Nombre, Descripcion, Foto, ID_Categoria) VALUES

@@ -208,8 +208,6 @@ function Resena() {
     setAnchorEl(null);
   };
 
-  
-
   return (
     <Box
       sx={{
@@ -444,6 +442,7 @@ function Resena() {
                 maxWidth: { xs: "100%", sm: 800, md: 1200 },
                 width: "100%",
                 mx: "auto",
+                marginTop: 4,
               }}
             >
               <Typography
@@ -453,9 +452,10 @@ function Resena() {
                   mb: 3,
                   fontWeight: 600,
                   textAlign: "center",
+                  marginTop: 2,
                 }}
               >
-                Deja tu reseña
+                Escríbenos como fue tu experiencia
               </Typography>
 
               {/* Puntuación */}
@@ -463,11 +463,12 @@ function Resena() {
                 sx={{
                   mb: 3,
                   display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
+                  alignItems: "center", // Alinea verticalmente
+                  gap: 2, // Espacio entre el texto y las estrellas
+                  marginLeft: 1,
                 }}
               >
-                <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
+                <Typography variant="body1" sx={{ fontWeight: 500 }}>
                   Puntuación:
                 </Typography>
                 <Rating

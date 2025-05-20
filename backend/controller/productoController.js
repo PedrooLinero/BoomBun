@@ -3,10 +3,13 @@ const { logMensaje } = require("../utils/logger.js");
 const initModels = require("../models/init-models.js").initModels;
 const sequelize = require("../config/sequelize.js");
 
+
 const models = initModels(sequelize);
 const Producto = models.Producto;
 const Categoria = models.Categoria;
 const PrecioProducto = models.PrecioProducto;
+const Alergeno = models.Alergeno;
+
 
 // Función auxiliar para validar ID_Producto
 const validarIdProducto = (ID_Producto) => {
@@ -45,21 +48,28 @@ const formatearProducto = (producto) => ({
 
 class ProductosController {
   async getAllProducts(req, res) {
-    try {
-      const productos = await Producto.findAll({
-        attributes: ["ID_Producto", "Nombre", "Descripcion", "Foto", "ID_Categoria"],
-        include: [
-          { model: Categoria, attributes: ["Nombre"] },
-          { model: PrecioProducto, as: 'Precios', attributes: ["Formato", "Precio"] }
-        ]
-      });
-      const productosFormateados = productos.map(formatearProducto);
-      return res.status(200).json(Respuesta.exito(productosFormateados));
-    } catch (err) {
-      logMensaje(`Error al obtener productos: ${err.message}`, "error");
-      return res.status(500).json(Respuesta.error(null, "Error al obtener los productos"));
-    }
+  try {
+    const productos = await Producto.findAll({
+      attributes: ["ID_Producto", "Nombre", "Descripcion", "Foto", "ID_Categoria"],
+      include: [
+        { model: Categoria, attributes: ["Nombre"] },
+        { model: PrecioProducto, as: 'Precios', attributes: ["Formato", "Precio"] },
+        {
+          model: Alergeno,
+          as: 'Alergenos', // Especificamos el alias para que coincida con el frontend
+          attributes: ["ID_Alergeno", "Nombre", "Imagen"],
+          through: { attributes: [] } // Esto evita incluir los atributos de la tabla intermedia
+        }
+      ]
+    });
+
+    const productosFormateados = productos.map(formatearProducto);
+    return res.status(200).json(Respuesta.exito(productosFormateados));
+  } catch (err) {
+    logMensaje(`Error al obtener productos: ${err.message}`, "error");
+    return res.status(500).json(Respuesta.error(null, "Error al obtener los productos"));
   }
+}
 
   async getProductById(req, res) {
     try {
