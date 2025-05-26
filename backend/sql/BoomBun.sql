@@ -389,3 +389,6 @@ INSERT INTO Reseña (ID_Usuario, ID_Producto, Texto, Puntuacion, Fecha) VALUES
 (4, 27, 'El Adobo es crujiente y sabroso, ¡me encanta!', 4.8, '2024-10-04'),
 (5, 35, 'Las Lagrimitas caseras son una delicia, ¡volveré por más!', 5.0, '2024-10-05'),
 (5, 50, 'La Extra de salsa es el toque perfecto para cualquier plato.', 3.0, '2024-10-06');
+
+-- Actualizar las rutas de las imágenes existentes
+UPDATE alergenos SET Imagen = 'uploads/' || Imagen WHERE Imagen IS NOT NULL;

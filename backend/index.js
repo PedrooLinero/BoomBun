@@ -7,6 +7,7 @@ const categoriaRoutes = require("./routes/categoriaRoutes");
 const resenaRoutes = require("./routes/resenaRoutes"); // Asegúrate de importar las rutas de reseñas
 const config = require("./config/config");
 const path = require("path"); // Importar el módulo path
+const alergenoRoutes = require("./routes/alergenoRoutes");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -22,12 +23,14 @@ app.use(cookieParser());
 
 // Configurar la carpeta images como estática para servir imágenes
 app.use("/images", express.static(path.join(__dirname, "images")));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Configurar rutas de la API
 app.use("/api", usuarioRoutes);
 app.use("/api", productoRoutes);
 app.use("/api", categoriaRoutes);
 app.use("/api", resenaRoutes); // Asegúrate de importar y usar las rutas de reseñas
+app.use("/api", alergenoRoutes)
 
 // Manejar rutas no encontradas (404)
 app.use((req, res, next) => {

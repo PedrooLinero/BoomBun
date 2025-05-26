@@ -1,5 +1,5 @@
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define(
+  const Producto = sequelize.define(
     "Producto",
     {
       ID_Producto: {
@@ -35,4 +35,14 @@ module.exports = function(sequelize, DataTypes) {
       timestamps: false
     }
   );
+
+  Producto.associate = function(models) {
+    Producto.belongsToMany(models.Alergeno, {
+      through: "Producto_Alergeno",
+      foreignKey: "ID_Producto",
+      otherKey: "ID_Alergeno"
+    });
+  };
+
+  return Producto;
 };

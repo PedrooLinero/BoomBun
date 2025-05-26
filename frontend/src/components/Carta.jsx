@@ -38,9 +38,8 @@ import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/material/styles";
 
 const ProductCard = styled(Card)(({ theme }) => ({
-  height: "100%",
   display: "flex",
-  flexDirection: "column",
+  flexDirection: "row",
   borderRadius: "12px",
   overflow: "hidden",
   boxShadow: "0 3px 15px rgba(0,0,0,0.1)",
@@ -50,9 +49,7 @@ const ProductCard = styled(Card)(({ theme }) => ({
     boxShadow: "0 6px 20px rgba(0,0,0,0.15)",
   },
   background: "#ffffff",
-  [theme.breakpoints.down("sm")]: {
-    marginBottom: theme.spacing(2),
-  },
+  marginBottom: theme.spacing(2),
 }));
 
 const CategoryHeader = styled(Box)(({ theme }) => ({
@@ -127,48 +124,48 @@ const CartaCompleta = () => {
 
   // Mapa de íconos por categoría (ajusta según tus categorías reales)
   const categoryIcons = {
-    "Cervezas": <LocalBarIcon sx={{ mr: 2, fontSize: "2rem" }} />,
-    "Tapas": <RestaurantIcon sx={{ mr: 2, fontSize: "2rem" }} />,
-    "Platos": <DinnerDiningIcon sx={{ mr: 2, fontSize: "2rem" }} />,
-    "Postres": <IcecreamIcon sx={{ mr: 2, fontSize: "2rem" }} />,
+    Cervezas: <LocalBarIcon sx={{ mr: 2, fontSize: "2rem" }} />,
+    Tapas: <RestaurantIcon sx={{ mr: 2, fontSize: "2rem" }} />,
+    Platos: <DinnerDiningIcon sx={{ mr: 2, fontSize: "2rem" }} />,
+    Postres: <IcecreamIcon sx={{ mr: 2, fontSize: "2rem" }} />,
   };
 
   // Check if user is logged in and has the role "Jefe"
-useEffect(() => {
-  const checkAuth = () => {
-    const authData = localStorage.getItem("auth");
-    console.log("authData:", authData);
-    if (authData) {
-      try {
-        const parsedData = JSON.parse(authData);
-        console.log("parsedData:", parsedData);
-        const { isAuthenticated, user } = parsedData;
-        console.log("isAuthenticated:", isAuthenticated);
-        console.log("user:", user);
-        if (user) {
-          console.log("user.tipo:", user.tipo); // Log the correct field
-        }
-        if (isAuthenticated && user && user.tipo === "Jefe") {
-          setIsJefe(true);
-        } else {
+  useEffect(() => {
+    const checkAuth = () => {
+      const authData = localStorage.getItem("auth");
+      console.log("authData:", authData);
+      if (authData) {
+        try {
+          const parsedData = JSON.parse(authData);
+          console.log("parsedData:", parsedData);
+          const { isAuthenticated, user } = parsedData;
+          console.log("isAuthenticated:", isAuthenticated);
+          console.log("user:", user);
+          if (user) {
+            console.log("user.tipo:", user.tipo); // Log the correct field
+          }
+          if (isAuthenticated && user && user.tipo === "Jefe") {
+            setIsJefe(true);
+          } else {
+            setIsJefe(false);
+          }
+        } catch (err) {
+          console.error("Error parsing auth data:", err);
           setIsJefe(false);
         }
-      } catch (err) {
-        console.error("Error parsing auth data:", err);
+      } else {
         setIsJefe(false);
       }
-    } else {
-      setIsJefe(false);
-    }
-  };
+    };
 
-  checkAuth(); // Initial check
-  window.addEventListener("storage", checkAuth); // Listen for storage changes
+    checkAuth(); // Initial check
+    window.addEventListener("storage", checkAuth); // Listen for storage changes
 
-  return () => {
-    window.removeEventListener("storage", checkAuth); // Cleanup
-  };
-}, []);
+    return () => {
+      window.removeEventListener("storage", checkAuth); // Cleanup
+    };
+  }, []);
 
   const fetchData = async () => {
     try {
@@ -227,7 +224,9 @@ useEffect(() => {
     }
 
     if (selectedCategory) {
-      filtered = filtered.filter((prod) => prod.ID_Categoria == selectedCategory);
+      filtered = filtered.filter(
+        (prod) => prod.ID_Categoria == selectedCategory
+      );
     }
 
     setFilteredProductos(filtered);
@@ -262,7 +261,9 @@ useEffect(() => {
         setSuccessMessage(data.mensaje);
         setOpenSuccessSnackbar(true);
         setProductos(
-          productos.filter((prod) => prod.ID_Producto !== productToDelete.ID_Producto)
+          productos.filter(
+            (prod) => prod.ID_Producto !== productToDelete.ID_Producto
+          )
         );
       } else {
         throw new Error(data.mensaje || "Error al eliminar el producto");
@@ -299,6 +300,20 @@ useEffect(() => {
     setSearchTerm("");
     setSelectedCategory("");
   };
+
+  // Extraer todos los alérgenos únicos de los productos
+  const allAlergenos = Array.from(
+    new Set(
+      productos
+        .flatMap((prod) => prod.Alergenos || [])
+        .map((alergeno) => alergeno.Nombre)
+    )
+  ).map((nombre) => {
+    const alergeno = productos
+      .flatMap((prod) => prod.Alergenos || [])
+      .find((a) => a.Nombre === nombre);
+    return { Nombre: nombre, Imagen: alergeno?.Imagen };
+  });
 
   if (loading) {
     return (
@@ -382,13 +397,21 @@ useEffect(() => {
             fontSize: { xs: "0.9rem", md: "1rem" },
           }}
         >
-          Descubre las mejores cervezas artesanales, tapas y platos en Cervecería Boom Bun.
+          Descubre las mejores cervezas artesanales, tapas y platos en
+          Cervecería Boom Bun.
         </Typography>
       </Box>
 
       <Container maxWidth="xl" sx={{ py: 4 }}>
         {/* Barra de búsqueda y filtros */}
-        <Box sx={{ mb: 4, display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 2 }}>
+        <Box
+          sx={{
+            mb: 4,
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            gap: 2,
+          }}
+        >
           <TextField
             fullWidth
             variant="outlined"
@@ -458,7 +481,11 @@ useEffect(() => {
           <Button
             variant="outlined"
             onClick={handleResetFilters}
-            sx={{ color: "#065f46", borderColor: "#065f46", backgroundColor: "white" }}
+            sx={{
+              color: "#065f46",
+              borderColor: "#065f46",
+              backgroundColor: "white",
+            }}
           >
             Limpiar filtros
           </Button>
@@ -468,7 +495,10 @@ useEffect(() => {
           <Fade in timeout={1000}>
             <Box sx={{ mb: 6 }}>
               <CategoryHeader>
-                {categoryIcons[categorias.find((c) => c.ID_Categoria == selectedCategory)?.Nombre] || <LocalBarIcon sx={{ mr: 2, fontSize: "2rem" }} />}
+                {categoryIcons[
+                  categorias.find((c) => c.ID_Categoria == selectedCategory)
+                    ?.Nombre
+                ] || <LocalBarIcon sx={{ mr: 2, fontSize: "2rem" }} />}
                 <Typography
                   variant="h5"
                   sx={{
@@ -476,106 +506,183 @@ useEffect(() => {
                     fontSize: { xs: "1.25rem", md: "1.75rem" },
                   }}
                 >
-                  {categorias.find((c) => c.ID_Categoria == selectedCategory)?.Nombre}
+                  {
+                    categorias.find((c) => c.ID_Categoria == selectedCategory)
+                      ?.Nombre
+                  }
                 </Typography>
               </CategoryHeader>
               <Grid container spacing={{ xs: 2, md: 3 }}>
                 {getProductosPorCategoria(selectedCategory).map((producto) => (
-                  <Grid item xs={12} sm={6} md={4} lg={3} key={producto.ID_Producto}>
+                  <Grid
+                    item
+                    xs={12}
+                    sm={12}
+                    md={6}
+                    lg={4}
+                    key={producto.ID_Producto}
+                  >
                     <ProductCard>
-                      <CardMedia
-                        component="img"
-                        height={{ xs: "180", md: "220" }}
-                        image={
-                          producto.ImagenURL ||
-                          "https://via.placeholder.com/400x260?text=Sin+Imagen"
-                        }
-                        alt={producto.Nombre}
+                      <Box
                         sx={{
-                          objectFit: "cover",
-                          transition: "transform 0.3s ease",
-                          "&:hover": {
-                            transform: "scale(1.03)",
-                          },
+                          position: "relative",
+                          width: "100%",
+                          display: "flex",
+                          flexDirection: "row",
                         }}
-                      />
-                      {isJefe && (
-                        <IconButton
-                          aria-label="delete"
-                          onClick={() => handleOpenDeleteDialog(producto)}
+                      >
+                        <Box sx={{ flex: 1, p: 2 }}>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              mb: 1,
+                            }}
+                          >
+                            <Typography
+                              variant="h6"
+                              sx={{
+                                fontWeight: 600,
+                                flexGrow: 1,
+                                color: "#1a1a1a",
+                                fontSize: { xs: "1rem", md: "1.25rem" },
+                              }}
+                            >
+                              {producto.Nombre}
+                            </Typography>
+                            {producto.Precios?.some(
+                              (p) => p.Formato === "Nuevo"
+                            ) && (
+                              <Chip
+                                label="Nuevo"
+                                size="small"
+                                sx={{
+                                  ml: 1,
+                                  fontWeight: 600,
+                                  backgroundColor: "#ff6b6b",
+                                  color: "#ffffff",
+                                  fontSize: { xs: "0.7rem", md: "0.8rem" },
+                                }}
+                              />
+                            )}
+                          </Box>
+                          {producto.Descripcion && (
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                mb: 2,
+                                color: "#666666",
+                                lineHeight: 1.5,
+                                fontSize: { xs: "0.85rem", md: "0.9rem" },
+                              }}
+                            >
+                              {producto.Descripcion}
+                            </Typography>
+                          )}
+                          <Box
+                            sx={{
+                              display: "flex",
+                              flexWrap: "wrap",
+                              gap: 1,
+                              mb: 2,
+                            }}
+                          >
+                            {producto.Precios?.map((precio, idx) => (
+                              <PriceTag
+                                key={idx}
+                                label={`${precio.Formato}: ${precio.Precio}€`}
+                                size="small"
+                              />
+                            ))}
+                          </Box>
+                          <Box sx={{ borderTop: "1px solid #e0e0e0", my: 1 }} />
+                          {producto.Alergenos &&
+                            producto.Alergenos.length > 0 && (
+                              <Box sx={{ mb: 2 }}>
+                                <Typography
+                                  variant="subtitle2"
+                                  sx={{ fontWeight: 500, color: "#666", mb: 1 }}
+                                >
+                                  Alérgenos:
+                                </Typography>
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    flexWrap: "wrap",
+                                    gap: 1,
+                                  }}
+                                >
+                                  {producto.Alergenos.map((alergeno) => (
+                                    <Chip
+                                      key={alergeno.ID_Alergeno}
+                                      icon={
+                                        <img
+                                          src={`http://localhost:3000/${alergeno.Imagen}`}
+                                          alt={alergeno.Nombre}
+                                          style={{ width: 20, height: 20 }}
+                                        />
+                                      }
+                                      label={alergeno.Nombre}
+                                      size="small"
+                                      sx={{
+                                        backgroundColor: "#fff3e0",
+                                        color: "#333",
+                                        fontSize: {
+                                          xs: "0.7rem",
+                                          md: "0.8rem",
+                                        },
+                                      }}
+                                    />
+                                  ))}
+                                </Box>
+                              </Box>
+                            )}
+                          <IconButton
+                            onClick={() => handleShare(producto)}
+                            sx={{
+                              color: "#065f46",
+                              "&:hover": { color: "#047857" },
+                            }}
+                          >
+                            <ShareIcon fontSize="small" />
+                          </IconButton>
+                        </Box>
+                        <CardMedia
+                          component="img"
                           sx={{
-                            position: "absolute",
-                            right: 8,
-                            top: 8,
-                            color: "#ffffff",
-                            backgroundColor: "rgba(0,0,0,0.5)",
+                            width: 200,
+                            height: 200,
+                            objectFit: "cover",
+                            transition: "transform 0.3s ease",
                             "&:hover": {
-                              backgroundColor: "rgba(0,0,0,0.7)",
+                              transform: "scale(1.03)",
                             },
                           }}
-                        >
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
-                      )}
-                      <CardContent sx={{ flexGrow: 1, p: 2 }}>
-                        <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                          <Typography
-                            variant="h6"
+                          image={
+                            producto.ImagenURL ||
+                            "https://via.placeholder.com/400x260?text=Sin+Imagen"
+                          }
+                          alt={producto.Nombre}
+                        />
+                        {isJefe && (
+                          <IconButton
+                            aria-label="delete"
+                            onClick={() => handleOpenDeleteDialog(producto)}
                             sx={{
-                              fontWeight: 600,
-                              flexGrow: 1,
-                              color: "#1a1a1a",
-                              fontSize: { xs: "1rem", md: "1.25rem" },
+                              position: "absolute",
+                              right: 8,
+                              top: 8,
+                              color: "#ffffff",
+                              backgroundColor: "rgba(0,0,0,0.5)",
+                              "&:hover": {
+                                backgroundColor: "rgba(0,0,0,0.7)",
+                              },
                             }}
                           >
-                            {producto.Nombre}
-                          </Typography>
-                          {producto.Precios?.some((p) => p.Formato === "Nuevo") && (
-                            <Chip
-                              label="Nuevo"
-                              size="small"
-                              sx={{
-                                ml: 1,
-                                fontWeight: 600,
-                                backgroundColor: "#ff6b6b",
-                                color: "#ffffff",
-                                fontSize: { xs: "0.7rem", md: "0.8rem" },
-                              }}
-                            />
-                          )}
-                        </Box>
-                        {producto.Descripcion && (
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              mb: 2,
-                              color: "#666666",
-                              lineHeight: 1.5,
-                              fontSize: { xs: "0.85rem", md: "0.9rem" },
-                            }}
-                          >
-                            {producto.Descripcion}
-                          </Typography>
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
                         )}
-                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 1 }}>
-                          {producto.Precios?.map((precio, idx) => (
-                            <PriceTag
-                              key={idx}
-                              label={`${precio.Formato}: ${precio.Precio}€`}
-                              size="small"
-                            />
-                          ))}
-                        </Box>
-                        <IconButton
-                          onClick={() => handleShare(producto)}
-                          sx={{
-                            color: "#065f46",
-                            "&:hover": { color: "#047857" },
-                          }}
-                        >
-                          <ShareIcon fontSize="small" />
-                        </IconButton>
-                      </CardContent>
+                      </Box>
                     </ProductCard>
                   </Grid>
                 ))}
@@ -584,14 +691,18 @@ useEffect(() => {
           </Fade>
         ) : (
           categorias.map((categoria) => {
-            const productosCategoria = getProductosPorCategoria(categoria.ID_Categoria);
+            const productosCategoria = getProductosPorCategoria(
+              categoria.ID_Categoria
+            );
             if (productosCategoria.length === 0) return null;
 
             return (
               <Fade in timeout={1000} key={categoria.ID_Categoria}>
                 <Box sx={{ mb: 6 }}>
                   <CategoryHeader>
-                    {categoryIcons[categoria.Nombre] || <LocalBarIcon sx={{ mr: 2, fontSize: "2rem" }} />}
+                    {categoryIcons[categoria.Nombre] || (
+                      <LocalBarIcon sx={{ mr: 2, fontSize: "2rem" }} />
+                    )}
                     <Typography
                       variant="h5"
                       sx={{
@@ -604,101 +715,185 @@ useEffect(() => {
                   </CategoryHeader>
                   <Grid container spacing={{ xs: 2, md: 3 }}>
                     {productosCategoria.map((producto) => (
-                      <Grid item xs={12} sm={6} md={4} lg={3} key={producto.ID_Producto}>
+                      <Grid
+                        item
+                        xs={12}
+                        sm={12}
+                        md={6}
+                        lg={4}
+                        key={producto.ID_Producto}
+                      >
                         <ProductCard>
-                          <CardMedia
-                            component="img"
-                            height={{ xs: "180", md: "220" }}
-                            image={
-                              producto.ImagenURL ||
-                              "https://via.placeholder.com/400x260?text=Sin+Imagen"
-                            }
-                            alt={producto.Nombre}
+                          <Box
                             sx={{
-                              objectFit: "cover",
-                              transition: "transform 0.3s ease",
-                              "&:hover": {
-                                transform: "scale(1.03)",
-                              },
+                              position: "relative",
+                              width: "100%",
+                              display: "flex",
+                              flexDirection: "row",
                             }}
-                          />
-                          {isJefe && (
-                            <IconButton
-                              aria-label="delete"
-                              onClick={() => handleOpenDeleteDialog(producto)}
+                          >
+                            <Box sx={{ flex: 1, p: 2 }}>
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  mb: 1,
+                                }}
+                              >
+                                <Typography
+                                  variant="h6"
+                                  sx={{
+                                    fontWeight: 600,
+                                    flexGrow: 1,
+                                    color: "#1a1a1a",
+                                    fontSize: { xs: "1rem", md: "1.25rem" },
+                                  }}
+                                >
+                                  {producto.Nombre}
+                                </Typography>
+                                {producto.Precios?.some(
+                                  (p) => p.Formato === "Nuevo"
+                                ) && (
+                                  <Chip
+                                    label="Nuevo"
+                                    size="small"
+                                    sx={{
+                                      ml: 1,
+                                      fontWeight: 600,
+                                      backgroundColor: "#ff6b6b",
+                                      color: "#ffffff",
+                                      fontSize: { xs: "0.7rem", md: "0.8rem" },
+                                    }}
+                                  />
+                                )}
+                              </Box>
+                              {producto.Descripcion && (
+                                <Typography
+                                  variant="body2"
+                                  sx={{
+                                    mb: 2,
+                                    color: "#666666",
+                                    lineHeight: 1.5,
+                                    fontSize: { xs: "0.85rem", md: "0.9rem" },
+                                  }}
+                                >
+                                  {producto.Descripcion}
+                                </Typography>
+                              )}
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  flexWrap: "wrap",
+                                  gap: 1,
+                                  mb: 2,
+                                }}
+                              >
+                                {producto.Precios?.map((precio, idx) => (
+                                  <PriceTag
+                                    key={idx}
+                                    label={`${precio.Formato}: ${precio.Precio}€`}
+                                    size="small"
+                                  />
+                                ))}
+                              </Box>
+                              <Box
+                                sx={{ borderTop: "1px solid #e0e0e0", my: 1 }}
+                              />
+                              {producto.Alergenos &&
+                                producto.Alergenos.length > 0 && (
+                                  <Box sx={{ mb: 2 }}>
+                                    <Typography
+                                      variant="subtitle2"
+                                      sx={{
+                                        fontWeight: 500,
+                                        color: "#666",
+                                        mb: 1,
+                                      }}
+                                    >
+                                      Alérgenos:
+                                    </Typography>
+                                    <Box
+                                      sx={{
+                                        display: "flex",
+                                        flexWrap: "wrap",
+                                        gap: 1,
+                                      }}
+                                    >
+                                      {producto.Alergenos.map((alergeno) => (
+                                        <Chip
+                                          key={alergeno.ID_Alergeno}
+                                          icon={
+                                            <img
+                                              src={`http://localhost:3000/${alergeno.Imagen}`}
+                                              alt={alergeno.Nombre}
+                                              style={{ width: 20, height: 20 }}
+                                            />
+                                          }
+                                          label={alergeno.Nombre}
+                                          size="small"
+                                          sx={{
+                                            backgroundColor: "#fff3e0",
+                                            color: "#333",
+                                            fontSize: {
+                                              xs: "0.7rem",
+                                              md: "0.8rem",
+                                            },
+                                          }}
+                                        />
+                                      ))}
+                                    </Box>
+                                  </Box>
+                                )}
+                              <IconButton
+                                onClick={() => handleShare(producto)}
+                                sx={{
+                                  color: "#065f46",
+                                  "&:hover": { color: "#047857" },
+                                }}
+                              >
+                                <ShareIcon fontSize="small" />
+                              </IconButton>
+                            </Box>
+                            <CardMedia
+                              component="img"
                               sx={{
-                                position: "absolute",
-                                right: 8,
-                                top: 8,
-                                color: "#ffffff",
-                                backgroundColor: "rgba(0,0,0,0.5)",
+                                width: 200,
+                                height: 230,
+                                objectFit: "cover",
+                                display: "block", // Ensures no extra space below the image
+                                margin: 0, // Removes any default margin
+                                padding: 0, // Removes any default padding
+                                transition: "transform 0.3s ease",
                                 "&:hover": {
-                                  backgroundColor: "rgba(0,0,0,0.7)",
+                                  transform: "scale(1.03)",
                                 },
                               }}
-                            >
-                              <DeleteIcon fontSize="small" />
-                            </IconButton>
-                          )}
-                          <CardContent sx={{ flexGrow: 1, p: 2 }}>
-                            <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                              <Typography
-                                variant="h6"
+                              image={
+                                producto.Foto
+                                  ? `http://localhost:3000/uploads/${producto.Foto}`
+                                  : "https://via.placeholder.com/400x260?text=Sin+Imagen"
+                              }
+                              alt={producto.Nombre}
+                            />
+                            {isJefe && (
+                              <IconButton
+                                aria-label="delete"
+                                onClick={() => handleOpenDeleteDialog(producto)}
                                 sx={{
-                                  fontWeight: 600,
-                                  flexGrow: 1,
-                                  color: "#1a1a1a",
-                                  fontSize: { xs: "1rem", md: "1.25rem" },
+                                  position: "absolute",
+                                  right: 8,
+                                  top: 8,
+                                  color: "#ffffff",
+                                  backgroundColor: "rgba(0,0,0,0.5)",
+                                  "&:hover": {
+                                    backgroundColor: "rgba(0,0,0,0.7)",
+                                  },
                                 }}
                               >
-                                {producto.Nombre}
-                              </Typography>
-                              {producto.Precios?.some((p) => p.Formato === "Nuevo") && (
-                                <Chip
-                                  label="Nuevo"
-                                  size="small"
-                                  sx={{
-                                    ml: 1,
-                                    fontWeight: 600,
-                                    backgroundColor: "#ff6b6b",
-                                    color: "#ffffff",
-                                    fontSize: { xs: "0.7rem", md: "0.8rem" },
-                                  }}
-                                />
-                              )}
-                            </Box>
-                            {producto.Descripcion && (
-                              <Typography
-                                variant="body2"
-                                sx={{
-                                  mb: 2,
-                                  color: "#666666",
-                                  lineHeight: 1.5,
-                                  fontSize: { xs: "0.85rem", md: "0.9rem" },
-                                }}
-                              >
-                                {producto.Descripcion}
-                              </Typography>
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
                             )}
-                            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 1 }}>
-                              {producto.Precios?.map((precio, idx) => (
-                                <PriceTag
-                                  key={idx}
-                                  label={`${precio.Formato}: ${precio.Precio}€`}
-                                  size="small"
-                                />
-                              ))}
-                            </Box>
-                            <IconButton
-                              onClick={() => handleShare(producto)}
-                              sx={{
-                                color: "#065f46",
-                                "&:hover": { color: "#047857" },
-                              }}
-                            >
-                              <ShareIcon fontSize="small" />
-                            </IconButton>
-                          </CardContent>
+                          </Box>
                         </ProductCard>
                       </Grid>
                     ))}
@@ -710,6 +905,51 @@ useEffect(() => {
         )}
       </Container>
 
+      {/* Leyenda de alérgenos */}
+      <Box
+        sx={{
+          backgroundColor: "#ffffff",
+          padding: 3,
+          borderTop: "1px solid #e0e0e0",
+          marginTop: 4,
+        }}
+      >
+        <Typography
+          variant="h6"
+          sx={{ fontWeight: 600, mb: 2, color: "#1a1a1a", textAlign: "center" }}
+        >
+          Leyenda de Alérgenos
+        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            flexWrap: "wrap",
+            gap: 2,
+          }}
+        >
+          {allAlergenos.map((alergeno, index) => (
+            <Chip
+              key={index}
+              icon={
+                <img
+                  src={`http://localhost:3000/${alergeno.Imagen}`}
+                  alt={alergeno.Nombre}
+                  style={{ width: 20, height: 20 }}
+                />
+              }
+              label={alergeno.Nombre}
+              size="small"
+              sx={{
+                backgroundColor: "#fff3e0",
+                color: "#333",
+                fontSize: { xs: "0.7rem", md: "0.8rem" },
+              }}
+            />
+          ))}
+        </Box>
+      </Box>
+
       <Dialog
         open={openDeleteDialog}
         onClose={handleCloseDeleteDialog}
@@ -720,7 +960,9 @@ useEffect(() => {
           },
         }}
       >
-        <DialogTitle sx={{ fontWeight: 600 }}>Confirmar eliminación</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 600 }}>
+          Confirmar eliminación
+        </DialogTitle>
         <DialogContent>
           <DialogContentText>
             ¿Estás seguro de eliminar el producto "{productToDelete?.Nombre}"?
@@ -773,7 +1015,10 @@ useEffect(() => {
       </Snackbar>
 
       {isJefe && (
-        <AddButton variant="contained" onClick={() => navigate("/añadirProducto")}>
+        <AddButton
+          variant="contained"
+          onClick={() => navigate("/añadirProducto")}
+        >
           <AddIcon />
         </AddButton>
       )}

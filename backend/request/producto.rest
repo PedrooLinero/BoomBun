@@ -5,7 +5,7 @@ GET http://localhost:3000/api/productos
 
 ### Obtener un producto por ID
 
-GET http://localhost:3000/api/productos/64
+GET http://localhost:3000/api/productos/33
 
 ### Añadir un nuevo producto
 

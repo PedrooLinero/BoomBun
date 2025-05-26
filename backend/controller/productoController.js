@@ -2,7 +2,8 @@ const Respuesta = require("../utils/respuesta.js");
 const { logMensaje } = require("../utils/logger.js");
 const initModels = require("../models/init-models.js").initModels;
 const sequelize = require("../config/sequelize.js");
-
+const multer = require("multer");
+const path = require("path");
 
 const models = initModels(sequelize);
 const Producto = models.Producto;
@@ -10,7 +11,30 @@ const Categoria = models.Categoria;
 const PrecioProducto = models.PrecioProducto;
 const Alergeno = models.Alergeno;
 
+// Configuración de multer para subir archivos
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/"); // Carpeta donde se guardarán las fotos
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname)); // Nombre único con timestamp
+  },
+});
 
+const upload = multer({
+  storage: storage,
+  fileFilter: (req, file, cb) => {
+    const fileTypes = /jpeg|jpg|png|gif/;
+    const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = fileTypes.test(file.mimetype);
+
+    if (extname && mimetype) {
+      return cb(null, true);
+    } else {
+      cb(new Error("Solo se permiten imágenes (jpeg, jpg, png, gif)"));
+    }
+  },
+});
 // Función auxiliar para validar ID_Producto
 const validarIdProducto = (ID_Producto) => {
   if (!ID_Producto || isNaN(ID_Producto)) {
@@ -31,8 +55,14 @@ const validarCategoria = async (ID_Categoria) => {
 
 // Función auxiliar para validar Precios
 const validarPrecios = (Precios) => {
-  if (Precios && (!Array.isArray(Precios) || Precios.some(precio => !precio.Formato || precio.Precio == null))) {
-    throw new Error("El formato de Precios es inválido. Debe ser un array de objetos con Formato y Precio");
+  if (
+    Precios &&
+    (!Array.isArray(Precios) ||
+      Precios.some((precio) => !precio.Formato || precio.Precio == null))
+  ) {
+    throw new Error(
+      "El formato de Precios es inválido. Debe ser un array de objetos con Formato y Precio"
+    );
   }
 };
 
@@ -40,36 +70,48 @@ const validarPrecios = (Precios) => {
 const formatearProducto = (producto) => ({
   ...producto.get({ plain: true }),
   Categoria: producto.Categoria?.Nombre,
-  Precios: producto.Precios.map(precio => ({
+  Precios: producto.Precios.map((precio) => ({
     Formato: precio.Formato,
-    Precio: precio.Precio
-  }))
+    Precio: precio.Precio,
+  })),
 });
 
 class ProductosController {
   async getAllProducts(req, res) {
-  try {
-    const productos = await Producto.findAll({
-      attributes: ["ID_Producto", "Nombre", "Descripcion", "Foto", "ID_Categoria"],
-      include: [
-        { model: Categoria, attributes: ["Nombre"] },
-        { model: PrecioProducto, as: 'Precios', attributes: ["Formato", "Precio"] },
-        {
-          model: Alergeno,
-          as: 'Alergenos', // Especificamos el alias para que coincida con el frontend
-          attributes: ["ID_Alergeno", "Nombre", "Imagen"],
-          through: { attributes: [] } // Esto evita incluir los atributos de la tabla intermedia
-        }
-      ]
-    });
+    try {
+      const productos = await Producto.findAll({
+        attributes: [
+          "ID_Producto",
+          "Nombre",
+          "Descripcion",
+          "Foto",
+          "ID_Categoria",
+        ],
+        include: [
+          { model: Categoria, attributes: ["Nombre"] },
+          {
+            model: PrecioProducto,
+            as: "Precios",
+            attributes: ["Formato", "Precio"],
+          },
+          {
+            model: Alergeno,
+            as: "Alergenos",
+            attributes: ["ID_Alergeno", "Nombre", "Imagen"],
+            through: { attributes: [] },
+          },
+        ],
+      });
 
-    const productosFormateados = productos.map(formatearProducto);
-    return res.status(200).json(Respuesta.exito(productosFormateados));
-  } catch (err) {
-    logMensaje(`Error al obtener productos: ${err.message}`, "error");
-    return res.status(500).json(Respuesta.error(null, "Error al obtener los productos"));
+      const productosFormateados = productos.map(formatearProducto);
+      return res.status(200).json(Respuesta.exito(productosFormateados));
+    } catch (err) {
+      logMensaje(`Error al obtener productos: ${err.message}`, "error");
+      return res
+        .status(500)
+        .json(Respuesta.error(null, "Error al obtener los productos"));
+    }
   }
-}
 
   async getProductById(req, res) {
     try {
@@ -77,115 +119,295 @@ class ProductosController {
       validarIdProducto(ID_Producto);
 
       const producto = await Producto.findByPk(ID_Producto, {
-        attributes: ["ID_Producto", "Nombre", "Descripcion", "Foto", "ID_Categoria"],
+        attributes: [
+          "ID_Producto",
+          "Nombre",
+          "Descripcion",
+          "Foto",
+          "ID_Categoria",
+        ],
         include: [
           { model: Categoria, attributes: ["Nombre"] },
-          { model: PrecioProducto, as: 'Precios', attributes: ["Formato", "Precio"] }
-        ]
+          {
+            model: PrecioProducto,
+            as: "Precios",
+            attributes: ["Formato", "Precio"],
+          },
+        ],
       });
 
       if (!producto) {
-        return res.status(404).json(Respuesta.error(null, `Producto con ID ${ID_Producto} no existe`));
+        return res
+          .status(404)
+          .json(
+            Respuesta.error(null, `Producto con ID ${ID_Producto} no existe`)
+          );
       }
 
       return res.status(200).json(Respuesta.exito(formatearProducto(producto)));
     } catch (err) {
       logMensaje(`Error al obtener producto: ${err.message}`, "error");
-      return res.status(err.message.includes("ID_Producto") ? 400 : 500)
-        .json(Respuesta.error(null, err.message.includes("ID_Producto") ? err.message : "Error al obtener el producto"));
+      return res
+        .status(err.message.includes("ID_Producto") ? 400 : 500)
+        .json(
+          Respuesta.error(
+            null,
+            err.message.includes("ID_Producto")
+              ? err.message
+              : "Error al obtener el producto"
+          )
+        );
     }
   }
 
+  // Dentro de controller/productoController.js
+
   async addProduct(req, res) {
     try {
-      const { Nombre, Descripcion, Foto, ID_Categoria, Precios } = req.body;
-      if (!Nombre) throw new Error("Nombre es requerido");
-      await validarCategoria(ID_Categoria);
-      validarPrecios(Precios);
-
-      const resultado = await sequelize.transaction(async (t) => {
-        const nuevoProducto = await Producto.create({
-          Nombre,
-          Descripcion: Descripcion || null,
-          Foto: Foto || null,
-          ID_Categoria
-        }, { transaction: t });
-
-        let preciosCreados = [];
-        if (Precios?.length > 0) {
-          const preciosParaCrear = Precios.map(precio => ({
-            ID_Producto: nuevoProducto.ID_Producto,
-            Formato: precio.Formato,
-            Precio: precio.Precio
-          }));
-          preciosCreados = await PrecioProducto.bulkCreate(preciosParaCrear, { transaction: t });
+      upload.single("Foto")(req, res, async (err) => {
+        if (err) {
+          logMensaje(`Error al subir la foto: ${err.message}`, "error");
+          return res
+            .status(400)
+            .json(Respuesta.error(null, "Error al subir la foto"));
         }
 
-        return {
-          ...nuevoProducto.get({ plain: true }),
-          Precios: preciosCreados.map(precio => ({
-            Formato: precio.Formato,
-            Precio: precio.Precio
-          }))
-        };
-      });
+        let { Nombre, Descripcion, ID_Categoria, Precios, Alergenos } =
+          req.body;
 
-      return res.status(201).json(Respuesta.exito(resultado, "Producto creado correctamente"));
+        // Parsear JSON strings
+        if (typeof Precios === "string") {
+          try {
+            Precios = JSON.parse(Precios);
+          } catch {
+            throw new Error("El formato de Precios no es JSON válido");
+          }
+        }
+        if (typeof Alergenos === "string") {
+          try {
+            Alergenos = JSON.parse(Alergenos);
+          } catch {
+            throw new Error("El formato de Alergenos no es JSON válido");
+          }
+        }
+
+        if (!Nombre) throw new Error("Nombre es requerido");
+        await validarCategoria(ID_Categoria);
+        validarPrecios(Precios);
+
+        const fotoPath = req.file ? req.file.filename : null;
+
+        const resultado = await sequelize.transaction(async (t) => {
+          const nuevoProducto = await Producto.create(
+            {
+              Nombre,
+              Descripcion: Descripcion || null,
+              Foto: fotoPath,
+              ID_Categoria,
+            },
+            { transaction: t }
+          );
+
+          // Crear precios
+          let preciosCreados = [];
+          if (Array.isArray(Precios) && Precios.length) {
+            const preciosParaCrear = Precios.map((p) => ({
+              ID_Producto: nuevoProducto.ID_Producto,
+              Formato: p.Formato,
+              Precio: p.Precio,
+            }));
+            preciosCreados = await PrecioProducto.bulkCreate(preciosParaCrear, {
+              transaction: t,
+            });
+          }
+
+          // Asociar alérgenos
+          if (Array.isArray(Alergenos) && Alergenos.length) {
+            const alergenosIds = Alergenos.map((a) => {
+              if (!a.ID_Alergeno || isNaN(a.ID_Alergeno)) {
+                throw new Error(
+                  "ID_Alergeno inválido en la lista de alérgenos"
+                );
+              }
+              return a.ID_Alergeno;
+            });
+            await nuevoProducto.setAlergenos(alergenosIds, { transaction: t });
+          }
+
+          // Intentar recuperar con alérgenos
+          const productoConAlergenos = await Producto.findByPk(
+            nuevoProducto.ID_Producto,
+            {
+              include: [
+                {
+                  model: Alergeno,
+                  as: "Alergenos",
+                  attributes: ["ID_Alergeno", "Nombre", "Imagen"],
+                  through: { attributes: [] },
+                },
+              ],
+            }
+          );
+
+          // Si por algún motivo no existe (muy improbable), devolvemos los datos básicos
+          if (!productoConAlergenos) {
+            return {
+              ...nuevoProducto.get({ plain: true }),
+              Precios: preciosCreados.map((p) => ({
+                Formato: p.Formato,
+                Precio: p.Precio,
+              })),
+              Alergenos: [],
+            };
+          }
+
+          return {
+            ...productoConAlergenos.get({ plain: true }),
+            Precios: preciosCreados.map((p) => ({
+              Formato: p.Formato,
+              Precio: p.Precio,
+            })),
+            Alergenos: productoConAlergenos.Alergenos,
+          };
+        });
+
+        return res
+          .status(201)
+          .json(Respuesta.exito(resultado, "Producto creado correctamente"));
+      });
     } catch (err) {
       logMensaje(`Error al crear producto: ${err.message}`, "error");
-      return res.status(err.message.includes("requerido") || err.message.includes("categoría") || err.message.includes("Precios") ? 400 : 500)
-        .json(Respuesta.error(null, err.message.includes("requerido") || err.message.includes("categoría") || err.message.includes("Precios") ? err.message : "Error al crear el producto"));
+      const status = /requerido|categoría|Precios|Alergeno/.test(err.message)
+        ? 400
+        : 500;
+      return res.status(status).json(Respuesta.error(null, err.message));
     }
   }
 
   async updateProduct(req, res) {
     try {
       const { ID_Producto } = req.params;
-      const { Nombre, Descripcion, Foto, ID_Categoria, Precios } = req.body;
+      let { Nombre, Descripcion, Foto, ID_Categoria, Precios, Alergenos } =
+        req.body;
+
       validarIdProducto(ID_Producto);
       if (ID_Categoria) await validarCategoria(ID_Categoria);
+
+      // Parsear JSON strings
+      if (typeof Precios === "string") {
+        try {
+          Precios = JSON.parse(Precios);
+        } catch {
+          throw new Error("El formato de Precios no es JSON válido");
+        }
+      }
+      if (typeof Alergenos === "string") {
+        try {
+          Alergenos = JSON.parse(Alergenos);
+        } catch {
+          throw new Error("El formato de Alergenos no es JSON válido");
+        }
+      }
+
       validarPrecios(Precios);
 
       const producto = await Producto.findByPk(ID_Producto);
       if (!producto) {
-        return res.status(404).json(Respuesta.error(null, `Producto con ID ${ID_Producto} no existe`));
+        return res
+          .status(404)
+          .json(
+            Respuesta.error(null, `Producto con ID ${ID_Producto} no existe`)
+          );
       }
 
       const resultado = await sequelize.transaction(async (t) => {
-        await producto.update({
-          Nombre: Nombre || producto.Nombre,
-          Descripcion: Descripcion || producto.Descripcion,
-          Foto: Foto || producto.Foto,
-          ID_Categoria: ID_Categoria || producto.ID_Categoria
-        }, { transaction: t });
+        await producto.update(
+          {
+            Nombre: Nombre || producto.Nombre,
+            Descripcion: Descripcion || producto.Descripcion,
+            Foto: Foto || producto.Foto,
+            ID_Categoria: ID_Categoria || producto.ID_Categoria,
+          },
+          { transaction: t }
+        );
 
+        // Reemplazar precios
         let preciosActualizados = [];
-        if (Precios) {
-          await PrecioProducto.destroy({ where: { ID_Producto }, transaction: t });
-          const preciosParaCrear = Precios.map(precio => ({
+        if (Array.isArray(Precios)) {
+          await PrecioProducto.destroy({
+            where: { ID_Producto },
+            transaction: t,
+          });
+          const preciosParaCrear = Precios.map((p) => ({
             ID_Producto,
-            Formato: precio.Formato,
-            Precio: precio.Precio
+            Formato: p.Formato,
+            Precio: p.Precio,
           }));
-          preciosActualizados = await PrecioProducto.bulkCreate(preciosParaCrear, { transaction: t });
+          preciosActualizados = await PrecioProducto.bulkCreate(
+            preciosParaCrear,
+            { transaction: t }
+          );
         } else {
-          preciosActualizados = await PrecioProducto.findAll({ where: { ID_Producto }, transaction: t });
+          preciosActualizados = await PrecioProducto.findAll({
+            where: { ID_Producto },
+            transaction: t,
+          });
+        }
+
+        // Actualizar alérgenos
+        if (Array.isArray(Alergenos)) {
+          const alergenosIds = Alergenos.map((a) => {
+            if (!a.ID_Alergeno || isNaN(a.ID_Alergeno)) {
+              throw new Error("ID_Alergeno inválido en la lista de alérgenos");
+            }
+            return a.ID_Alergeno;
+          });
+          await producto.setAlergenos(alergenosIds, { transaction: t });
+        }
+
+        // Recuperar producto actualizado
+        const productoActualizado = await Producto.findByPk(ID_Producto, {
+          include: [
+            {
+              model: Alergeno,
+              as: "Alergenos",
+              attributes: ["ID_Alergeno", "Nombre", "Imagen"],
+              through: { attributes: [] },
+            },
+          ],
+        });
+
+        // Guard por si es null
+        if (!productoActualizado) {
+          return {
+            ...producto.get({ plain: true }),
+            Precios: preciosActualizados.map((p) => ({
+              Formato: p.Formato,
+              Precio: p.Precio,
+            })),
+            Alergenos: [],
+          };
         }
 
         return {
-          ...producto.get({ plain: true }),
-          Precios: preciosActualizados.map(precio => ({
-            Formato: precio.Formato,
-            Precio: precio.Precio
-          }))
+          ...productoActualizado.get({ plain: true }),
+          Precios: preciosActualizados.map((p) => ({
+            Formato: p.Formato,
+            Precio: p.Precio,
+          })),
+          Alergenos: productoActualizado.Alergenos,
         };
       });
 
-      return res.status(200).json(Respuesta.exito(resultado, "Producto actualizado correctamente"));
+      return res
+        .status(200)
+        .json(Respuesta.exito(resultado, "Producto actualizado correctamente"));
     } catch (err) {
       logMensaje(`Error al actualizar producto: ${err.message}`, "error");
-      return res.status(err.message.includes("ID_Producto") || err.message.includes("categoría") || err.message.includes("Precios") ? 400 : 500)
-        .json(Respuesta.error(null, err.message.includes("ID_Producto") || err.message.includes("categoría") || err.message.includes("Precios") ? err.message : "Error al actualizar el producto"));
+      const status = /ID_Producto|categoría|Precios|Alergeno/.test(err.message)
+        ? 400
+        : 500;
+      return res.status(status).json(Respuesta.error(null, err.message));
     }
   }
 
@@ -196,15 +418,34 @@ class ProductosController {
 
       const producto = await Producto.findByPk(ID_Producto);
       if (!producto) {
-        return res.status(404).json(Respuesta.error(null, `Producto con ID ${ID_Producto} no existe`));
+        return res
+          .status(404)
+          .json(
+            Respuesta.error(null, `Producto con ID ${ID_Producto} no existe`)
+          );
       }
 
       await producto.destroy();
-      return res.status(200).json(Respuesta.exito(null, `Producto con ID ${ID_Producto} eliminado correctamente`));
+      return res
+        .status(200)
+        .json(
+          Respuesta.exito(
+            null,
+            `Producto con ID ${ID_Producto} eliminado correctamente`
+          )
+        );
     } catch (err) {
       logMensaje(`Error al eliminar producto: ${err.message}`, "error");
-      return res.status(err.message.includes("ID_Producto") ? 400 : 500)
-        .json(Respuesta.error(null, err.message.includes("ID_Producto") ? err.message : "Error al eliminar el producto"));
+      return res
+        .status(err.message.includes("ID_Producto") ? 400 : 500)
+        .json(
+          Respuesta.error(
+            null,
+            err.message.includes("ID_Producto")
+              ? err.message
+              : "Error al eliminar el producto"
+          )
+        );
     }
   }
 }

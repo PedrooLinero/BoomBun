@@ -20,6 +20,8 @@ import {
   CircularProgress,
   InputAdornment,
   Box,
+  Chip,
+  OutlinedInput,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import {
@@ -27,11 +29,14 @@ import {
   Category as CategoryIcon,
   AttachMoney as MoneyIcon,
   RestaurantMenu as RestaurantMenuIcon,
+  Image as ImageIcon,
+  Warning as WarningIcon,
 } from "@mui/icons-material";
 import { apiUrl } from "../pages/config";
 
 export default function AñadirProducto() {
   const [categorias, setCategorias] = useState([]);
+  const [alergenos, setAlergenos] = useState([]); // Estado para los alérgenos
   const navigate = useNavigate();
   const [datos, setDatos] = useState({
     nombre: "",
@@ -53,13 +58,16 @@ export default function AñadirProducto() {
       copa: "",
       botella: "",
     },
+    foto: null, // Estado para la foto (archivo)
+    alergenosSeleccionados: [], // Estado para los alérgenos seleccionados
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
+  // Cargar categorías y alérgenos al montar el componente
   useEffect(() => {
-    fetch("http://localhost:3000/api/categorias")
+    const fetchCategorias = fetch("http://localhost:3000/api/categorias")
       .then((res) =>
         res.ok ? res.json() : Promise.reject("Error al cargar categorías")
       )
@@ -71,6 +79,22 @@ export default function AñadirProducto() {
         console.error(err);
         setError("Error al cargar categorías: " + err.message);
       });
+
+    // En el useEffect que carga los alérgenos
+    const fetchAlergenos = fetch("http://localhost:3000/api/alergenos")
+      .then((res) =>
+        res.ok ? res.json() : Promise.reject("Error al cargar alérgenos")
+      )
+      .then((data) => {
+        const alers = data.datos.map((a) => ({
+          id: a.id,
+          nombre: a.nombre,
+          imagen: a.imagen || null, // Asegurar valor null si no hay imagen
+        }));
+        setAlergenos(alers);
+      });
+
+    Promise.all([fetchCategorias, fetchAlergenos]);
   }, []);
 
   const handleChange = (e) => {
@@ -95,30 +119,60 @@ export default function AñadirProducto() {
     }));
   };
 
+  const handleFotoChange = (e) => {
+    const file = e.target.files[0];
+    setDatos((prev) => ({
+      ...prev,
+      foto: file || null,
+    }));
+  };
+
+  const handleAlergenosChange = (event) => {
+    const { value } = event.target;
+    setDatos((prev) => ({
+      ...prev,
+      alergenosSeleccionados: value,
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     setSuccess(false);
 
-    const requestBody = {
-      Nombre: datos.nombre,
-      Descripcion: datos.descripcion,
-      ID_Categoria: Number(datos.idCategoria),
-      Precios: Object.entries(datos.formatos)
-        .filter(([, activo]) => activo)
-        .map(([formato]) => ({
-          Formato: formato.charAt(0).toUpperCase() + formato.slice(1),
-          Precio: parseFloat(datos.precios[formato]) || 0,
-        })),
-      Foto: null,
-    };
+    // Crear FormData para enviar los datos como multipart/form-data
+    const formData = new FormData();
+    formData.append("Nombre", datos.nombre);
+    formData.append("Descripcion", datos.descripcion);
+    formData.append("ID_Categoria", Number(datos.idCategoria));
+    formData.append(
+      "Precios",
+      JSON.stringify(
+        Object.entries(datos.formatos)
+          .filter(([, activo]) => activo)
+          .map(([formato]) => ({
+            Formato: formato.charAt(0).toUpperCase() + formato.slice(1),
+            Precio: parseFloat(datos.precios[formato]) || 0,
+          }))
+      )
+    );
+    if (datos.foto) {
+      formData.append("Foto", datos.foto);
+    }
+    if (datos.alergenosSeleccionados.length > 0) {
+      formData.append(
+        "Alergenos",
+        JSON.stringify(
+          datos.alergenosSeleccionados.map((id) => ({ ID_Alergeno: id }))
+        )
+      );
+    }
 
     try {
       const response = await fetch(apiUrl + "/productos", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestBody),
+        body: formData, // Enviar como FormData en lugar de JSON
       });
 
       const data = await response.json();
@@ -196,7 +250,11 @@ export default function AñadirProducto() {
             </Box>
 
             {/* Formulario */}
-            <Box component="form" onSubmit={handleSubmit} sx={{ p: { xs: 3, lg: 5 } }}>
+            <Box
+              component="form"
+              onSubmit={handleSubmit}
+              sx={{ p: { xs: 3, lg: 5 } }}
+            >
               {error && (
                 <Alert
                   severity="error"
@@ -325,6 +383,110 @@ export default function AñadirProducto() {
                   />
                 </Grid>
 
+                {/* Tercera fila: Foto */}
+                <Grid item xs={12}>
+                  <TextField
+                    label="Foto del producto"
+                    type="file"
+                    name="foto"
+                    onChange={handleFotoChange}
+                    fullWidth
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    inputProps={{
+                      accept: "image/*", // Solo permitir imágenes
+                    }}
+                    variant="outlined"
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <ImageIcon sx={{ color: "#6b7280" }} />
+                        </InputAdornment>
+                      ),
+                    }}
+                    sx={{
+                      "& .MuiInputLabel-root": {
+                        color: "#065f46",
+                        fontWeight: "bold",
+                      },
+                      "& .MuiInputLabel-root.Mui-focused": {
+                        color: "#065f46",
+                      },
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": { borderColor: "#e5e7eb" },
+                        "&:hover fieldset": { borderColor: "#064e3b" },
+                        "&.Mui-focused fieldset": { borderColor: "#065f46" },
+                        transition: "all 0.3s ease",
+                      },
+                    }}
+                  />
+                </Grid>
+
+                {/* Cuarta fila: Alérgenos */}
+                <Grid item xs={12}>
+                  <FormControl fullWidth variant="outlined">
+                    <InputLabel id="alergenos-label">Alérgenos</InputLabel>
+                    <Select
+                      labelId="alergenos-label"
+                      multiple
+                      value={datos.alergenosSeleccionados}
+                      onChange={handleAlergenosChange}
+                      input={<OutlinedInput label="Alérgenos" />}
+                      renderValue={(selected) => (
+                        <Box
+                          sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}
+                        >
+                          // Dentro del renderValue del Select
+                          {selected.map((id) => {
+                            const a = alergenos.find((x) => x.id === id); // Cambiado de ID_Alergeno a id
+                            return (
+                              <Chip
+                                key={id}
+                                label={a?.nombre ?? id} // Usar nombre en minúscula
+                                sx={{ bgcolor: "#fff3e0", color: "#333" }}
+                              />
+                            );
+                          })}
+                        </Box>
+                      )}
+                    >
+                      {alergenos.map((alergeno) => (
+                        <MenuItem
+                          key={alergeno.id} // Cambiado de ID_Alergeno a id
+                          value={alergeno.id} // Cambiado de ID_Alergeno a id
+                        >
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1,
+                            }}
+                          >
+                            {alergeno.imagen && (
+                              <img
+                                src={
+                                  alergeno.imagen.startsWith("http") // Verificar si es URL absoluta
+                                    ? alergeno.imagen
+                                    : `http://localhost:3000/${alergeno.imagen}`
+                                }
+                                alt={alergeno.nombre}
+                                width={20}
+                                height={20}
+                                onError={(e) => {
+                                  // Manejar errores de carga
+                                  e.target.style.display = "none";
+                                }}
+                              />
+                            )}
+                            {alergeno.nombre}
+                          </Box>
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+
                 {/* Formatos y Precios */}
                 <Grid item xs={12}>
                   <Box
@@ -337,7 +499,12 @@ export default function AñadirProducto() {
                   >
                     <Typography
                       variant="h6"
-                      sx={{ mb: 2, color: "#333", fontWeight: "bold", textAlign: "center" }}
+                      sx={{
+                        mb: 2,
+                        color: "#333",
+                        fontWeight: "bold",
+                        textAlign: "center",
+                      }}
                     >
                       Formatos y Precios
                     </Typography>
@@ -350,7 +517,14 @@ export default function AñadirProducto() {
                         flexWrap: "wrap",
                       }}
                     >
-                      {["tapa", "media", "plato", "unidad", "copa", "botella"].map((formato) => (
+                      {[
+                        "tapa",
+                        "media",
+                        "plato",
+                        "unidad",
+                        "copa",
+                        "botella",
+                      ].map((formato) => (
                         <FormControlLabel
                           key={formato}
                           control={
@@ -364,7 +538,9 @@ export default function AñadirProducto() {
                               }}
                             />
                           }
-                          label={formato.charAt(0).toUpperCase() + formato.slice(1)}
+                          label={
+                            formato.charAt(0).toUpperCase() + formato.slice(1)
+                          }
                         />
                       ))}
                     </FormGroup>
@@ -372,7 +548,14 @@ export default function AñadirProducto() {
                       {Object.entries(datos.formatos).map(
                         ([formato, activo]) =>
                           activo && (
-                            <Grid item xs={12} sm={6} md={4} lg={3} key={formato}>
+                            <Grid
+                              item
+                              xs={12}
+                              sm={6}
+                              md={4}
+                              lg={3}
+                              key={formato}
+                            >
                               <TextField
                                 label={`Precio ${formato}`}
                                 name={formato}
@@ -400,8 +583,12 @@ export default function AñadirProducto() {
                                   },
                                   "& .MuiOutlinedInput-root": {
                                     "& fieldset": { borderColor: "#e5e7eb" },
-                                    "&:hover fieldset": { borderColor: "#064e3b" },
-                                    "&.Mui-focused fieldset": { borderColor: "#065f46" },
+                                    "&:hover fieldset": {
+                                      borderColor: "#064e3b",
+                                    },
+                                    "&.Mui-focused fieldset": {
+                                      borderColor: "#065f46",
+                                    },
                                     transition: "all 0.3s ease",
                                   },
                                 }}
