@@ -127,13 +127,13 @@ export default function AñadirProducto() {
     }));
   };
 
-  const handleAlergenosChange = (event) => {
-    const { value } = event.target;
-    setDatos((prev) => ({
-      ...prev,
-      alergenosSeleccionados: value,
-    }));
-  };
+  // const handleAlergenosChange = (event) => {
+  //   const { value } = event.target;
+  //   setDatos((prev) => ({
+  //     ...prev,
+  //     alergenosSeleccionados: value,
+  //   }));
+  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -425,66 +425,82 @@ export default function AñadirProducto() {
 
                 {/* Cuarta fila: Alérgenos */}
                 <Grid item xs={12}>
-                  <FormControl fullWidth variant="outlined">
-                    <InputLabel id="alergenos-label">Alérgenos</InputLabel>
-                    <Select
-                      labelId="alergenos-label"
-                      multiple
-                      value={datos.alergenosSeleccionados}
-                      onChange={handleAlergenosChange}
-                      input={<OutlinedInput label="Alérgenos" />}
-                      renderValue={(selected) => (
-                        <Box
-                          sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}
-                        >
-                          // Dentro del renderValue del Select
-                          {selected.map((id) => {
-                            const a = alergenos.find((x) => x.id === id); // Cambiado de ID_Alergeno a id
-                            return (
-                              <Chip
-                                key={id}
-                                label={a?.nombre ?? id} // Usar nombre en minúscula
-                                sx={{ bgcolor: "#fff3e0", color: "#333" }}
-                              />
-                            );
-                          })}
-                        </Box>
-                      )}
-                    >
-                      {alergenos.map((alergeno) => (
-                        <MenuItem
-                          key={alergeno.id} // Cambiado de ID_Alergeno a id
-                          value={alergeno.id} // Cambiado de ID_Alergeno a id
-                        >
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 1,
-                            }}
-                          >
-                            {alergeno.imagen && (
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      mb: 2,
+                      color: "#333",
+                      fontWeight: "bold",
+                      textAlign: "center",
+                    }}
+                  >
+                    Seleccionar Alérgenos
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: 1,
+                      justifyContent: "center",
+                      p: 2,
+                      border: "1px solid #e5e7eb",
+                      borderRadius: 2,
+                      backgroundColor: "#f9fafb",
+                      maxHeight: 200, // Limit height for scrolling on mobile
+                      overflowY: "auto", // Enable vertical scrolling if needed
+                    }}
+                  >
+                    {alergenos.map((alergeno) => {
+                      const isSelected = datos.alergenosSeleccionados.includes(
+                        alergeno.id
+                      );
+                      return (
+                        <Chip
+                          key={alergeno.id}
+                          avatar={
+                            alergeno.imagen && (
                               <img
                                 src={
-                                  alergeno.imagen.startsWith("http") // Verificar si es URL absoluta
+                                  alergeno.imagen.startsWith("http")
                                     ? alergeno.imagen
                                     : `http://localhost:3000/${alergeno.imagen}`
                                 }
                                 alt={alergeno.nombre}
-                                width={20}
-                                height={20}
+                                style={{ width: 20, height: 20 }}
                                 onError={(e) => {
-                                  // Manejar errores de carga
                                   e.target.style.display = "none";
                                 }}
                               />
-                            )}
-                            {alergeno.nombre}
-                          </Box>
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
+                            )
+                          }
+                          label={alergeno.nombre}
+                          onClick={() => {
+                            setDatos((prev) => ({
+                              ...prev,
+                              alergenosSeleccionados: isSelected
+                                ? prev.alergenosSeleccionados.filter(
+                                    (id) => id !== alergeno.id
+                                  )
+                                : [...prev.alergenosSeleccionados, alergeno.id],
+                            }));
+                          }}
+                          sx={{
+                            bgcolor: isSelected ? "#065f46" : "#fff",
+                            color: isSelected ? "#fff" : "#333",
+                            border: `1px solid ${
+                              isSelected ? "#065f46" : "#e5e7eb"
+                            }`,
+                            "&:hover": {
+                              bgcolor: isSelected ? "#047857" : "#f1f5f9",
+                            },
+                            transition: "all 0.3s ease",
+                            fontSize: "0.85rem",
+                            height: 32, // Compact size for mobile
+                          }}
+                        />
+                      );
+                    })}
+                  </Box>
                 </Grid>
 
                 {/* Formatos y Precios */}
