@@ -27,13 +27,14 @@ import {
   Select,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit"; // Added for edit icon
 import SearchIcon from "@mui/icons-material/Search";
 import ShareIcon from "@mui/icons-material/Share";
 import AddIcon from "@mui/icons-material/Add";
-import LocalBarIcon from "@mui/icons-material/LocalBar"; // Para Cervezas
-import RestaurantIcon from "@mui/icons-material/Restaurant"; // Para Tapas
-import DinnerDiningIcon from "@mui/icons-material/DinnerDining"; // Para Platos
-import IcecreamIcon from "@mui/icons-material/Icecream"; // Para Postres
+import LocalBarIcon from "@mui/icons-material/LocalBar";
+import RestaurantIcon from "@mui/icons-material/Restaurant";
+import DinnerDiningIcon from "@mui/icons-material/DinnerDining";
+import IcecreamIcon from "@mui/icons-material/Icecream";
 import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/material/styles";
 
@@ -112,7 +113,7 @@ const CartaCompleta = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [isJefe, setIsJefe] = useState(false); // State to track if user is Jefe
+  const [isJefe, setIsJefe] = useState(false);
   const navigate = useNavigate();
 
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
@@ -122,7 +123,6 @@ const CartaCompleta = () => {
   const [openErrorSnackbar, setOpenErrorSnackbar] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Mapa de íconos por categoría (ajusta según tus categorías reales)
   const categoryIcons = {
     Cervezas: <LocalBarIcon sx={{ mr: 2, fontSize: "2rem" }} />,
     Tapas: <RestaurantIcon sx={{ mr: 2, fontSize: "2rem" }} />,
@@ -130,21 +130,13 @@ const CartaCompleta = () => {
     Postres: <IcecreamIcon sx={{ mr: 2, fontSize: "2rem" }} />,
   };
 
-  // Check if user is logged in and has the role "Jefe"
   useEffect(() => {
     const checkAuth = () => {
       const authData = localStorage.getItem("auth");
-      console.log("authData:", authData);
       if (authData) {
         try {
           const parsedData = JSON.parse(authData);
-          console.log("parsedData:", parsedData);
           const { isAuthenticated, user } = parsedData;
-          console.log("isAuthenticated:", isAuthenticated);
-          console.log("user:", user);
-          if (user) {
-            console.log("user.tipo:", user.tipo); // Log the correct field
-          }
           if (isAuthenticated && user && user.tipo === "Jefe") {
             setIsJefe(true);
           } else {
@@ -159,11 +151,11 @@ const CartaCompleta = () => {
       }
     };
 
-    checkAuth(); // Initial check
-    window.addEventListener("storage", checkAuth); // Listen for storage changes
+    checkAuth();
+    window.addEventListener("storage", checkAuth);
 
     return () => {
-      window.removeEventListener("storage", checkAuth); // Cleanup
+      window.removeEventListener("storage", checkAuth);
     };
   }, []);
 
@@ -301,7 +293,6 @@ const CartaCompleta = () => {
     setSelectedCategory("");
   };
 
-  // Extraer todos los alérgenos únicos de los productos
   const allAlergenos = Array.from(
     new Set(
       productos
@@ -366,7 +357,6 @@ const CartaCompleta = () => {
 
   return (
     <Box sx={{ backgroundColor: "#F5F5F5", minHeight: "100vh", pb: 10 }}>
-      {/* Banner promocional */}
       <Box
         sx={{
           background: "linear-gradient(135deg, #065f46 0%, #047857 100%)",
@@ -403,7 +393,6 @@ const CartaCompleta = () => {
       </Box>
 
       <Container maxWidth="xl" sx={{ py: 4 }}>
-        {/* Barra de búsqueda y filtros */}
         <Box
           sx={{
             mb: 4,
@@ -651,36 +640,62 @@ const CartaCompleta = () => {
                           component="img"
                           sx={{
                             width: 200,
-                            height: 200,
+                            height: 230,
                             objectFit: "cover",
+                            display: "block",
+                            margin: 0,
+                            padding: 0,
                             transition: "transform 0.3s ease",
                             "&:hover": {
                               transform: "scale(1.03)",
                             },
                           }}
                           image={
-                            producto.ImagenURL ||
-                            "https://via.placeholder.com/400x260?text=Sin+Imagen"
+                            producto.Foto
+                              ? `http://localhost:3000/uploads/${producto.Foto}`
+                              : "https://via.placeholder.com/400x260?text=Sin+Imagen"
                           }
                           alt={producto.Nombre}
                         />
                         {isJefe && (
-                          <IconButton
-                            aria-label="delete"
-                            onClick={() => handleOpenDeleteDialog(producto)}
+                          <Box
                             sx={{
                               position: "absolute",
                               right: 8,
                               top: 8,
-                              color: "#ffffff",
-                              backgroundColor: "rgba(0,0,0,0.5)",
-                              "&:hover": {
-                                backgroundColor: "rgba(0,0,0,0.7)",
-                              },
+                              display: "flex",
+                              gap: 1,
                             }}
                           >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
+                            <IconButton
+                              aria-label="edit"
+                              onClick={() =>
+                                navigate(`/modificar/${producto.ID_Producto}`)
+                              }
+                              sx={{
+                                color: "#ffffff",
+                                backgroundColor: "rgba(0,0,0,0.5)",
+                                "&:hover": {
+                                  backgroundColor: "rgba(0,0,0,0.7)",
+                                },
+                              }}
+                            >
+                              <EditIcon fontSize="small" />
+                            </IconButton>
+                            <IconButton
+                              aria-label="delete"
+                              onClick={() => handleOpenDeleteDialog(producto)}
+                              sx={{
+                                color: "#ffffff",
+                                backgroundColor: "rgba(0,0,0,0.5)",
+                                "&:hover": {
+                                  backgroundColor: "rgba(0,0,0,0.7)",
+                                },
+                              }}
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          </Box>
                         )}
                       </Box>
                     </ProductCard>
@@ -860,9 +875,9 @@ const CartaCompleta = () => {
                                 width: 200,
                                 height: 230,
                                 objectFit: "cover",
-                                display: "block", // Ensures no extra space below the image
-                                margin: 0, // Removes any default margin
-                                padding: 0, // Removes any default padding
+                                display: "block",
+                                margin: 0,
+                                padding: 0,
                                 transition: "transform 0.3s ease",
                                 "&:hover": {
                                   transform: "scale(1.03)",
@@ -876,22 +891,48 @@ const CartaCompleta = () => {
                               alt={producto.Nombre}
                             />
                             {isJefe && (
-                              <IconButton
-                                aria-label="delete"
-                                onClick={() => handleOpenDeleteDialog(producto)}
+                              <Box
                                 sx={{
                                   position: "absolute",
                                   right: 8,
                                   top: 8,
-                                  color: "#ffffff",
-                                  backgroundColor: "rgba(0,0,0,0.5)",
-                                  "&:hover": {
-                                    backgroundColor: "rgba(0,0,0,0.7)",
-                                  },
+                                  display: "flex",
+                                  gap: 1,
                                 }}
                               >
-                                <DeleteIcon fontSize="small" />
-                              </IconButton>
+                                <IconButton
+                                  aria-label="edit"
+                                  onClick={() =>
+                                    navigate(
+                                      "/modificar/" + producto.ID_Producto
+                                    )
+                                  }
+                                  sx={{
+                                    color: "#ffffff",
+                                    backgroundColor: "rgba(0,0,0,0.5)",
+                                    "&:hover": {
+                                      backgroundColor: "rgba(0,0,0,0.7)",
+                                    },
+                                  }}
+                                >
+                                  <EditIcon fontSize="small" />
+                                </IconButton>
+                                <IconButton
+                                  aria-label="delete"
+                                  onClick={() =>
+                                    handleOpenDeleteDialog(producto)
+                                  }
+                                  sx={{
+                                    color: "#ffffff",
+                                    backgroundColor: "rgba(0,0,0,0.5)",
+                                    "&:hover": {
+                                      backgroundColor: "rgba(0,0,0,0.7)",
+                                    },
+                                  }}
+                                >
+                                  <DeleteIcon fontSize="small" />
+                                </IconButton>
+                              </Box>
                             )}
                           </Box>
                         </ProductCard>
@@ -905,7 +946,6 @@ const CartaCompleta = () => {
         )}
       </Container>
 
-      {/* Leyenda de alérgenos */}
       <Box
         sx={{
           backgroundColor: "#ffffff",

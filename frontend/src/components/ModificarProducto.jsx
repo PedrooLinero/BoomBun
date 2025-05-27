@@ -63,7 +63,6 @@ export default function ModificarProducto() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [loadingProduct, setLoadingProduct] = useState(true);
-  const [vistaPreviaFoto, setVistaPreviaFoto] = useState(null); // Nuevo estado para la vista previa
 
   useEffect(() => {
     const fetchCategorias = fetch("http://localhost:3000/api/categorias")
@@ -123,6 +122,7 @@ export default function ModificarProducto() {
         };
         (producto.Precios || []).forEach((p) => {
           const formatoLower = p.Formato.toLowerCase();
+          // eslint-disable-next-line no-prototype-builtins
           if (formatos.hasOwnProperty(formatoLower)) {
             formatos[formatoLower] = true;
             precios[formatoLower] = p.Precio.toString();
@@ -184,13 +184,6 @@ export default function ModificarProducto() {
       ...prev,
       foto: file || null,
     }));
-    // Crear vista previa de la nueva foto
-    if (file) {
-      const urlVistaPrevia = URL.createObjectURL(file);
-      setVistaPreviaFoto(urlVistaPrevia);
-    } else {
-      setVistaPreviaFoto(null);
-    }
   };
 
   const handleSubmit = async (e) => {
@@ -224,6 +217,7 @@ export default function ModificarProducto() {
       );
     }
 
+    // Depurar el FormData
     const formDataEntries = {};
     for (let [key, value] of formData.entries()) {
       formDataEntries[key] = value;
@@ -234,6 +228,7 @@ export default function ModificarProducto() {
       const response = await fetch(`http://localhost:3000/api/productos/${id}`, {
         method: "PUT",
         body: formData,
+        // No especificar Content-Type, fetch lo maneja automáticamente con FormData
       });
 
       const data = await response.json();
@@ -456,160 +451,67 @@ export default function ModificarProducto() {
                 </Grid>
 
                 <Grid item xs={12}>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      mb: 2,
-                      color: "#333",
-                      fontWeight: "bold",
-                      textAlign: "center",
+                  {producto?.Foto && (
+                    <Box sx={{ mb: 2 }}>
+                      <Typography
+                        variant="body1"
+                        sx={{ color: "#333", fontWeight: "medium", mb: 1 }}
+                      >
+                        Foto actual:
+                      </Typography>
+                      <img
+                        src={`http://localhost:3000/uploads/${producto.Foto}`}
+                        alt={datos.nombre}
+                        style={{
+                          maxWidth: "200px",
+                          borderRadius: "8px",
+                          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                        }}
+                        onError={(e) => {
+                          e.target.style.display = "none";
+                          e.target.parentElement.prepend(
+                            document.createTextNode("No se pudo cargar la imagen")
+                          );
+                        }}
+                      />
+                    </Box>
+                  )}
+                  <TextField
+                    label="Cambiar foto del producto"
+                    type="file"
+                    name="foto"
+                    onChange={handleFotoChange}
+                    fullWidth
+                    InputLabelProps={{
+                      shrink: true,
                     }}
-                  >
-                    Foto del Producto
-                  </Typography>
-                  <Grid container spacing={2} alignItems="center">
-                    {vistaPreviaFoto ? (
-                      <Grid item xs={12} sm={6}>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            border: "1px solid #e5e7eb",
-                            borderRadius: "8px",
-                            p: 1,
-                            height: "150px",
-                            backgroundColor: "#f9fafb",
-                          }}
-                        >
-                          <img
-                            src={vistaPreviaFoto}
-                            alt="Vista previa de la nueva foto"
-                            style={{
-                              maxWidth: "100%",
-                              maxHeight: "100%",
-                              borderRadius: "8px",
-                              objectFit: "contain",
-                            }}
-                          />
-                        </Box>
-                      </Grid>
-                    ) : producto?.Foto ? (
-                      <>
-                        <Grid item xs={12} sm={6}>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
-                              border: "1px solid #e5e7eb",
-                              borderRadius: "8px",
-                              p: 1,
-                              height: "150px",
-                              backgroundColor: "#f9fafb",
-                            }}
-                          >
-                            <img
-                              src={`http://localhost:3000/uploads/${producto.Foto}`}
-                              alt={datos.nombre}
-                              style={{
-                                maxWidth: "100%",
-                                maxHeight: "100%",
-                                borderRadius: "8px",
-                                objectFit: "contain",
-                              }}
-                              onError={(e) => {
-                                e.target.style.display = "none";
-                                e.target.parentElement.innerHTML =
-                                  "No se pudo cargar la imagen";
-                              }}
-                            />
-                          </Box>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <TextField
-                            label="Cambiar foto del producto"
-                            type="file"
-                            name="foto"
-                            onChange={handleFotoChange}
-                            fullWidth
-                            InputLabelProps={{
-                              shrink: true,
-                            }}
-                            inputProps={{
-                              accept: "image/*",
-                            }}
-                            variant="outlined"
-                            InputProps={{
-                              startAdornment: (
-                                <InputAdornment position="start">
-                                  <ImageIcon sx={{ color: "#6b7280" }} />
-                                </InputAdornment>
-                              ),
-                            }}
-                            sx={{
-                              "& .MuiInputLabel-root": {
-                                color: "#065f46",
-                                fontWeight: "bold",
-                              },
-                              "& .MuiInputLabel-root.Mui-focused": {
-                                color: "#065f46",
-                              },
-                              "& .MuiOutlinedInput-root": {
-                                "& fieldset": { borderColor: "#e5e7eb" },
-                                "&:hover fieldset": { borderColor: "#064e3b" },
-                                "&.Mui-focused fieldset": {
-                                  borderColor: "#065f46",
-                                },
-                                transition: "all 0.3s ease",
-                              },
-                            }}
-                          />
-                        </Grid>
-                      </>
-                    ) : (
-                      <Grid item xs={12}>
-                        <TextField
-                          label="Subir foto del producto"
-                          type="file"
-                          name="foto"
-                          onChange={handleFotoChange}
-                          fullWidth
-                          InputLabelProps={{
-                            shrink: true,
-                          }}
-                          inputProps={{
-                            accept: "image/*",
-                          }}
-                          variant="outlined"
-                          InputProps={{
-                            startAdornment: (
-                              <InputAdornment position="start">
-                                <ImageIcon sx={{ color: "#6b7280" }} />
-                              </InputAdornment>
-                            ),
-                          }}
-                          sx={{
-                            "& .MuiInputLabel-root": {
-                              color: "#065f46",
-                              fontWeight: "bold",
-                            },
-                            "& .MuiInputLabel-root.Mui-focused": {
-                              color: "#065f46",
-                            },
-                            "& .MuiOutlinedInput-root": {
-                              "& fieldset": { borderColor: "#e5e7eb" },
-                              "&:hover fieldset": { borderColor: "#064e3b" },
-                              "&.Mui-focused fieldset": {
-                                borderColor: "#065f46",
-                              },
-                              transition: "all 0.3s ease",
-                            },
-                          }}
-                        />
-                      </Grid>
-                    )}
-                  </Grid>
+                    inputProps={{
+                      accept: "image/*",
+                    }}
+                    variant="outlined"
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <ImageIcon sx={{ color: "#6b7280" }} />
+                        </InputAdornment>
+                      ),
+                    }}
+                    sx={{
+                      "& .MuiInputLabel-root": {
+                        color: "#065f46",
+                        fontWeight: "bold",
+                      },
+                      "& .MuiInputLabel-root.Mui-focused": {
+                        color: "#065f46",
+                      },
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": { borderColor: "#e5e7eb" },
+                        "&:hover fieldset": { borderColor: "#064e3b" },
+                        "&.Mui-focused fieldset": { borderColor: "#065f46" },
+                        transition: "all 0.3s ease",
+                      },
+                    }}
+                  />
                 </Grid>
 
                 <Grid item xs={12}>

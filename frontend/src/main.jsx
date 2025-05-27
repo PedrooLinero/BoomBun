@@ -19,6 +19,7 @@ import AñadirProducto from "./components/AñadirProducto";
 import Resena from "./components/Resena";
 import Registro from "./components/Registro";
 import Jamon from "./components/Jamon";
+import ModificarProducto from "./components/ModificarProducto";
 
 const router = createBrowserRouter([
   {
@@ -54,11 +55,10 @@ const router = createBrowserRouter([
         path: "/jamon",
         element: <Jamon />,
       },
-      // Añade esta ruta si implementas registro
-      // {
-      //   path: "/register",
-      //   element: <Register />, // Crea este componente si lo necesitas
-      // }
+      {
+        path: "/modificar/:id",
+        element: <ModificarProducto />,
+      },
     ],
   },
 ]);
