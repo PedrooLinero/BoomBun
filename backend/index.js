@@ -23,7 +23,7 @@ app.use(cookieParser());
 
 // Configurar la carpeta images como estática para servir imágenes
 app.use("/images", express.static(path.join(__dirname, "images")));
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Configurar rutas de la API
 app.use("/api", usuarioRoutes);

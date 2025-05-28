@@ -34,6 +34,7 @@ class AlergenoController {
             : `${req.protocol}://${req.get("host")}/uploads/${alergeno.Imagen}` // Agregar /uploads/
           : null,
       }));
+      
 
       return res.status(200).json(Respuesta.exito(alergenosFormateados));
     } catch (err) {

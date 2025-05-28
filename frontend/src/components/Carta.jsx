@@ -27,7 +27,7 @@ import {
   Select,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit"; // Added for edit icon
+import EditIcon from "@mui/icons-material/Edit";
 import SearchIcon from "@mui/icons-material/Search";
 import ShareIcon from "@mui/icons-material/Share";
 import AddIcon from "@mui/icons-material/Add";
@@ -38,7 +38,7 @@ import IcecreamIcon from "@mui/icons-material/Icecream";
 import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/material/styles";
 
-const ProductCard = styled(Card)(({ theme }) => ({
+const ProductCard = styled(Card)(() => ({
   display: "flex",
   flexDirection: "row",
   borderRadius: "12px",
@@ -50,7 +50,7 @@ const ProductCard = styled(Card)(({ theme }) => ({
     boxShadow: "0 6px 20px rgba(0,0,0,0.15)",
   },
   background: "#ffffff",
-  marginBottom: theme.spacing(2),
+  minHeight: 230, // Altura mínima fija para todos los cards
 }));
 
 const CategoryHeader = styled(Box)(({ theme }) => ({
@@ -105,6 +105,25 @@ const AddButton = styled(Button)(({ theme }) => ({
   },
 }));
 
+const AllergensButton = styled(Button)(() => ({
+  border: "none", // Sin borde
+  color: "#065f46",
+  backgroundColor: "transparent",
+  padding: 0,
+  minWidth: "auto",
+  fontSize: "0.85rem",
+  textTransform: "none",
+  fontWeight: 400,
+  textDecoration: "underline", // Como enlace
+  boxShadow: "none",
+  "&:hover": {
+    backgroundColor: "transparent",
+    color: "#047857",
+    textDecoration: "underline",
+    boxShadow: "none",
+  },
+}));
+
 const CartaCompleta = () => {
   const [categorias, setCategorias] = useState([]);
   const [productos, setProductos] = useState([]);
@@ -114,6 +133,8 @@ const CartaCompleta = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [isJefe, setIsJefe] = useState(false);
+  const [openAllergensDialog, setOpenAllergensDialog] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const navigate = useNavigate();
 
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
@@ -127,7 +148,6 @@ const CartaCompleta = () => {
     Cervezas: <LocalBarIcon sx={{ mr: 2, fontSize: "2rem" }} />,
     Tapas: <RestaurantIcon sx={{ mr: 2, fontSize: "2rem" }} />,
     Platos: <DinnerDiningIcon sx={{ mr: 2, fontSize: "2rem" }} />,
-    Postres: <IcecreamIcon sx={{ mr: 2, fontSize: "2rem" }} />,
   };
 
   useEffect(() => {
@@ -269,18 +289,14 @@ const CartaCompleta = () => {
     }
   };
 
-  const handleShare = (producto) => {
-    const shareText = `¡Mira este producto en Cervecería Boom Bun! ${producto.Nombre} - ${producto.Precios?.[0]?.Precio}€`;
-    const shareUrl = window.location.href;
-    if (navigator.share) {
-      navigator.share({
-        title: producto.Nombre,
-        text: shareText,
-        url: shareUrl,
-      });
-    } else {
-      alert("Comparte este producto: " + shareText + " " + shareUrl);
-    }
+  const handleOpenAllergensDialog = (producto) => {
+    setSelectedProduct(producto);
+    setOpenAllergensDialog(true);
+  };
+
+  const handleCloseAllergensDialog = () => {
+    setOpenAllergensDialog(false);
+    setSelectedProduct(null);
   };
 
   const handleCloseSnackbar = () => {
@@ -387,8 +403,7 @@ const CartaCompleta = () => {
             fontSize: { xs: "0.9rem", md: "1rem" },
           }}
         >
-          Descubre las mejores cervezas artesanales, tapas y platos en
-          Cervecería Boom Bun.
+          Descubre las mejor cerveza, tapas y platos en Cervecería Boom Bun.
         </Typography>
       </Box>
 
@@ -518,6 +533,7 @@ const CartaCompleta = () => {
                           width: "100%",
                           display: "flex",
                           flexDirection: "row",
+                          alignItems: "stretch",
                         }}
                       >
                         <Box sx={{ flex: 1, p: 2 }}>
@@ -585,62 +601,17 @@ const CartaCompleta = () => {
                             ))}
                           </Box>
                           <Box sx={{ borderTop: "1px solid #e0e0e0", my: 1 }} />
-                          {producto.Alergenos &&
-                            producto.Alergenos.length > 0 && (
-                              <Box sx={{ mb: 2 }}>
-                                <Typography
-                                  variant="subtitle2"
-                                  sx={{ fontWeight: 500, color: "#666", mb: 1 }}
-                                >
-                                  Alérgenos:
-                                </Typography>
-                                <Box
-                                  sx={{
-                                    display: "flex",
-                                    flexWrap: "wrap",
-                                    gap: 1,
-                                  }}
-                                >
-                                  {producto.Alergenos.map((alergeno) => (
-                                    <Chip
-                                      key={alergeno.ID_Alergeno}
-                                      icon={
-                                        <img
-                                          src={`http://localhost:3000/${alergeno.Imagen}`}
-                                          alt={alergeno.Nombre}
-                                          style={{ width: 20, height: 20 }}
-                                        />
-                                      }
-                                      label={alergeno.Nombre}
-                                      size="small"
-                                      sx={{
-                                        backgroundColor: "#fff3e0",
-                                        color: "#333",
-                                        fontSize: {
-                                          xs: "0.7rem",
-                                          md: "0.8rem",
-                                        },
-                                      }}
-                                    />
-                                  ))}
-                                </Box>
-                              </Box>
-                            )}
-                          <IconButton
-                            onClick={() => handleShare(producto)}
-                            sx={{
-                              color: "#065f46",
-                              "&:hover": { color: "#047857" },
-                            }}
+                          <AllergensButton
+                            onClick={() => handleOpenAllergensDialog(producto)}
                           >
-                            <ShareIcon fontSize="small" />
-                          </IconButton>
+                            Ver Alérgenos
+                          </AllergensButton>
                         </Box>
                         <CardMedia
                           component="img"
                           sx={{
                             width: 200,
-                            height: 230,
+                            height: "100%",
                             objectFit: "cover",
                             display: "block",
                             margin: 0,
@@ -651,9 +622,8 @@ const CartaCompleta = () => {
                             },
                           }}
                           image={
-                            producto.Foto
-                              ? `http://localhost:3000/uploads/${producto.Foto}`
-                              : "https://via.placeholder.com/400x260?text=Sin+Imagen"
+                            producto.Foto ||
+                            "https://via.placeholder.com/400x260?text=Sin+Imagen"
                           }
                           alt={producto.Nombre}
                         />
@@ -745,6 +715,7 @@ const CartaCompleta = () => {
                               width: "100%",
                               display: "flex",
                               flexDirection: "row",
+                              alignItems: "stretch",
                             }}
                           >
                             <Box sx={{ flex: 1, p: 2 }}>
@@ -811,69 +782,18 @@ const CartaCompleta = () => {
                                   />
                                 ))}
                               </Box>
-                              <Box
-                                sx={{ borderTop: "1px solid #e0e0e0", my: 1 }}
-                              />
-                              {producto.Alergenos &&
-                                producto.Alergenos.length > 0 && (
-                                  <Box sx={{ mb: 2 }}>
-                                    <Typography
-                                      variant="subtitle2"
-                                      sx={{
-                                        fontWeight: 500,
-                                        color: "#666",
-                                        mb: 1,
-                                      }}
-                                    >
-                                      Alérgenos:
-                                    </Typography>
-                                    <Box
-                                      sx={{
-                                        display: "flex",
-                                        flexWrap: "wrap",
-                                        gap: 1,
-                                      }}
-                                    >
-                                      {producto.Alergenos.map((alergeno) => (
-                                        <Chip
-                                          key={alergeno.ID_Alergeno}
-                                          icon={
-                                            <img
-                                              src={`http://localhost:3000/${alergeno.Imagen}`}
-                                              alt={alergeno.Nombre}
-                                              style={{ width: 20, height: 20 }}
-                                            />
-                                          }
-                                          label={alergeno.Nombre}
-                                          size="small"
-                                          sx={{
-                                            backgroundColor: "#fff3e0",
-                                            color: "#333",
-                                            fontSize: {
-                                              xs: "0.7rem",
-                                              md: "0.8rem",
-                                            },
-                                          }}
-                                        />
-                                      ))}
-                                    </Box>
-                                  </Box>
-                                )}
-                              <IconButton
-                                onClick={() => handleShare(producto)}
-                                sx={{
-                                  color: "#065f46",
-                                  "&:hover": { color: "#047857" },
-                                }}
+                              <Box sx={{ borderTop: "1px solid #e0e0e0", my: 1 }} />
+                              <AllergensButton
+                                onClick={() => handleOpenAllergensDialog(producto)}
                               >
-                                <ShareIcon fontSize="small" />
-                              </IconButton>
+                                Ver Alérgenos
+                              </AllergensButton>
                             </Box>
                             <CardMedia
                               component="img"
                               sx={{
                                 width: 200,
-                                height: 230,
+                                height: "100%",
                                 objectFit: "cover",
                                 display: "block",
                                 margin: 0,
@@ -884,9 +804,8 @@ const CartaCompleta = () => {
                                 },
                               }}
                               image={
-                                producto.Foto
-                                  ? `http://localhost:3000/uploads/${producto.Foto}`
-                                  : "https://via.placeholder.com/400x260?text=Sin+Imagen"
+                                producto.Foto ||
+                                "https://via.placeholder.com/400x260?text=Sin+Imagen"
                               }
                               alt={producto.Nombre}
                             />
@@ -1020,6 +939,48 @@ const CartaCompleta = () => {
             autoFocus
           >
             Eliminar
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openAllergensDialog}
+        onClose={handleCloseAllergensDialog}
+        PaperProps={{
+          sx: {
+            borderRadius: "8px",
+            padding: 2,
+          },
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: 600 }}>
+          Alérgenos de {selectedProduct?.Nombre}
+        </DialogTitle>
+        <DialogContent>
+          {selectedProduct?.Alergenos && selectedProduct.Alergenos.length > 0 ? (
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+              {selectedProduct.Alergenos.map((alergeno) => (
+                <Chip
+                  key={alergeno.ID_Alergeno}
+                  label={alergeno.Nombre}
+                  size="small"
+                  sx={{
+                    backgroundColor: "#fff3e0",
+                    color: "#333",
+                    fontSize: { xs: "0.7rem", md: "0.8rem" },
+                  }}
+                />
+              ))}
+            </Box>
+          ) : (
+            <DialogContentText>
+              Este producto no contiene alérgenos.
+            </DialogContentText>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseAllergensDialog} sx={{ color: "red" }}>
+            Cerrar
           </Button>
         </DialogActions>
       </Dialog>

@@ -1,887 +1,515 @@
-import React, { useState, useEffect } from "react";
-import {
-  Container,
-  Typography,
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  FormGroup,
-  FormControlLabel,
-  Checkbox,
-  Button,
-  Paper,
-  Grid,
-  Fade,
-  Snackbar,
-  Alert,
-  CircularProgress,
-  InputAdornment,
-  Box,
-  Chip,
-} from "@mui/material";
-import { useNavigate, useParams } from "react-router-dom";
-import {
-  Description as DescriptionIcon,
-  Category as CategoryIcon,
-  AttachMoney as MoneyIcon,
-  RestaurantMenu as RestaurantMenuIcon,
-  Image as ImageIcon,
-} from "@mui/icons-material";
+const Respuesta = require("../utils/respuesta.js");
+const { logMensaje } = require("../utils/logger.js");
+const initModels = require("../models/init-models.js").initModels;
+const sequelize = require("../config/sequelize.js");
+const multer = require("multer");
+const path = require("path");
 
-export default function ModificarProducto() {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const [categorias, setCategorias] = useState([]);
-  const [alergenos, setAlergenos] = useState([]);
-  const [producto, setProducto] = useState(null);
-  const [datos, setDatos] = useState({
-    nombre: "",
-    Descripcion: "",
-    idCategoria: "",
-    formatos: {
-      tapa: false,
-      media: false,
-      plato: false,
-      unidad: false,
-      copa: false,
-      botella: false,
-    },
-    precios: {
-      tapa: "",
-      media: "",
-      plato: "",
-      unidad: "",
-      copa: "",
-      botella: "",
-    },
-    foto: null,
-    alergenosSeleccionados: [],
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
-  const [loadingProduct, setLoadingProduct] = useState(true);
-  const [vistaPreviaFoto, setVistaPreviaFoto] = useState(null); // Nuevo estado para la vista previa
+const models = initModels(sequelize);
+const Producto = models.Producto;
+const Categoria = models.Categoria;
+const PrecioProducto = models.PrecioProducto;
+const Alergeno = models.Alergeno;
 
-  useEffect(() => {
-    const fetchCategorias = fetch("http://localhost:3000/api/categorias")
-      .then((res) =>
-        res.ok ? res.json() : Promise.reject("Error al cargar categorías")
-      )
-      .then((data) => {
-        const cats = Array.isArray(data) ? data : data.datos || [];
-        setCategorias(cats);
-      })
-      .catch((err) => {
-        console.error("Categorías:", err);
-        setError("Error al cargar categorías: " + err.message);
-      });
+// Configuración de multer para manejar FormData
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
 
-    const fetchAlergenos = fetch("http://localhost:3000/api/alergenos")
-      .then((res) =>
-        res.ok ? res.json() : Promise.reject("Error al cargar alérgenos")
-      )
-      .then((data) => {
-        const alers = (Array.isArray(data) ? data : data.datos || []).map(
-          (a) => ({
-            id: Number(a.id || a.ID_Alergeno),
-            nombre: a.nombre || a.Nombre,
-            imagen: a.imagen || a.Imagen || null,
-          })
-        );
-        setAlergenos(alers);
-      })
-      .catch((err) => {
-        console.error("Alérgenos:", err);
-        setError("Error al cargar alérgenos: " + err.message);
-      });
-
-    const fetchProducto = fetch(`http://localhost:3000/api/productos/${id}`)
-      .then((res) =>
-        res.ok ? res.json() : Promise.reject("Error al cargar producto")
-      )
-      .then((data) => {
-        const producto = data.datos;
-        if (!producto) throw new Error("Producto no encontrado");
-        const formatos = {
-          tapa: false,
-          media: false,
-          plato: false,
-          unidad: false,
-          copa: false,
-          botella: false,
-        };
-        const precios = {
-          tapa: "",
-          media: "",
-          plato: "",
-          unidad: "",
-          copa: "",
-          botella: "",
-        };
-        (producto.Precios || []).forEach((p) => {
-          const formatoLower = p.Formato.toLowerCase();
-          if (formatos.hasOwnProperty(formatoLower)) {
-            formatos[formatoLower] = true;
-            precios[formatoLower] = p.Precio.toString();
-          }
-        });
-        setProducto(producto);
-        setDatos({
-          nombre: producto.Nombre || "",
-          Descripcion: producto.Descripcion || "",
-          idCategoria: producto.ID_Categoria || "",
-          formatos,
-          precios,
-          foto: null,
-          alergenosSeleccionados: (producto.Alergenos || []).map((a) =>
-            Number(a.ID_Alergeno)
-          ),
-        });
-      })
-      .catch((err) => {
-        console.error("Producto:", err);
-        setError("Error al cargar producto: " + err.message);
-      })
-      .finally(() => setLoadingProduct(false));
-
-    Promise.all([fetchCategorias, fetchAlergenos, fetchProducto]).catch(
-      (err) => {
-        console.error("Error en Promise.all:", err);
-        setError("Error al cargar los datos iniciales");
-        setLoadingProduct(false);
-      }
+const upload = multer({
+  storage: storage,
+  fileFilter: (req, file, cb) => {
+    const fileTypes = /jpeg|jpg|png|gif/;
+    const extname = fileTypes.test(
+      path.extname(file.originalname).toLowerCase()
     );
-  }, [id]);
+    const mimetype = fileTypes.test(file.mimetype);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setDatos((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleCheckboxChange = (e) => {
-    const { name, checked } = e.target;
-    setDatos((prev) => ({
-      ...prev,
-      formatos: { ...prev.formatos, [name]: checked },
-      precios: { ...prev.precios, [name]: checked ? prev.precios[name] : "" },
-    }));
-  };
-
-  const handlePrecioChange = (e) => {
-    const { name, value } = e.target;
-    setDatos((prev) => ({
-      ...prev,
-      precios: { ...prev.precios, [name]: value },
-    }));
-  };
-
-  const handleFotoChange = (e) => {
-    const file = e.target.files[0];
-    setDatos((prev) => ({
-      ...prev,
-      foto: file || null,
-    }));
-    // Crear vista previa de la nueva foto
-    if (file) {
-      const urlVistaPrevia = URL.createObjectURL(file);
-      setVistaPreviaFoto(urlVistaPrevia);
+    if (extname && mimetype) {
+      return cb(null, true);
     } else {
-      setVistaPreviaFoto(null);
+      cb(new Error("Solo se permiten imágenes (jpeg, jpg, png, gif)"));
     }
-  };
+  },
+});
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    setSuccess(false);
+// Validaciones
+const validarIdProducto = (ID_Producto) => {
+  if (!ID_Producto || isNaN(ID_Producto)) {
+    throw new Error("ID_Producto inválido");
+  }
+};
 
-    const formData = new FormData();
-    formData.append("Nombre", datos.nombre);
-    formData.append("Descripcion", datos.Descripcion || "");
-    formData.append("ID_Categoria", Number(datos.idCategoria));
+const validarCategoria = async (ID_Categoria) => {
+  if (!ID_Categoria) {
+    throw new Error("ID_Categoria es requerido");
+  }
+  const categoria = await Categoria.findByPk(ID_Categoria);
+  if (!categoria) {
+    throw new Error(`La categoría con ID ${ID_Categoria} no existe`);
+  }
+};
 
-    const preciosArray = Object.entries(datos.formatos)
-      .filter(([, activo]) => activo)
-      .map(([formato]) => ({
-        Formato: formato.charAt(0).toUpperCase() + formato.slice(1),
-        Precio: parseFloat(datos.precios[formato]) || 0,
-      }));
-    formData.append("Precios", JSON.stringify(preciosArray));
-
-    if (datos.foto) {
-      formData.append("Foto", datos.foto);
-    }
-    if (datos.alergenosSeleccionados.length > 0) {
-      formData.append(
-        "Alergenos",
-        JSON.stringify(
-          datos.alergenosSeleccionados.map((id) => ({ ID_Alergeno: id }))
-        )
-      );
-    }
-
-    const formDataEntries = {};
-    for (let [key, value] of formData.entries()) {
-      formDataEntries[key] = value;
-    }
-    console.log("FormData enviado:", formDataEntries);
-
-    try {
-      const response = await fetch(`http://localhost:3000/api/productos/${id}`, {
-        method: "PUT",
-        body: formData,
-      });
-
-      const data = await response.json();
-      console.log("Respuesta del backend:", data);
-
-      if (response.ok) {
-        setSuccess(true);
-        setTimeout(() => navigate("/carta"), 2000);
-      } else {
-        throw new Error(data.mensaje || "Error desconocido");
-      }
-    } catch (error) {
-      setError("Error: " + error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loadingProduct) {
-    return (
-      <Box
-        sx={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "linear-gradient(to bottom right, #F5F5F5, #E0E0E0)",
-        }}
-      >
-        <CircularProgress sx={{ color: "#065f46" }} />
-      </Box>
+const validarPrecios = (Precios) => {
+  if (
+    Precios &&
+    (!Array.isArray(Precios) ||
+      Precios.some((precio) => !precio.Formato || precio.Precio == null))
+  ) {
+    throw new Error(
+      "El formato de Precios es inválido. Debe ser un array de objetos con Formato y Precio"
     );
   }
+};
 
-  return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "linear-gradient(to bottom right, #F5F5F5, #E0E0E0)",
-        p: { xs: 2, sm: 4 },
-      }}
-    >
-      <Fade in timeout={1000}>
-        <Container maxWidth={false} sx={{ maxWidth: { xs: 600, lg: 1200 } }}>
-          <Paper
-            elevation={4}
-            sx={{
-              borderRadius: 4,
-              bgcolor: "white",
-              boxShadow: "0 6px 25px rgba(0, 0, 0, 0.15)",
-              border: "1px solid #e5e7eb",
-              overflow: "hidden",
-            }}
-          >
-            <Box
-              sx={{
-                bgcolor: "#065f46",
-                p: 4,
-                textAlign: "center",
-                borderBottom: "3px solid #047857",
-              }}
-            >
-              <Typography
-                variant="h5"
-                sx={{
-                  color: "white",
-                  fontWeight: "bold",
-                  letterSpacing: 1,
-                  mb: 1,
-                }}
-              >
-                Cervecería Boom Bun
-              </Typography>
-              <Typography
-                variant="h6"
-                sx={{ color: "white", fontWeight: "medium" }}
-              >
-                Modificar Producto
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{ color: "#d1fae5", mt: 1, opacity: 0.9 }}
-              >
-                Edita los detalles del producto
-              </Typography>
-            </Box>
+const formatearProducto = (producto, req) => {
+  const baseUrl = `${req.protocol}://${req.get("host")}`;
+  return {
+    ...producto.get({ plain: true }),
+    Categoria: producto.Categoria?.Nombre,
+    Precios: producto.Precios.map((precio) => ({
+      Formato: precio.Formato,
+      Precio: precio.Precio,
+    })),
+    Alergenos: producto.Alergenos.map((alergeno) => ({
+      ID_Alergeno: alergeno.ID_Alergeno,
+      Nombre: alergeno.Nombre,
+      Imagen: alergeno.Imagen, // Esto ya funciona porque AlergenoController lo formatea
+    })),
+    Foto: producto.Foto
+      ? producto.Foto.startsWith("http")
+        ? producto.Foto
+        : `${baseUrl}/${producto.Foto}`
+      : null,
+  };
+};
 
-            <Box
-              component="form"
-              onSubmit={handleSubmit}
-              sx={{ p: { xs: 3, lg: 5 } }}
-            >
-              {error && (
-                <Alert
-                  severity="error"
-                  sx={{
-                    mb: 3,
-                    bgcolor: "#fef2f2",
-                    color: "#b91c1c",
-                    borderRadius: 2,
-                    boxShadow: "0 1px 5px rgba(0,0,0,0.1)",
-                  }}
-                >
-                  {error}
-                </Alert>
-              )}
+class ProductosController {
+  async getAllProducts(req, res) {
+    try {
+      const productos = await Producto.findAll({
+        attributes: [
+          "ID_Producto",
+          "Nombre",
+          "Descripcion",
+          "Foto",
+          "ID_Categoria",
+        ],
+        include: [
+          { model: Categoria, attributes: ["Nombre"] },
+          {
+            model: PrecioProducto,
+            as: "Precios",
+            attributes: ["Formato", "Precio"],
+          },
+          {
+            model: Alergeno,
+            as: "Alergenos",
+            attributes: ["ID_Alergeno", "Nombre", "Imagen"],
+            through: { attributes: [] },
+          },
+        ],
+      });
 
-              <Grid container spacing={4}>
-                <Grid item xs={12} lg={6}>
-                  <TextField
-                    label="Nombre"
-                    name="nombre"
-                    placeholder="Nombre del producto"
-                    value={datos.nombre}
-                    onChange={handleChange}
-                    fullWidth
-                    required
-                    variant="outlined"
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <RestaurantMenuIcon sx={{ color: "#6b7280" }} />
-                        </InputAdornment>
-                      ),
-                    }}
-                    sx={{
-                      "& .MuiInputLabel-root": {
-                        color: "#065f46",
-                        fontWeight: "bold",
-                      },
-                      "& .MuiInputLabel-root.Mui-focused": {
-                        color: "#065f46",
-                      },
-                      "& .MuiOutlinedInput-root": {
-                        "& fieldset": { borderColor: "#e5e7eb" },
-                        "&:hover fieldset": { borderColor: "#064e3b" },
-                        "&.Mui-focused fieldset": { borderColor: "#065f46" },
-                        transition: "all 0.3s ease",
-                      },
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12} lg={6}>
-                  <FormControl fullWidth required variant="outlined">
-                    <InputLabel sx={{ color: "#065f46", fontWeight: "bold" }}>
-                      Categoría
-                    </InputLabel>
-                    <Select
-                      name="idCategoria"
-                      value={datos.idCategoria}
-                      label="Categoría"
-                      onChange={handleChange}
-                      startAdornment={
-                        <InputAdornment position="start">
-                          <CategoryIcon sx={{ color: "#6b7280", mr: 1 }} />
-                        </InputAdornment>
-                      }
-                      sx={{
-                        "& .MuiSelect-select": { color: "#333" },
-                        "& .MuiOutlinedInput-notchedOutline": {
-                          borderColor: "#e5e7eb",
-                        },
-                        "&:hover .MuiOutlinedInput-notchedOutline": {
-                          borderColor: "#064e3b",
-                        },
-                        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                          borderColor: "#065f46",
-                        },
-                      }}
-                    >
-                      <MenuItem value="">Seleccione categoría</MenuItem>
-                      {categorias.map((cat) => (
-                        <MenuItem
-                          key={cat.ID_Categoria}
-                          value={cat.ID_Categoria}
-                        >
-                          {cat.Nombre}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
+      const productosFormateados = productos.map((producto) =>
+        formatearProducto(producto, req)
+      );
+      return res.status(200).json(Respuesta.exito(productosFormateados));
+    } catch (err) {
+      logMensaje(`Error al obtener productos: ${err.message}`, "error");
+      return res
+        .status(500)
+        .json(Respuesta.error(null, "Error al obtener los productos"));
+    }
+  }
 
-                <Grid item xs={12}>
-                  <TextField
-                    label="Descripción"
-                    name="Descripcion"
-                    value={datos.Descripcion}
-                    onChange={handleChange}
-                    fullWidth
-                    multiline
-                    minRows={3}
-                    variant="outlined"
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <DescriptionIcon sx={{ color: "#6b7280" }} />
-                        </InputAdornment>
-                      ),
-                    }}
-                    sx={{
-                      "& .MuiInputLabel-root": {
-                        color: "#065f46",
-                        fontWeight: "bold",
-                      },
-                      "& .MuiInputLabel-root.Mui-focused": {
-                        color: "#065f46",
-                      },
-                      "& .MuiOutlinedInput-root": {
-                        "& fieldset": { borderColor: "#e5e7eb" },
-                        "&:hover fieldset": { borderColor: "#064e3b" },
-                        "&.Mui-focused fieldset": { borderColor: "#065f46" },
-                        transition: "all 0.3s ease",
-                      },
-                    }}
-                  />
-                </Grid>
+  async getProductById(req, res) {
+    try {
+      const { ID_Producto } = req.params;
+      validarIdProducto(ID_Producto);
 
-                <Grid item xs={12}>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      mb: 2,
-                      color: "#333",
-                      fontWeight: "bold",
-                      textAlign: "center",
-                    }}
-                  >
-                    Foto del Producto
-                  </Typography>
-                  <Grid container spacing={2} alignItems="center">
-                    {vistaPreviaFoto ? (
-                      <Grid item xs={12} sm={6}>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            border: "1px solid #e5e7eb",
-                            borderRadius: "8px",
-                            p: 1,
-                            height: "150px",
-                            backgroundColor: "#f9fafb",
-                          }}
-                        >
-                          <img
-                            src={vistaPreviaFoto}
-                            alt="Vista previa de la nueva foto"
-                            style={{
-                              maxWidth: "100%",
-                              maxHeight: "100%",
-                              borderRadius: "8px",
-                              objectFit: "contain",
-                            }}
-                          />
-                        </Box>
-                      </Grid>
-                    ) : producto?.Foto ? (
-                      <>
-                        <Grid item xs={12} sm={6}>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
-                              border: "1px solid #e5e7eb",
-                              borderRadius: "8px",
-                              p: 1,
-                              height: "150px",
-                              backgroundColor: "#f9fafb",
-                            }}
-                          >
-                            <img
-                              src={`http://localhost:3000/uploads/${producto.Foto}`}
-                              alt={datos.nombre}
-                              style={{
-                                maxWidth: "100%",
-                                maxHeight: "100%",
-                                borderRadius: "8px",
-                                objectFit: "contain",
-                              }}
-                              onError={(e) => {
-                                e.target.style.display = "none";
-                                e.target.parentElement.innerHTML =
-                                  "No se pudo cargar la imagen";
-                              }}
-                            />
-                          </Box>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <TextField
-                            label="Cambiar foto del producto"
-                            type="file"
-                            name="foto"
-                            onChange={handleFotoChange}
-                            fullWidth
-                            InputLabelProps={{
-                              shrink: true,
-                            }}
-                            inputProps={{
-                              accept: "image/*",
-                            }}
-                            variant="outlined"
-                            InputProps={{
-                              startAdornment: (
-                                <InputAdornment position="start">
-                                  <ImageIcon sx={{ color: "#6b7280" }} />
-                                </InputAdornment>
-                              ),
-                            }}
-                            sx={{
-                              "& .MuiInputLabel-root": {
-                                color: "#065f46",
-                                fontWeight: "bold",
-                              },
-                              "& .MuiInputLabel-root.Mui-focused": {
-                                color: "#065f46",
-                              },
-                              "& .MuiOutlinedInput-root": {
-                                "& fieldset": { borderColor: "#e5e7eb" },
-                                "&:hover fieldset": { borderColor: "#064e3b" },
-                                "&.Mui-focused fieldset": {
-                                  borderColor: "#065f46",
-                                },
-                                transition: "all 0.3s ease",
-                              },
-                            }}
-                          />
-                        </Grid>
-                      </>
-                    ) : (
-                      <Grid item xs={12}>
-                        <TextField
-                          label="Subir foto del producto"
-                          type="file"
-                          name="foto"
-                          onChange={handleFotoChange}
-                          fullWidth
-                          InputLabelProps={{
-                            shrink: true,
-                          }}
-                          inputProps={{
-                            accept: "image/*",
-                          }}
-                          variant="outlined"
-                          InputProps={{
-                            startAdornment: (
-                              <InputAdornment position="start">
-                                <ImageIcon sx={{ color: "#6b7280" }} />
-                              </InputAdornment>
-                            ),
-                          }}
-                          sx={{
-                            "& .MuiInputLabel-root": {
-                              color: "#065f46",
-                              fontWeight: "bold",
-                            },
-                            "& .MuiInputLabel-root.Mui-focused": {
-                              color: "#065f46",
-                            },
-                            "& .MuiOutlinedInput-root": {
-                              "& fieldset": { borderColor: "#e5e7eb" },
-                              "&:hover fieldset": { borderColor: "#064e3b" },
-                              "&.Mui-focused fieldset": {
-                                borderColor: "#065f46",
-                              },
-                              transition: "all 0.3s ease",
-                            },
-                          }}
-                        />
-                      </Grid>
-                    )}
-                  </Grid>
-                </Grid>
+      const producto = await Producto.findByPk(ID_Producto, {
+        attributes: [
+          "ID_Producto",
+          "Nombre",
+          "Descripcion",
+          "Foto",
+          "ID_Categoria",
+        ],
+        include: [
+          { model: Categoria, attributes: ["Nombre"] },
+          {
+            model: PrecioProducto,
+            as: "Precios",
+            attributes: ["Formato", "Precio"],
+          },
+          {
+            model: Alergeno,
+            as: "Alergenos",
+            attributes: ["ID_Alergeno", "Nombre", "Imagen"],
+            through: { attributes: [] },
+          },
+        ],
+      });
 
-                <Grid item xs={12}>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      mb: 2,
-                      color: "#333",
-                      fontWeight: "bold",
-                      textAlign: "center",
-                    }}
-                  >
-                    Seleccionar Alérgenos
-                  </Typography>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexWrap: "wrap",
-                      gap: 1,
-                      justifyContent: "center",
-                      p: 2,
-                      border: "1px solid #e5e7eb",
-                      borderRadius: 2,
-                      backgroundColor: "#f9fafb",
-                      maxHeight: 200,
-                      overflowY: "auto",
-                    }}
-                  >
-                    {alergenos.length === 0 ? (
-                      <Typography variant="body2" color="text.secondary">
-                        No hay alérgenos disponibles
-                      </Typography>
-                    ) : (
-                      alergenos.map((alergeno) => {
-                        const isSelected = datos.alergenosSeleccionados.includes(
-                          alergeno.id
-                        );
-                        return (
-                          <Chip
-                            key={alergeno.id}
-                            avatar={
-                              alergeno.imagen && (
-                                <img
-                                  src={
-                                    alergeno.imagen.startsWith("http")
-                                      ? alergeno.imagen
-                                      : `http://localhost:3000/uploads/${alergeno.imagen}`
-                                  }
-                                  alt={alergeno.nombre}
-                                  style={{ width: 20, height: 20 }}
-                                  onError={(e) => {
-                                    e.target.style.display = "none";
-                                  }}
-                                />
-                              )
-                            }
-                            label={alergeno.nombre}
-                            onClick={() => {
-                              setDatos((prev) => ({
-                                ...prev,
-                                alergenosSeleccionados: isSelected
-                                  ? prev.alergenosSeleccionados.filter(
-                                      (id) => id !== alergeno.id
-                                    )
-                                  : [...prev.alergenosSeleccionados, alergeno.id],
-                              }));
-                            }}
-                            sx={{
-                              bgcolor: isSelected ? "#065f46" : "#fff",
-                              color: isSelected ? "#fff" : "#333",
-                              border: `1px solid ${
-                                isSelected ? "#065f46" : "#e5e7eb"
-                              }`,
-                              "&:hover": {
-                                bgcolor: isSelected ? "#047857" : "#f1f5f9",
-                              },
-                              transition: "all 0.3s ease",
-                              fontSize: "0.85rem",
-                              height: 32,
-                            }}
-                          />
-                        );
-                      })
-                    )}
-                  </Box>
-                </Grid>
+      if (!producto) {
+        return res
+          .status(404)
+          .json(
+            Respuesta.error(null, `Producto con ID ${ID_Producto} no existe`)
+          );
+      }
 
-                <Grid item xs={12}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      width: "100%",
-                    }}
-                  >
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        mb: 2,
-                        color: "#333",
-                        fontWeight: "bold",
-                        textAlign: "center",
-                      }}
-                    >
-                      Formatos y Precios
-                    </Typography>
-                    <FormGroup
-                      row
-                      sx={{
-                        gap: { xs: 2, lg: 3 },
-                        mb: 3,
-                        justifyContent: "center",
-                        flexWrap: "wrap",
-                      }}
-                    >
-                      {[
-                        "tapa",
-                        "media",
-                        "plato",
-                        "unidad",
-                        "copa",
-                        "botella",
-                      ].map((formato) => (
-                        <FormControlLabel
-                          key={formato}
-                          control={
-                            <Checkbox
-                              checked={datos.formatos[formato]}
-                              onChange={handleCheckboxChange}
-                              name={formato}
-                              sx={{
-                                color: "#065f46",
-                                "&.Mui-checked": { color: "#065f46" },
-                              }}
-                            />
-                          }
-                          label={
-                            formato.charAt(0).toUpperCase() + formato.slice(1)
-                          }
-                        />
-                      ))}
-                    </FormGroup>
-                    <Grid container spacing={3} justifyContent="center">
-                      {Object.entries(datos.formatos).map(
-                        ([formato, activo]) =>
-                          activo && (
-                            <Grid
-                              item
-                              xs={12}
-                              sm={6}
-                              md={4}
-                              lg={3}
-                              key={formato}
-                            >
-                              <TextField
-                                label={`Precio ${formato}`}
-                                name={formato}
-                                type="number"
-                                value={datos.precios[formato]}
-                                onChange={handlePrecioChange}
-                                fullWidth
-                                required
-                                inputProps={{ step: "0.01" }}
-                                variant="outlined"
-                                InputProps={{
-                                  startAdornment: (
-                                    <InputAdornment position="start">
-                                      <MoneyIcon sx={{ color: "#6b7280" }} />
-                                    </InputAdornment>
-                                  ),
-                                }}
-                                sx={{
-                                  "& .MuiInputLabel-root": {
-                                    color: "#065f46",
-                                    fontWeight: "bold",
-                                  },
-                                  "& .MuiInputLabel-root.Mui-focused": {
-                                    color: "#065f46",
-                                  },
-                                  "& .MuiOutlinedInput-root": {
-                                    "& fieldset": { borderColor: "#e5e7eb" },
-                                    "&:hover fieldset": { borderColor: "#064e3b" },
-                                    "&.Mui-focused fieldset": {
-                                      borderColor: "#065f46",
-                                    },
-                                    transition: "all 0.3s ease",
-                                  },
-                                }}
-                              />
-                            </Grid>
-                          )
-                      )}
-                    </Grid>
-                  </Box>
-                </Grid>
-              </Grid>
+      return res
+        .status(200)
+        .json(Respuesta.exito(formatearProducto(producto, req)));
+    } catch (err) {
+      logMensaje(`Error al obtener producto: ${err.message}`, "error");
+      return res
+        .status(err.message.includes("ID_Producto") ? 400 : 500)
+        .json(
+          Respuesta.error(
+            null,
+            err.message.includes("ID_Producto")
+              ? err.message
+              : "Error al obtener el producto"
+          )
+        );
+    }
+  }
 
-              <Button
-                type="submit"
-                variant="contained"
-                fullWidth
-                disabled={loading}
-                sx={{
-                  mt: 4,
-                  py: 1.5,
-                  bgcolor: "#065f46",
-                  "&:hover": {
-                    bgcolor: "#047857",
-                    transform: "scale(1.02)",
-                    boxShadow: "0 4px 15px rgba(6, 95, 70, 0.3)",
-                  },
-                  textTransform: "none",
-                  fontWeight: "bold",
-                  fontSize: "1rem",
-                  transition: "all 0.3s ease",
-                  borderRadius: "6px",
-                }}
-              >
-                {loading ? (
-                  <CircularProgress size={24} color="inherit" />
-                ) : (
-                  "Actualizar Producto"
-                )}
-              </Button>
+  async addProduct(req, res) {
+    try {
+      upload.single("Foto")(req, res, async (err) => {
+        if (err) {
+          logMensaje(`Error al subir la foto: ${err.message}`, "error");
+          return res
+            .status(400)
+            .json(Respuesta.error(null, "Error al subir la foto"));
+        }
 
-              <Typography
-                variant="body2"
-                sx={{ mt: 3, textAlign: "center", color: "#6b7280" }}
-              >
-                ¿No quieres modificar el producto?{" "}
-                <Box
-                  component="span"
-                  onClick={() => navigate("/carta")}
-                  sx={{
-                    color: "#065f46",
-                    cursor: "pointer",
-                    fontWeight: "bold",
-                    "&:hover": {
-                      textDecoration: "underline",
-                      color: "#047857",
-                    },
-                    transition: "color 0.3s ease",
-                  }}
-                >
-                  Volver a la carta
-                </Box>
-              </Typography>
-            </Box>
-          </Paper>
-        </Container>
-      </Fade>
+        let { Nombre, Descripcion, ID_Categoria, Precios, Alergenos } =
+          req.body;
 
-      <Snackbar
-        open={success}
-        autoHideDuration={2000}
-        onClose={() => setSuccess(false)}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          severity="success"
-          sx={{
-            bgcolor: "#d1fae5",
-            color: "#065f46",
-            borderRadius: 4,
-            boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-            fontWeight: "medium",
-          }}
-        >
-          ¡Producto actualizado con éxito!
-        </Alert>
-      </Snackbar>
-    </Box>
-  );
+        if (typeof Precios === "string") {
+          try {
+            Precios = JSON.parse(Precios);
+          } catch {
+            throw new Error("El formato de Precios no es JSON válido");
+          }
+        }
+        if (typeof Alergenos === "string") {
+          try {
+            Alergenos = JSON.parse(Alergenos);
+          } catch {
+            throw new Error("El formato de Alergenos no es JSON válido");
+          }
+        }
+
+        if (!Nombre) throw new Error("Nombre es requerido");
+        await validarCategoria(ID_Categoria);
+        validarPrecios(Precios);
+
+        const fotoPath = req.file ? req.file.filename : null;
+
+        const resultado = await sequelize.transaction(async (t) => {
+          const nuevoProducto = await Producto.create(
+            {
+              Nombre,
+              Descripcion: Descripcion || null,
+              Foto: fotoPath,
+              ID_Categoria,
+            },
+            { transaction: t }
+          );
+
+          let preciosCreados = [];
+          if (Array.isArray(Precios) && Precios.length) {
+            const preciosParaCrear = Precios.map((p) => ({
+              ID_Producto: nuevoProducto.ID_Producto,
+              Formato: p.Formato,
+              Precio: p.Precio,
+            }));
+            preciosCreados = await PrecioProducto.bulkCreate(preciosParaCrear, {
+              transaction: t,
+            });
+          }
+
+          if (Array.isArray(Alergenos) && Alergenos.length) {
+            const alergenosIds = Alergenos.map((a) => {
+              if (!a.ID_Alergeno || isNaN(a.ID_Alergeno)) {
+                throw new Error(
+                  "ID_Alergeno inválido en la lista de alérgenos"
+                );
+              }
+              return a.ID_Alergeno;
+            });
+            await nuevoProducto.setAlergenos(alergenosIds, { transaction: t });
+          }
+
+          const productoConAlergenos = await Producto.findByPk(
+            nuevoProducto.ID_Producto,
+            {
+              include: [
+                {
+                  model: Alergeno,
+                  as: "Alergenos",
+                  attributes: ["ID_Alergeno", "Nombre", "Imagen"],
+                  through: { attributes: [] },
+                },
+              ],
+            }
+          );
+
+          if (!productoConAlergenos) {
+            return {
+              ...nuevoProducto.get({ plain: true }),
+              Precios: preciosCreados.map((p) => ({
+                Formato: p.Formato,
+                Precio: p.Precio,
+              })),
+              Alergenos: [],
+            };
+          }
+
+          return {
+            ...productoConAlergenos.get({ plain: true }),
+            Precios: preciosCreados.map((p) => ({
+              Formato: p.Formato,
+              Precio: p.Precio,
+            })),
+            Alergenos: productoConAlergenos.Alergenos,
+          };
+        });
+
+        return res
+          .status(201)
+          .json(Respuesta.exito(resultado, "Producto creado correctamente"));
+      });
+    } catch (err) {
+      logMensaje(`Error al crear producto: ${err.message}`, "error");
+      const status = /requerido|categoría|Precios|Alergeno/.test(err.message)
+        ? 400
+        : 500;
+      return res.status(status).json(Respuesta.error(null, err.message));
+    }
+  }
+
+  async updateProduct(req, res) {
+    try {
+      upload.single("Foto")(req, res, async (err) => {
+        if (err) {
+          logMensaje(`Error al subir la foto: ${err.message}`, "error");
+          return res
+            .status(400)
+            .json(Respuesta.error(null, "Error al subir la foto"));
+        }
+
+        const { ID_Producto } = req.params;
+        validarIdProducto(ID_Producto);
+
+        // Extraer datos del req.body
+        let { Nombre, Descripcion, ID_Categoria, Precios, Alergenos } =
+          req.body;
+        const Foto = req.file ? req.file.filename : null;
+
+        logMensaje(`req.body: ${JSON.stringify(req.body)}`, "info");
+        logMensaje(`Foto recibida: ${Foto}`, "info");
+
+        // Parsear JSON si es necesario
+        if (typeof Precios === "string") {
+          try {
+            Precios = JSON.parse(Precios);
+            logMensaje(`Precios parseados: ${JSON.stringify(Precios)}`, "info");
+          } catch (e) {
+            throw new Error("El formato de Precios no es JSON válido");
+          }
+        }
+        if (typeof Alergenos === "string") {
+          try {
+            Alergenos = JSON.parse(Alergenos);
+            logMensaje(
+              `Alergenos parseados: ${JSON.stringify(Alergenos)}`,
+              "info"
+            );
+          } catch (e) {
+            throw new Error("El formato de Alergenos no es JSON válido");
+          }
+        }
+
+        // Convertir ID_Categoria a número si existe
+        ID_Categoria = ID_Categoria ? Number(ID_Categoria) : null;
+        // Asegurar que Descripcion sea null si está vacía
+        Descripcion = Descripcion === "" ? null : Descripcion;
+
+        logMensaje(
+          `Datos procesados - Nombre: ${Nombre}, Descripcion: ${Descripcion}, ID_Categoria: ${ID_Categoria}, Precios: ${JSON.stringify(
+            Precios
+          )}, Alergenos: ${JSON.stringify(Alergenos)}, Foto: ${Foto}`,
+          "info"
+        );
+
+        if (ID_Categoria) await validarCategoria(ID_Categoria);
+        validarPrecios(Precios);
+
+        const producto = await Producto.findByPk(ID_Producto);
+        if (!producto) {
+          return res
+            .status(404)
+            .json(
+              Respuesta.error(null, `Producto con ID ${ID_Producto} no existe`)
+            );
+        }
+
+        const resultado = await sequelize.transaction(async (t) => {
+          await producto.update(
+            {
+              Nombre: Nombre || producto.Nombre,
+              Descripcion:
+                Descripcion !== undefined ? Descripcion : producto.Descripcion,
+              Foto: Foto !== null ? Foto : producto.Foto,
+              ID_Categoria: ID_Categoria || producto.ID_Categoria,
+            },
+            { transaction: t }
+          );
+
+          let preciosActualizados = [];
+          if (Array.isArray(Precios)) {
+            await PrecioProducto.destroy({
+              where: { ID_Producto },
+              transaction: t,
+            });
+            if (Precios.length > 0) {
+              const preciosParaCrear = Precios.map((p) => ({
+                ID_Producto,
+                Formato: p.Formato,
+                Precio: p.Precio,
+              }));
+              preciosActualizados = await PrecioProducto.bulkCreate(
+                preciosParaCrear,
+                {
+                  transaction: t,
+                }
+              );
+            }
+          } else {
+            preciosActualizados = await PrecioProducto.findAll({
+              where: { ID_Producto },
+              transaction: t,
+            });
+          }
+
+          if (Array.isArray(Alergenos)) {
+            const alergenosIds = Alergenos.map((a) => {
+              if (!a.ID_Alergeno || isNaN(a.ID_Alergeno)) {
+                throw new Error(
+                  "ID_Alergeno inválido en la lista de alérgenos"
+                );
+              }
+              return a.ID_Alergeno;
+            });
+            await producto.setAlergenos(alergenosIds, { transaction: t });
+          }
+
+          const productoActualizado = await Producto.findByPk(ID_Producto, {
+            include: [
+              { model: Categoria, attributes: ["Nombre"] },
+              {
+                model: PrecioProducto,
+                as: "Precios",
+                attributes: ["Formato", "Precio"],
+              },
+              {
+                model: Alergeno,
+                as: "Alergenos",
+                attributes: ["ID_Alergeno", "Nombre", "Imagen"],
+                through: { attributes: [] },
+              },
+            ],
+          });
+
+          if (!productoActualizado) {
+            return {
+              ...producto.get({ plain: true }),
+              Precios: preciosActualizados.map((p) => ({
+                Formato: p.Formato,
+                Precio: p.Precio,
+              })),
+              Alergenos: [],
+            };
+          }
+
+          return res.status(200).json(
+            Respuesta.exito(
+              formatearProducto(productoActualizado, req), // <-- Usa el formateador
+              "Producto actualizado correctamente"
+            )
+          );
+        });
+
+        logMensaje(
+          `Producto actualizado - ID: ${ID_Producto}, Datos: ${JSON.stringify(
+            resultado
+          )}`,
+          "info"
+        );
+        return res
+          .status(200)
+          .json(
+            Respuesta.exito(resultado, "Producto actualizado correctamente")
+          );
+      });
+    } catch (err) {
+      logMensaje(`Error al actualizar producto: ${err.message}`, "error");
+      const status = /ID_Producto|categoría|Precios|Alergeno/.test(err.message)
+        ? 400
+        : 500;
+      return res.status(status).json(Respuesta.error(null, err.message));
+    }
+  }
+
+  async deleteProduct(req, res) {
+    try {
+      const { ID_Producto } = req.params;
+      validarIdProducto(ID_Producto);
+
+      const producto = await Producto.findByPk(ID_Producto);
+      if (!producto) {
+        return res
+          .status(404)
+          .json(
+            Respuesta.error(null, `Producto con ID ${ID_Producto} no existe`)
+          );
+      }
+
+      await producto.destroy();
+      return res
+        .status(200)
+        .json(
+          Respuesta.exito(
+            null,
+            `Producto con ID ${ID_Producto} eliminado correctamente`
+          )
+        );
+    } catch (err) {
+      logMensaje(`Error al eliminar producto: ${err.message}`, "error");
+      return res
+        .status(err.message.includes("ID_Producto") ? 400 : 500)
+        .json(
+          Respuesta.error(
+            null,
+            err.message.includes("ID_Producto")
+              ? err.message
+              : "Error al eliminar el producto"
+          )
+        );
+    }
+  }
 }
+
+module.exports = new ProductosController();
