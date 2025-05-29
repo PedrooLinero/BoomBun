@@ -46,14 +46,28 @@ function Resena() {
   const [newPuntuacion, setNewPuntuacion] = useState(0);
   const [selectedProduct, setSelectedProduct] = useState("");
   const [products, setProducts] = useState([]);
+  // eslint-disable-next-line no-unused-vars
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  // eslint-disable-next-line no-unused-vars
   const [auth, setAuth] = useState(isAuthenticated());
   const [filterRating, setFilterRating] = useState(0);
   const [sortBy, setSortBy] = useState("relevancia");
   const [anchorEl, setAnchorEl] = useState(null);
   const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
+
+  const puntuacionesValidas = reseñas
+    .map((r) => Number(r.puntuacion))
+    .filter((p) => !isNaN(p) && p > 0);
+
+  const promedioPuntuacion =
+    puntuacionesValidas.length > 0
+      ? (
+          puntuacionesValidas.reduce((sum, p) => sum + p, 0) /
+          puntuacionesValidas.length
+        ).toFixed(1)
+      : "0.0";
 
   useEffect(() => {
     async function getResenas() {
@@ -249,6 +263,43 @@ function Resena() {
               {error}
             </Alert>
           )}
+
+          {/* Resumen de reseñas */}
+          <Card
+            sx={{
+              mb: 4,
+              p: 3,
+              bgcolor: "#f9fafb",
+              borderRadius: 2,
+              boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexDirection: "column",
+              }}
+            >
+              <Typography
+                variant="h5"
+                sx={{ fontWeight: 700, color: "#1a1a1a", mb: 1 }}
+              >
+                {promedioPuntuacion} / 5
+              </Typography>
+              <Rating
+                value={parseFloat(promedioPuntuacion)}
+                readOnly
+                precision={0.1}
+                size="large"
+                sx={{ mb: 1 }}
+              />
+              <Typography variant="body2" sx={{ color: "#666666" }}>
+                Basado en {reseñas.length} reseñas
+              </Typography>
+            </Box>
+          </Card>
 
           {/* Filtros y Buscador */}
           <Box
