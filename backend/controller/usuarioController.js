@@ -96,95 +96,38 @@ class UsuarioController {
       await transporter.sendMail({
         from: '"Cervecería Boom Bun" <cerveceriaboombun@gmail.com>',
         to: Correo,
-        subject: "¡Bienvenido/a a Cervecería Boom Bun!",
+        subject: "Bienvenido/a a Cervecería Boom Bun",
+        text: `¡Bienvenido/a, ${Nombre}!
+Gracias por unirte a nuestra comunidad. Estamos emocionados de tenerte como parte de Cervecería Boom Bun.
+Explora nuestra carta, disfruta de nuestra mejor cerveza y cuéntanos tu experiencia.
+Si tienes alguna pregunta, puedes responder a este correo o visitarnos en https://tu-sitio-web.com
+Un saludo,
+El equipo de Cervecería Boom Bun
+`,
         html: `
-          <!DOCTYPE html>
-          <html lang="es">
-          <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <style>
-              body {
-                font-family: Arial, sans-serif;
-                background-color: #f5f5f5;
-                color: #1a1a1a;
-                margin: 0;
-                padding: 0;
-              }
-              .container {
-                max-width: 600px;
-                margin: 20px auto;
-                background-color: #fff;
-                border-radius: 10px;
-                overflow: hidden;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-              }
-              .header {
-                background-color: #065f46;
-                color: #fff;
-                padding: 20px;
-                text-align: center;
-                border-bottom: 3px solid #047857;
-              }
-              .header h1 {
-                margin: 0;
-                font-size: 24px;
-                font-weight: bold;
-              }
-              .content {
-                padding: 20px;
-                text-align: center;
-              }
-              .content h2 {
-                color: #c98c26;
-                font-size: 20px;
-                margin-bottom: 10px;
-              }
-              .content p {
-                font-size: 16px;
-                line-height: 1.5;
-                color: #666666;
-              }
-              .footer {
-                background-color: #e0e0e0;
-                padding: 10px;
-                text-align: center;
-                font-size: 12px;
-                color: #666666;
-              }
-              .button {
-                display: inline-block;
-                padding: 10px 20px;
-                background-color: #c98c26;
-                color: #fff;
-                text-decoration: none;
-                border-radius: 5px;
-                font-weight: bold;
-                margin-top: 20px;
-              }
-              .button:hover {
-                background-color: #a76f1f;
-              }
-            </style>
-          </head>
-          <body>
-            <div class="container">
-              <div class="header">
-                <h1>Cervecería Boom Bun</h1>
-              </div>
-              <div class="content">
-                <h2>¡Bienvenido/a, ${Nombre}!</h2>
-                <p>Gracias por unirte a nuestra comunidad. Estamos emocionados de tenerte como parte de Cervecería Boom Bun. Explora nuestra carta, disfruta de nuestra mejor cerveza y déjanos saber tu experiencia.</p>
-                <p>Si tienes alguna pregunta, no dudes en contactarnos. ¡Esperamos verte pronto!</p>
-                <a href="https://tu-sitio-web.com" class="button">Visita nuestro sitio</a>
-              </div>
-              <div class="footer">
-                <p>&copy; ${new Date().getFullYear()} Cervecería Boom Bun. Todos los derechos reservados.</p>
-              </div>
-            </div>
-          </body>
-          </html>
-        `,
+    <div style="font-family: Arial, sans-serif; color: #1a1a1a; background: #f5f5f5; padding: 24px;">
+      <div style="max-width:600px;margin:auto;background:#fff;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.1);overflow:hidden;">
+        <div style="background:#065f46;color:#fff;padding:20px;text-align:center;border-bottom:3px solid #047857;">
+          <h1 style="margin:0;font-size:24px;font-weight:bold;">Cervecería Boom Bun</h1>
+        </div>
+        <div style="padding:20px;text-align:center;">
+          <h2 style="color:#c98c26;font-size:20px;margin-bottom:10px;">¡Bienvenido/a, ${Nombre}!</h2>
+          <p style="font-size:16px;line-height:1.5;color:#666;">
+            Gracias por unirte a nuestra comunidad. Estamos emocionados de tenerte como parte de Cervecería Boom Bun.<br>
+            Explora nuestra carta, disfruta de nuestra mejor cerveza y cuéntanos tu experiencia.<br>
+            Si tienes alguna pregunta, puedes responder a este correo o visitarnos.
+          </p>
+          <a href="https://tu-sitio-web.com" style="display:inline-block;padding:10px 20px;background:#c98c26;color:#fff;text-decoration:none;border-radius:5px;font-weight:bold;margin-top:20px;">
+            Visita nuestro sitio
+          </a>
+        </div>
+        <div style="background:#e0e0e0;padding:10px;text-align:center;font-size:12px;color:#666;">
+          &copy; ${new Date().getFullYear()} Cervecería Boom Bun. Todos los derechos reservados.
+        </div>
+      </div>
+    </div>
+  `,
+        replyTo: "cerveceriaboombun@gmail.com",
       });
 
       // Respuesta sin datos sensibles
