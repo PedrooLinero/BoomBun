@@ -14,11 +14,18 @@ import {
   MenuItem,
   Snackbar,
   Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
 } from "@mui/material";
 import {
   Menu as MenuIcon,
   Close as CloseIcon,
   AccountCircle,
+  Logout as LogoutIcon,
 } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.jpg";
@@ -28,6 +35,7 @@ function AppMenu() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [welcomeMessage, setWelcomeMessage] = useState("");
+  const [openModal, setOpenModal] = useState(false);
   const [authState, setAuthState] = useState(() => {
     const authData = localStorage.getItem("auth");
     return authData
@@ -59,6 +67,15 @@ function AppMenu() {
   const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
   const handleMenuClose = () => setAnchorEl(null);
 
+  const handleOpenModal = () => {
+    setOpenModal(true);
+    handleMenuClose(); // Cerrar el menú desplegable si está abierto
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
+
   const handleLogout = async () => {
     try {
       await fetch("/api/logout", {
@@ -75,7 +92,7 @@ function AppMenu() {
     } catch (error) {
       console.error("Error en logout:", error);
     } finally {
-      handleMenuClose();
+      handleCloseModal();
     }
   };
 
@@ -180,42 +197,50 @@ function AppMenu() {
                   },
                 }}
               >
-                {authState.isAuthenticated
-                  ? [
-                      <MenuItem
-                        key="profile"
-                        onClick={() => {
-                          handleMenuClose();
-                          navigate("/perfil");
-                        }}
-                      >
-                        Mi Perfil
-                      </MenuItem>,
-                      <MenuItem key="logout" onClick={handleLogout}>
-                        Cerrar Sesión
-                      </MenuItem>,
-                    ]
-                  : [
-                      <MenuItem
-                        key="login"
-                        onClick={() => {
-                          handleMenuClose();
-                          navigate("/login");
-                        }}
-                      >
-                        Iniciar Sesión
-                      </MenuItem>,
-                      <MenuItem
-                        key="register"
-                        onClick={() => {
-                          handleMenuClose();
-                          navigate("/register");
-                        }}
-                      >
-                        Registrarse
-                      </MenuItem>,
-                    ]}
+                {authState.isAuthenticated ? (
+                  <MenuItem
+                    onClick={() => {
+                      handleMenuClose();
+                      setAnchorEl(null); // Asegura que el menú se cierre
+                    }}
+                  >
+                    <Typography sx={{ color: "white" }}>
+                      {authState.user?.nombre || "Usuario autenticado"}
+                    </Typography>
+                  </MenuItem>
+                ) : [
+                  <MenuItem
+                    key="login"
+                    onClick={() => {
+                      handleMenuClose();
+                      navigate("/login");
+                    }}
+                  >
+                    Iniciar Sesión
+                  </MenuItem>,
+                  <MenuItem
+                    key="register"
+                    onClick={() => {
+                      handleMenuClose();
+                      navigate("/register");
+                    }}
+                  >
+                    Registrarse
+                  </MenuItem>,
+                ]}
               </Menu>
+
+              {authState.isAuthenticated && (
+                <IconButton
+                  size="large"
+                  onClick={handleOpenModal}
+                  color="inherit"
+                  aria-label="cerrar-sesion"
+                  sx={{ color: "#d32f2f" }}
+                >
+                  <LogoutIcon fontSize="large" />
+                </IconButton>
+              )}
 
               <IconButton
                 sx={{ display: { xs: "flex", md: "none" }, color: "black" }}
@@ -270,18 +295,8 @@ function AppMenu() {
               ? [
                   <ListItem
                     button
-                    key="profile"
-                    component={Link}
-                    to="/perfil"
-                    onClick={() => setIsDrawerOpen(false)}
-                    sx={{ "&:hover": { backgroundColor: "#065f46" } }}
-                  >
-                    <ListItemText sx={{ color: "white" }} primary="Mi Perfil" />
-                  </ListItem>,
-                  <ListItem
-                    button
                     key="logout"
-                    onClick={handleLogout}
+                    onClick={handleOpenModal}
                     sx={{ "&:hover": { backgroundColor: "#065f46" } }}
                   >
                     <ListItemText sx={{ color: "white" }} primary="Cerrar Sesión" />
@@ -312,6 +327,45 @@ function AppMenu() {
           </List>
         </Box>
       </Drawer>
+
+      <Dialog
+        open={openModal}
+        onClose={handleCloseModal}
+        PaperProps={{
+          sx: {
+            borderRadius: "8px",
+            padding: 2,
+          },
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: 600, color: "#1a1a1a" }}>
+          Confirmar cierre de sesión
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ color: "#666666" }}>
+            ¿Estás seguro de que deseas cerrar tu sesión?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={handleCloseModal}
+            sx={{ color: "#d32f2f", fontWeight: 500 }}
+          >
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleLogout}
+            sx={{
+              bgcolor: "#065f46",
+              color: "white",
+              "&:hover": { bgcolor: "#047857" },
+              fontWeight: 500,
+            }}
+          >
+            Cerrar Sesión
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Snackbar
         open={!!welcomeMessage}
