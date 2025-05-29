@@ -418,7 +418,7 @@ function Login() {
               setRecoveryMsg("");
               try {
                 const res = await fetch(
-                  "http://localhost:3000/api/recuperar_password",
+                  "http://localhost:3000/api/actualizar_password",
                   {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },

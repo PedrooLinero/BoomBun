@@ -277,7 +277,7 @@ El equipo de Cervecería Boom Bun
     }
   }
 
-  async recuperarPassword(req, res) {
+  async actualizarPassword(req, res) {
     const { Correo, nuevaContraseña } = req.body;
 
     if (!Correo || !nuevaContraseña) {
