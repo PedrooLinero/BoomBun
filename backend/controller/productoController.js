@@ -69,6 +69,11 @@ const validarPrecios = (Precios) => {
 
 const formatearProducto = (producto, req) => {
   const baseUrl = `${req.protocol}://${req.get("host")}`;
+  // Extraer solo el nombre del archivo de Foto, eliminando 'uploads/' si está presente
+  const fotoPath =
+    producto.Foto && producto.Foto.includes("uploads/")
+      ? producto.Foto.split("/").pop()
+      : producto.Foto;
   return {
     ...producto.get({ plain: true }),
     Categoria: producto.Categoria?.Nombre,
@@ -79,13 +84,9 @@ const formatearProducto = (producto, req) => {
     Alergenos: producto.Alergenos.map((alergeno) => ({
       ID_Alergeno: alergeno.ID_Alergeno,
       Nombre: alergeno.Nombre,
-      Imagen: alergeno.Imagen, // Esto ya funciona porque AlergenoController lo formatea
+      Imagen: alergeno.Imagen,
     })),
-    Foto: producto.Foto
-      ? producto.Foto.startsWith("http")
-        ? producto.Foto
-        : `${baseUrl}/${producto.Foto}`
-      : null,
+    Foto: fotoPath ? `${baseUrl}/uploads/${fotoPath}` : null,
   };
 };
 
@@ -366,7 +367,7 @@ class ProductosController {
             );
         }
 
-        const resultado = await sequelize.transaction(async (t) => {
+        await sequelize.transaction(async (t) => {
           await producto.update(
             {
               Nombre: Nombre || producto.Nombre,
@@ -415,53 +416,47 @@ class ProductosController {
             });
             await producto.setAlergenos(alergenosIds, { transaction: t });
           }
-
-          const productoActualizado = await Producto.findByPk(ID_Producto, {
-            include: [
-              { model: Categoria, attributes: ["Nombre"] },
-              {
-                model: PrecioProducto,
-                as: "Precios",
-                attributes: ["Formato", "Precio"],
-              },
-              {
-                model: Alergeno,
-                as: "Alergenos",
-                attributes: ["ID_Alergeno", "Nombre", "Imagen"],
-                through: { attributes: [] },
-              },
-            ],
-          });
-
-          if (!productoActualizado) {
-            return {
-              ...producto.get({ plain: true }),
-              Precios: preciosActualizados.map((p) => ({
-                Formato: p.Formato,
-                Precio: p.Precio,
-              })),
-              Alergenos: [],
-            };
-          }
-
-          return res.status(200).json(
-            Respuesta.exito(
-              formatearProducto(productoActualizado, req), // <-- Usa el formateador
-              "Producto actualizado correctamente"
-            )
-          );
         });
+
+        // Obtener el producto actualizado para respuesta y log
+        const productoActualizado = await Producto.findByPk(ID_Producto, {
+          include: [
+            { model: Categoria, attributes: ["Nombre"] },
+            {
+              model: PrecioProducto,
+              as: "Precios",
+              attributes: ["Formato", "Precio"],
+            },
+            {
+              model: Alergeno,
+              as: "Alergenos",
+              attributes: ["ID_Alergeno", "Nombre", "Imagen"],
+              through: { attributes: [] },
+            },
+          ],
+        });
+
+        if (!productoActualizado) {
+          return res
+            .status(404)
+            .json(
+              Respuesta.error(null, `Producto con ID ${ID_Producto} no existe`)
+            );
+        }
+
+        const productoPlano = formatearProducto(productoActualizado, req);
 
         logMensaje(
           `Producto actualizado - ID: ${ID_Producto}, Datos: ${JSON.stringify(
-            resultado
+            productoPlano
           )}`,
           "info"
         );
+
         return res
           .status(200)
           .json(
-            Respuesta.exito(resultado, "Producto actualizado correctamente")
+            Respuesta.exito(productoPlano, "Producto actualizado correctamente")
           );
       });
     } catch (err) {

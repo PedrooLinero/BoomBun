@@ -80,32 +80,32 @@ INSERT INTO Categoria (Nombre, Orden) VALUES
 
 -- 2. Insertar Todos los Alérgenos
 INSERT INTO Alergeno (Nombre, Imagen) VALUES
-('Cereales con gluten', 'images/cereales.png'),
-('Leche y derivados', 'images/leche.png'),
-('Huevos y derivados', 'images/huevos.png'),
-('Crustáceos', 'images/crustaceo.png'),
-('Moluscos y derivados', 'images/molusco.png'),
-('Pescado y derivados', 'images/pescado.png'),
-('Frutos de cáscara', 'images/frutos_secos.png'),
-('Cacahuetes', 'images/cacahuete.png'),
-('Soja', 'images/soja.png'),
-('Apio y derivados', 'images/apio.png'),
-('Granos de sésamo', 'images/sesamo.png'),
-('Mostaza', 'images/mostaza.png'),
-('Altramuces', 'images/altramuces.png'),
-('Dióxido de azufre y sulfitos', 'images/dioxido.png');
+('Cereales con gluten', 'uploads/cereales.png'),
+('Leche y derivados', 'uploads/leche.png'),
+('Huevos y derivados', 'uploads/huevos.png'),
+('Crustáceos', 'uploads/crustaceo.png'),
+('Moluscos y derivados', 'uploads/molusco.png'),
+('Pescado y derivados', 'uploads/pescado.png'),
+('Frutos de cáscara', 'uploads/frutos_secos.png'),
+('Cacahuetes', 'uploads/cacahuete.png'),
+('Soja', 'uploads/soja.png'),
+('Apio y derivados', 'uploads/apio.png'),
+('Granos de sésamo', 'uploads/sesamo.png'),
+('Mostaza', 'uploads/mostaza.png'),
+('Altramuces', 'uploads/altramuces.png'),
+('Dióxido de azufre y sulfitos', 'uploads/dioxido.png');
 
 -- 3. Insertar Productos (incluyendo nuevos)
 INSERT INTO Producto (Nombre, Descripcion, Foto, ID_Categoria) VALUES
-('Jamón ibérico', NULL, 'images/jamon.jpg', 1),
-('Queso puro de oveja', NULL, 'images/queso.jpg', 1),
-('Caña de lomo', NULL, 'images/caña_lomo.jpg', 1),
-('Chicharrón de Cádiz', NULL, 'images/chihcarron.jpg', 1),
-('Jamón y queso', 'Jamón, queso y caña de lomo', 'images/jamon_queso.jpg', 1),
-('Tabla ibérica', NULL, 'images/tabla_iberica.jpg', 1),
-('Mojama de atún', NULL, 'images/mojama.jpg', 1),
-('Gambas al ajillo', NULL, 'images/gambas_al_ajillo.jpg', 1),
-('Gambas cocidas', NULL, 'images/gambas.jpg', 1);
+('Jamón ibérico', NULL, 'uploads/jamon.jpg', 1),
+('Queso puro de oveja', NULL, 'uploads/queso.jpg', 1),
+('Caña de lomo', NULL, 'uploads/caña_lomo.jpg', 1),
+('Chicharrón de Cádiz', NULL, 'uploads/chihcarron.jpg', 1),
+('Jamón y queso', 'Jamón, queso y caña de lomo', 'uploads/jamon_queso.jpg', 1),
+('Tabla ibérica', NULL, 'uploads/tabla_iberica.jpg', 1),
+('Mojama de atún', NULL, 'uploads/mojama.jpg', 1),
+('Gambas al ajillo', NULL, 'uploads/gambas_al_ajillo.jpg', 1),
+('Gambas cocidas', NULL, 'uploads/gambas.jpg', 1);
 
 -- 4. Insertar Precios
 INSERT INTO Precio_Producto (ID_Producto, Formato, Precio) VALUES
@@ -133,11 +133,11 @@ INSERT INTO Categoria (Nombre, Orden) VALUES
 
 -- 2. Insertar Productos
 INSERT INTO Producto (Nombre, Descripcion, Foto, ID_Categoria) VALUES
-('Ensaladilla rusa', NULL, 'images/ensaladilla.jpg', 2),
-('Patatas alioli', NULL, 'images/patatas_alioli.jpg', 2),
-('Aliño de gambas', NULL, 'images/aliño_gambas.jpg', 2),
-('Cóctel de marisco', NULL, 'images/coctel.jpg', 2),
-('Salmorejo', NULL, 'images/salmorejo.jpg', 2),
+('Ensaladilla rusa', NULL, 'uploads/ensaladilla.jpg', 2),
+('Patatas alioli', NULL, 'uploads/patatas_alioli.jpg', 2),
+('Aliño de gambas', NULL, 'uploads/aliño_gambas.jpg', 2),
+('Cóctel de marisco', NULL, 'uploads/coctel.jpg', 2),
+('Salmorejo', NULL, 'uploads/salmorejo.jpg', 2),
 ('Aceitunas', NULL, NULL, 2);
 
 -- 3. Insertar Precios
@@ -164,11 +164,11 @@ INSERT INTO Categoria (Nombre, Orden) VALUES
 
 -- 2. Insertar Productos
 INSERT INTO Producto (Nombre, Descripcion, Foto, ID_Categoria) VALUES
-('Montadito de cabeza de lomo y pollo', NULL, 'images/mini_lomo.jpg', 3),
-('Montadito de cabeza de lomo y pollo con jamón', NULL, 'images/mini_lomo_pollo_jamon.jpg', 3),
-('Montadito de melva y pimiento', NULL, 'images/mont_melva.jpg', 3),
-('Montadito de gambas al ajillo', NULL, 'images/mont_gamba.jpg', 3),
-('Mini serranito de cabeza de lomo y pollo', NULL, 'images/mini_lomo_pollo.jpg', 3);
+('Montadito de cabeza de lomo y pollo', NULL, 'uploads/mini_lomo.jpg', 3),
+('Montadito de cabeza de lomo y pollo con jamón', NULL, 'uploads/mini_lomo_pollo_jamon.jpg', 3),
+('Montadito de melva y pimiento', NULL, 'uploads/mont_melva.jpg', 3),
+('Montadito de gambas al ajillo', NULL, 'uploads/mont_gamba.jpg', 3),
+('Mini serranito de cabeza de lomo y pollo', NULL, 'uploads/mini_lomo_pollo.jpg', 3);
 
 -- 3. Insertar Precios
 INSERT INTO Precio_Producto (ID_Producto, Formato, Precio) VALUES
@@ -192,9 +192,9 @@ INSERT INTO Categoria (Nombre, Orden) VALUES
 
 -- 2. Insertar Productos
 INSERT INTO Producto (Nombre, Descripcion, Foto, ID_Categoria) VALUES
-('Menudo', NULL, 'images/menudo.jpg', 4),
-('Carne con tomate', NULL, 'images/carne_tomate.jpg', 4),
-('Carrillada', NULL, 'images/carrilla.jpg', 4);
+('Menudo', NULL, 'uploads/menudo.jpg', 4),
+('Carne con tomate', NULL, 'uploads/carne_tomate.jpg', 4),
+('Carrillada', NULL, 'uploads/carrilla.jpg', 4);
 
 -- 3. Insertar Precios
 INSERT INTO Precio_Producto (ID_Producto, Formato, Precio) VALUES
@@ -214,9 +214,9 @@ INSERT INTO Categoria (Nombre, Orden) VALUES
 
 -- 2. Insertar Productos
 INSERT INTO Producto (Nombre, Descripcion, Foto, ID_Categoria) VALUES
-('Revuelto de gambas', NULL, 'images/rev_gambas.jpg', 5),
-('Revuelto de champiñones', NULL, 'images/rev_champi.jpg', 5),
-('Revuelto de espárragos', NULL, 'images/rev_esparrag.jpg', 5);
+('Revuelto de gambas', NULL, 'uploads/rev_gambas.jpg', 5),
+('Revuelto de champiñones', NULL, 'uploads/rev_champi.jpg', 5),
+('Revuelto de espárragos', NULL, 'uploads/rev_esparrag.jpg', 5);
 
 -- 3. Insertar Precios
 INSERT INTO Precio_Producto (ID_Producto, Formato, Precio) VALUES
@@ -236,14 +236,14 @@ INSERT INTO Categoria (Nombre, Orden) VALUES
 
 -- 2. Insertar Productos
 INSERT INTO Producto (Nombre, Descripcion, Foto, ID_Categoria) VALUES
-('Adobo', NULL, 'images/adobo.jpg', 6),
-('Tiras de calamar frito', NULL, 'images/tiras_calamar.jpg', 6),
-('Boquerones adobados', NULL, 'images/boquerones.jpg', 6),
-('Tortillita de camarones', NULL, 'images/tort_camaron.jpg', 6),
-('Chipirón a la plancha', NULL, 'images/chipi.jpg', 6),
-('Rosada a la plancha', NULL, 'images/rosada.jpg', 6),
-('Langostinos con bacon', NULL, 'images/lang_beicon.jpg', 6),
-('Pez espada a la plancha', NULL, 'images/pex_espada.jpg', 6);
+('Adobo', NULL, 'uploads/adobo.jpg', 6),
+('Tiras de calamar frito', NULL, 'uploads/tiras_calamar.jpg', 6),
+('Boquerones adobados', NULL, 'uploads/boquerones.jpg', 6),
+('Tortillita de camarones', NULL, 'uploads/tort_camaron.jpg', 6),
+('Chipirón a la plancha', NULL, 'uploads/chipi.jpg', 6),
+('Rosada a la plancha', NULL, 'uploads/rosada.jpg', 6),
+('Langostinos con bacon', NULL, 'uploads/lang_beicon.jpg', 6),
+('Pez espada a la plancha', NULL, 'uploads/pex_espada.jpg', 6);
 
 -- 3. Insertar Precios
 INSERT INTO Precio_Producto (ID_Producto, Formato, Precio) VALUES
@@ -273,21 +273,21 @@ INSERT INTO Categoria (Nombre, Orden) VALUES
 
 -- 2. Insertar Productos
 INSERT INTO Producto (Nombre, Descripcion, Foto, ID_Categoria) VALUES
-('Lagrimitas caseras', NULL, 'images/lagrimitas.jpg', 7),
-('Croquetas de puchero', NULL, 'images/croquetas.jpg', 7),
-('Pincho de pollo', NULL, 'images/pincho_pollo.jpg', 7),
+('Lagrimitas caseras', NULL, 'uploads/lagrimitas.jpg', 7),
+('Croquetas de puchero', NULL, 'uploads/croquetas.jpg', 7),
+('Pincho de pollo', NULL, 'uploads/pincho_pollo.jpg', 7),
 ('Hamburguesa de pollo', NULL, NULL, 7),
-('Hamburguesa de ternera', NULL, 'images/hamburguesa.jpg', 7),
-('Pechuga de pollo', NULL, 'images/pechuga.jpg', 7),
-('Churrasco de cerdo', NULL, 'images/churrasco.jpg', 7),
-('Punta de solomillo al whisky', NULL, 'images/sol_whisky.jpg', 7),
-('Punta de solomillo al jamón', NULL, 'images/sol_jamon.jpg', 7),
-('Punta de solomillo al roquefort', NULL, 'images/sol_roq.jpg', 7),
-('Punta de solomillo a la pimienta', NULL, 'images/sol_pim.jpg', 7),
-('Punta de solomillo salsa churrasco', NULL, 'images/sol_churrasco.jpg', 7),
-('Punta de solomillo a la almendra', NULL, 'images/sol_almendra.jpg', 7),
-('Lomito (cabeza de lomo) al jamón', NULL, 'images/cabeza_jamon.jpg', 7),
-('Lomito (cabeza de lomo) a la almendra', NULL, 'images/cabeza_almendra.jpg', 7),
+('Hamburguesa de ternera', NULL, 'uploads/hamburguesa.jpg', 7),
+('Pechuga de pollo', NULL, 'uploads/pechuga.jpg', 7),
+('Churrasco de cerdo', NULL, 'uploads/churrasco.jpg', 7),
+('Punta de solomillo al whisky', NULL, 'uploads/sol_whisky.jpg', 7),
+('Punta de solomillo al jamón', NULL, 'uploads/sol_jamon.jpg', 7),
+('Punta de solomillo al roquefort', NULL, 'uploads/sol_roq.jpg', 7),
+('Punta de solomillo a la pimienta', NULL, 'uploads/sol_pim.jpg', 7),
+('Punta de solomillo salsa churrasco', NULL, 'uploads/sol_churrasco.jpg', 7),
+('Punta de solomillo a la almendra', NULL, 'uploads/sol_almendra.jpg', 7),
+('Lomito (cabeza de lomo) al jamón', NULL, 'uploads/cabeza_jamon.jpg', 7),
+('Lomito (cabeza de lomo) a la almendra', NULL, 'uploads/cabeza_almendra.jpg', 7),
 ('Extra de salsa', NULL, NULL, 7);
 
 -- 3. Insertar Precios
@@ -333,11 +333,11 @@ INSERT INTO Categoria (Nombre, Orden) VALUES
 
 -- 2. Insertar Productos
 INSERT INTO Producto (Nombre, Descripcion, Foto, ID_Categoria) VALUES
-('Mejillones Gigantes', NULL, 'images/mejillon_gigante.jpg', 8),
-('Churrasquito Boom Bun', NULL, 'images/churr_boombun.jpg', 8),
-('Solomillo a la mostaza', NULL, 'images/sol_mostaza.jpg', 8),
+('Mejillones Gigantes', NULL, 'uploads/mejillon_gigante.jpg', 8),
+('Churrasquito Boom Bun', NULL, 'uploads/churr_boombun.jpg', 8),
+('Solomillo a la mostaza', NULL, 'uploads/sol_mostaza.jpg', 8),
 ('Pollo frito', NULL, NULL, 8),
-('Patatas Boom Bun', NULL, 'images/pat_boombun.jpg', 8);
+('Patatas Boom Bun', NULL, 'uploads/pat_boombun.jpg', 8);
 
 -- 3. Insertar Precios
 INSERT INTO Precio_Producto (ID_Producto, Formato, Precio) VALUES
@@ -392,5 +392,5 @@ INSERT INTO Reseña (ID_Usuario, ID_Producto, Texto, Puntuacion, Fecha) VALUES
 
 
 -- Actualizar las rutas de las imágenes para que apunten a la carpeta 'uploads'
-UPDATE Alergeno SET Imagen = REPLACE(Imagen, 'images/', 'uploads/') WHERE Imagen IS NOT NULL;
-UPDATE Producto SET Foto = REPLACE(Foto, 'images/', 'uploads/') WHERE Foto IS NOT NULL;
+UPDATE Alergeno SET Imagen = REPLACE(Imagen, 'uploads/', 'uploads/') WHERE Imagen IS NOT NULL;
+UPDATE Producto SET Foto = REPLACE(Foto, 'uploads/', 'uploads/') WHERE Foto IS NOT NULL;

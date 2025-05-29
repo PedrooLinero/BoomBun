@@ -11,7 +11,6 @@ import {
   FormControlLabel,
   Checkbox,
   Button,
-  Stack,
   Paper,
   Grid,
   Fade,
@@ -21,7 +20,8 @@ import {
   InputAdornment,
   Box,
   Chip,
-  OutlinedInput,
+  Modal,
+  IconButton,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import {
@@ -30,13 +30,13 @@ import {
   AttachMoney as MoneyIcon,
   RestaurantMenu as RestaurantMenuIcon,
   Image as ImageIcon,
-  Warning as WarningIcon,
+  Close as CloseIcon,
 } from "@mui/icons-material";
 import { apiUrl } from "../pages/config";
 
 export default function AñadirProducto() {
   const [categorias, setCategorias] = useState([]);
-  const [alergenos, setAlergenos] = useState([]); // Estado para los alérgenos
+  const [alergenos, setAlergenos] = useState([]);
   const navigate = useNavigate();
   const [datos, setDatos] = useState({
     nombre: "",
@@ -58,14 +58,16 @@ export default function AñadirProducto() {
       copa: "",
       botella: "",
     },
-    foto: null, // Estado para la foto (archivo)
-    alergenosSeleccionados: [], // Estado para los alérgenos seleccionados
+    foto: null,
+    alergenosSeleccionados: [],
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [vistaPreviaFoto, setVistaPreviaFoto] = useState(null); // Estado para la vista previa
+  const [openModal, setOpenModal] = useState(false); // Estado para el modal
+  const [selectedImage, setSelectedImage] = useState(""); // Imagen seleccionada para el modal
 
-  // Cargar categorías y alérgenos al montar el componente
   useEffect(() => {
     const fetchCategorias = fetch("http://localhost:3000/api/categorias")
       .then((res) =>
@@ -80,7 +82,6 @@ export default function AñadirProducto() {
         setError("Error al cargar categorías: " + err.message);
       });
 
-    // En el useEffect que carga los alérgenos
     const fetchAlergenos = fetch("http://localhost:3000/api/alergenos")
       .then((res) =>
         res.ok ? res.json() : Promise.reject("Error al cargar alérgenos")
@@ -89,9 +90,13 @@ export default function AñadirProducto() {
         const alers = data.datos.map((a) => ({
           id: a.id,
           nombre: a.nombre,
-          imagen: a.imagen || null, // Asegurar valor null si no hay imagen
+          imagen: a.imagen || null,
         }));
         setAlergenos(alers);
+      })
+      .catch((err) => {
+        console.error(err);
+        setError("Error al cargar alérgenos: " + err.message);
       });
 
     Promise.all([fetchCategorias, fetchAlergenos]);
@@ -125,15 +130,23 @@ export default function AñadirProducto() {
       ...prev,
       foto: file || null,
     }));
+    if (file) {
+      const urlVistaPrevia = URL.createObjectURL(file);
+      setVistaPreviaFoto(urlVistaPrevia);
+    } else {
+      setVistaPreviaFoto(null);
+    }
   };
 
-  // const handleAlergenosChange = (event) => {
-  //   const { value } = event.target;
-  //   setDatos((prev) => ({
-  //     ...prev,
-  //     alergenosSeleccionados: value,
-  //   }));
-  // };
+  const handleOpenModal = (image) => {
+    setSelectedImage(image);
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    setSelectedImage("");
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -141,7 +154,6 @@ export default function AñadirProducto() {
     setError("");
     setSuccess(false);
 
-    // Crear FormData para enviar los datos como multipart/form-data
     const formData = new FormData();
     formData.append("Nombre", datos.nombre);
     formData.append("Descripcion", datos.descripcion);
@@ -172,7 +184,7 @@ export default function AñadirProducto() {
     try {
       const response = await fetch(apiUrl + "/productos", {
         method: "POST",
-        body: formData, // Enviar como FormData en lugar de JSON
+        body: formData,
       });
 
       const data = await response.json();
@@ -215,7 +227,6 @@ export default function AñadirProducto() {
               overflow: "hidden",
             }}
           >
-            {/* Encabezado */}
             <Box
               sx={{
                 bgcolor: "#065f46",
@@ -249,7 +260,6 @@ export default function AñadirProducto() {
               </Typography>
             </Box>
 
-            {/* Formulario */}
             <Box
               component="form"
               onSubmit={handleSubmit}
@@ -271,7 +281,6 @@ export default function AñadirProducto() {
               )}
 
               <Grid container spacing={4}>
-                {/* Primera fila: Nombre y Categoría */}
                 <Grid item xs={12} lg={6}>
                   <TextField
                     label="Nombre"
@@ -347,7 +356,6 @@ export default function AñadirProducto() {
                   </FormControl>
                 </Grid>
 
-                {/* Segunda fila: Descripción */}
                 <Grid item xs={12}>
                   <TextField
                     label="Descripción"
@@ -383,47 +391,159 @@ export default function AñadirProducto() {
                   />
                 </Grid>
 
-                {/* Tercera fila: Foto */}
                 <Grid item xs={12}>
-                  <TextField
-                    label="Foto del producto"
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      mb: 2,
+                      color: "#333",
+                      fontWeight: "bold",
+                      textAlign: "center",
+                      letterSpacing: "0.5px",
+                      fontSize: { xs: "1.1rem", sm: "1.3rem", md: "1.5rem" },
+                    }}
+                  >
+                    Foto del Producto
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        borderRadius: "12px",
+                        overflow: "hidden",
+                        border: "2px solid #e5e7eb",
+                        bgcolor: "#fafafa",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+                        width: { xs: 200, sm: 220, md: 300 },
+                        height: { xs: 200, sm: 220, md: 300 },
+                        position: "relative",
+                        cursor: "pointer",
+                        transition: "transform 0.2s ease",
+                        "&:hover": {
+                          transform: "scale(1.02)",
+                        },
+                      }}
+                      onClick={() => {
+                        if (vistaPreviaFoto) {
+                          handleOpenModal(vistaPreviaFoto);
+                        } else {
+                          document.getElementById("file-input").click();
+                        }
+                      }}
+                    >
+                      <Typography
+                        variant="subtitle2"
+                        sx={{
+                          bgcolor: "#065f46",
+                          color: "#ffffff",
+                          width: "100%",
+                          textAlign: "center",
+                          py: { xs: 0.5, sm: 1 },
+                          fontWeight: "medium",
+                          fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
+                        }}
+                      >
+                        Nueva Foto
+                      </Typography>
+                      <Box
+                        sx={{
+                          width: "100%",
+                          height: "100%",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          overflow: "hidden",
+                        }}
+                      >
+                        {vistaPreviaFoto ? (
+                          <img
+                            src={vistaPreviaFoto}
+                            alt="Vista previa"
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "contain",
+                              borderRadius: "0 0 12px 12px",
+                            }}
+                          />
+                        ) : (
+                          <Box
+                            sx={{
+                              width: "100%",
+                              height: "100%",
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              bgcolor: "#f1f5f9",
+                              gap: 1,
+                            }}
+                          >
+                            <ImageIcon
+                              sx={{ fontSize: { xs: 30, sm: 35, md: 40 }, color: "#9ca3af" }}
+                            />
+                            <Typography
+                              variant="body2"
+                              color="text.secondary"
+                              sx={{
+                                fontStyle: "italic",
+                                textAlign: "center",
+                                px: 2,
+                                fontSize: { xs: "0.7rem", sm: "0.8rem", md: "0.9rem" },
+                              }}
+                            >
+                              Selecciona una imagen
+                            </Typography>
+                          </Box>
+                        )}
+                      </Box>
+                      {vistaPreviaFoto && (
+                        <Button
+                          variant="contained"
+                          size="small"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setVistaPreviaFoto(null);
+                            setDatos((prev) => ({ ...prev, foto: null }));
+                            document.getElementById("file-input").value = "";
+                          }}
+                          sx={{
+                            position: "absolute",
+                            bottom: 10,
+                            right: 10,
+                            bgcolor: "#b91c1c",
+                            color: "#ffffff",
+                            "&:hover": {
+                              bgcolor: "#991b1b",
+                            },
+                            fontSize: { xs: "0.6rem", sm: "0.7rem", md: "0.75rem" },
+                            px: 1.5,
+                            py: 0.5,
+                            borderRadius: "6px",
+                          }}
+                        >
+                          Eliminar
+                        </Button>
+                      )}
+                    </Box>
+                  </Box>
+                  <input
+                    id="file-input"
                     type="file"
                     name="foto"
                     onChange={handleFotoChange}
-                    fullWidth
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    inputProps={{
-                      accept: "image/*", // Solo permitir imágenes
-                    }}
-                    variant="outlined"
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <ImageIcon sx={{ color: "#6b7280" }} />
-                        </InputAdornment>
-                      ),
-                    }}
-                    sx={{
-                      "& .MuiInputLabel-root": {
-                        color: "#065f46",
-                        fontWeight: "bold",
-                      },
-                      "& .MuiInputLabel-root.Mui-focused": {
-                        color: "#065f46",
-                      },
-                      "& .MuiOutlinedInput-root": {
-                        "& fieldset": { borderColor: "#e5e7eb" },
-                        "&:hover fieldset": { borderColor: "#064e3b" },
-                        "&.Mui-focused fieldset": { borderColor: "#065f46" },
-                        transition: "all 0.3s ease",
-                      },
-                    }}
+                    accept="image/*"
+                    style={{ display: "none" }}
                   />
                 </Grid>
 
-                {/* Cuarta fila: Alérgenos */}
                 <Grid item xs={12}>
                   <Typography
                     variant="h6"
@@ -446,8 +566,8 @@ export default function AñadirProducto() {
                       border: "1px solid #e5e7eb",
                       borderRadius: 2,
                       backgroundColor: "#f9fafb",
-                      maxHeight: 200, // Limit height for scrolling on mobile
-                      overflowY: "auto", // Enable vertical scrolling if needed
+                      maxHeight: 200,
+                      overflowY: "auto",
                     }}
                   >
                     {alergenos.map((alergeno) => {
@@ -495,7 +615,7 @@ export default function AñadirProducto() {
                             },
                             transition: "all 0.3s ease",
                             fontSize: "0.85rem",
-                            height: 32, // Compact size for mobile
+                            height: 32,
                           }}
                         />
                       );
@@ -503,7 +623,6 @@ export default function AñadirProducto() {
                   </Box>
                 </Grid>
 
-                {/* Formatos y Precios */}
                 <Grid item xs={12}>
                   <Box
                     sx={{
@@ -691,6 +810,56 @@ export default function AñadirProducto() {
           ¡Producto añadido con éxito!
         </Alert>
       </Snackbar>
+
+      <Modal
+        open={openModal}
+        onClose={handleCloseModal}
+        closeAfterTransition
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Fade in={openModal}>
+          <Box
+            sx={{
+              position: "relative",
+              maxWidth: { xs: "90vw", sm: "80vw", md: "70vw" },
+              maxHeight: "90vh",
+              bgcolor: "transparent",
+              outline: "none",
+            }}
+          >
+            <img
+              src={selectedImage}
+              alt="Imagen ampliada"
+              style={{
+                width: "100%",
+                height: "auto",
+                maxHeight: "90vh",
+                objectFit: "contain",
+                borderRadius: "8px",
+              }}
+            />
+            <IconButton
+              onClick={handleCloseModal}
+              sx={{
+                position: "absolute",
+                top: 10,
+                right: 10,
+                bgcolor: "rgba(0, 0, 0, 0.5)",
+                color: "#ffffff",
+                "&:hover": {
+                  bgcolor: "rgba(0, 0, 0, 0.7)",
+                },
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </Fade>
+      </Modal>
     </Box>
   );
 }

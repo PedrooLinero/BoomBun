@@ -29,7 +29,6 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import SearchIcon from "@mui/icons-material/Search";
-import ShareIcon from "@mui/icons-material/Share";
 import AddIcon from "@mui/icons-material/Add";
 import LocalBarIcon from "@mui/icons-material/LocalBar";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
@@ -37,6 +36,7 @@ import DinnerDiningIcon from "@mui/icons-material/DinnerDining";
 import IcecreamIcon from "@mui/icons-material/Icecream";
 import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/material/styles";
+import sinFoto from "../assets/sin_foto.png";
 
 const ProductCard = styled(Card)(() => ({
   display: "flex",
@@ -372,334 +372,155 @@ const CartaCompleta = () => {
   }
 
   return (
-    <Box sx={{ backgroundColor: "#F5F5F5", minHeight: "100vh", pb: 10 }}>
-      <Box
-        sx={{
-          background: "linear-gradient(135deg, #065f46 0%, #047857 100%)",
-          py: 4,
-          textAlign: "center",
-          color: "#ffffff",
-          borderBottomLeftRadius: "24px",
-          borderBottomRightRadius: "24px",
-          boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
-        }}
-      >
-        <Typography
-          variant="h4"
-          sx={{
-            fontWeight: 700,
-            mb: 1,
-            fontSize: { xs: "1.5rem", md: "2.25rem" },
-          }}
-        >
-          Explora Nuestra Carta
-        </Typography>
-        <Typography
-          variant="body1"
-          sx={{
-            color: "#e0e0e0",
-            maxWidth: "600px",
-            mx: "auto",
-            fontSize: { xs: "0.9rem", md: "1rem" },
-          }}
-        >
-          Descubre las mejor cerveza, tapas y platos en Cervecería Boom Bun.
-        </Typography>
-      </Box>
-
-      <Container maxWidth="xl" sx={{ py: 4 }}>
+    <>
+      {console.log("Productos:", productos)}
+      <Box sx={{ backgroundColor: "#F5F5F5", minHeight: "100vh", pb: 10 }}>
         <Box
           sx={{
-            mb: 4,
-            display: "flex",
-            flexDirection: { xs: "column", md: "row" },
-            gap: 2,
+            background: "linear-gradient(135deg, #065f46 0%, #047857 100%)",
+            py: 4,
+            textAlign: "center",
+            color: "#ffffff",
+            borderBottomLeftRadius: "24px",
+            borderBottomRightRadius: "24px",
+            boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
           }}
         >
-          <TextField
-            fullWidth
-            variant="outlined"
-            placeholder="Busca tapas, platos o productos..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon sx={{ color: "#6b7280" }} />
-                </InputAdornment>
-              ),
-            }}
+          <Typography
+            variant="h4"
             sx={{
-              backgroundColor: "#ffffff",
-              borderRadius: "8px",
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": { borderColor: "#e5e7eb" },
-                "&:hover fieldset": { borderColor: "#065f46" },
-                "&.Mui-focused fieldset": { borderColor: "#065f46" },
-              },
-            }}
-          />
-
-          <FormControl
-            fullWidth
-            sx={{
-              minWidth: 120,
-              backgroundColor: "#ffffff",
-              borderRadius: "8px",
+              fontWeight: 700,
+              mb: 1,
+              fontSize: { xs: "1.5rem", md: "2.25rem" },
             }}
           >
-            <InputLabel id="category-select-label" sx={{ color: "#6b7280" }}>
-              Selecciona una categoría
-            </InputLabel>
-            <Select
-              labelId="category-select-label"
-              value={selectedCategory}
-              label="Selecciona una categoría"
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              sx={{
-                "& .MuiSelect-select": {
-                  color: selectedCategory ? "#1a1a1a" : "#6b7280",
-                  "&:focus": { backgroundColor: "transparent" },
-                },
-                "& .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "#e5e7eb",
-                },
-                "&:hover .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "#065f46",
-                },
-                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "#065f46",
-                },
-              }}
-            >
-              <MenuItem value="">
-                <em>Todas las categorías</em>
-              </MenuItem>
-              {categorias.map((cat) => (
-                <MenuItem key={cat.ID_Categoria} value={cat.ID_Categoria}>
-                  {cat.Nombre}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <Button
-            variant="outlined"
-            onClick={handleResetFilters}
+            Explora Nuestra Carta
+          </Typography>
+          <Typography
+            variant="body1"
             sx={{
-              color: "#065f46",
-              borderColor: "#065f46",
-              backgroundColor: "white",
+              color: "#e0e0e0",
+              maxWidth: "600px",
+              mx: "auto",
+              fontSize: { xs: "0.9rem", md: "1rem" },
             }}
           >
-            Limpiar filtros
-          </Button>
+            Descubre las mejor cerveza, tapas y platos en Cervecería Boom Bun.
+          </Typography>
         </Box>
 
-        {selectedCategory ? (
-          <Fade in timeout={1000}>
-            <Box sx={{ mb: 6 }}>
-              <CategoryHeader>
-                {categoryIcons[
-                  categorias.find((c) => c.ID_Categoria == selectedCategory)
-                    ?.Nombre
-                ] || <LocalBarIcon sx={{ mr: 2, fontSize: "2rem" }} />}
-                <Typography
-                  variant="h5"
-                  sx={{
-                    fontWeight: 600,
-                    fontSize: { xs: "1.25rem", md: "1.75rem" },
-                  }}
-                >
-                  {
+        <Container maxWidth="xl" sx={{ py: 4 }}>
+          <Box
+            sx={{
+              mb: 4,
+              display: "flex",
+              flexDirection: { xs: "column", md: "row" },
+              gap: 2,
+            }}
+          >
+            <TextField
+              fullWidth
+              variant="outlined"
+              placeholder="Busca tapas, platos o productos..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ color: "#6b7280" }} />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{
+                backgroundColor: "#ffffff",
+                borderRadius: "8px",
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": { borderColor: "#e5e7eb" },
+                  "&:hover fieldset": { borderColor: "#065f46" },
+                  "&.Mui-focused fieldset": { borderColor: "#065f46" },
+                },
+              }}
+            />
+
+            <FormControl
+              fullWidth
+              sx={{
+                minWidth: 120,
+                backgroundColor: "#ffffff",
+                borderRadius: "8px",
+              }}
+            >
+              <InputLabel id="category-select-label" sx={{ color: "#6b7280" }}>
+                Selecciona una categoría
+              </InputLabel>
+              <Select
+                labelId="category-select-label"
+                value={selectedCategory}
+                label="Selecciona una categoría"
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                sx={{
+                  "& .MuiSelect-select": {
+                    color: selectedCategory ? "#1a1a1a" : "#6b7280",
+                    "&:focus": { backgroundColor: "transparent" },
+                  },
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#e5e7eb",
+                  },
+                  "&:hover .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#065f46",
+                  },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#065f46",
+                  },
+                }}
+              >
+                <MenuItem value="">
+                  <em>Todas las categorías</em>
+                </MenuItem>
+                {categorias.map((cat) => (
+                  <MenuItem key={cat.ID_Categoria} value={cat.ID_Categoria}>
+                    {cat.Nombre}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <Button
+              variant="outlined"
+              onClick={handleResetFilters}
+              sx={{
+                color: "#065f46",
+                borderColor: "#065f46",
+                backgroundColor: "white",
+              }}
+            >
+              Limpiar filtros
+            </Button>
+          </Box>
+
+          {selectedCategory ? (
+            <Fade in timeout={1000}>
+              <Box sx={{ mb: 6 }}>
+                <CategoryHeader>
+                  {categoryIcons[
                     categorias.find((c) => c.ID_Categoria == selectedCategory)
                       ?.Nombre
-                  }
-                </Typography>
-              </CategoryHeader>
-              <Grid container spacing={{ xs: 2, md: 3 }}>
-                {getProductosPorCategoria(selectedCategory).map((producto) => (
-                  <Grid
-                    item
-                    xs={12}
-                    sm={12}
-                    md={6}
-                    lg={4}
-                    key={producto.ID_Producto}
+                  ] || <LocalBarIcon sx={{ mr: 2, fontSize: "2rem" }} />}
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      fontWeight: 600,
+                      fontSize: { xs: "1.25rem", md: "1.75rem" },
+                    }}
                   >
-                    <ProductCard>
-                      <Box
-                        sx={{
-                          position: "relative",
-                          width: "100%",
-                          display: "flex",
-                          flexDirection: "row",
-                          alignItems: "stretch",
-                        }}
-                      >
-                        <Box sx={{ flex: 1, p: 2 }}>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              mb: 1,
-                            }}
-                          >
-                            <Typography
-                              variant="h6"
-                              sx={{
-                                fontWeight: 600,
-                                flexGrow: 1,
-                                color: "#1a1a1a",
-                                fontSize: { xs: "1rem", md: "1.25rem" },
-                              }}
-                            >
-                              {producto.Nombre}
-                            </Typography>
-                            {producto.Precios?.some(
-                              (p) => p.Formato === "Nuevo"
-                            ) && (
-                              <Chip
-                                label="Nuevo"
-                                size="small"
-                                sx={{
-                                  ml: 1,
-                                  fontWeight: 600,
-                                  backgroundColor: "#ff6b6b",
-                                  color: "#ffffff",
-                                  fontSize: { xs: "0.7rem", md: "0.8rem" },
-                                }}
-                              />
-                            )}
-                          </Box>
-                          {producto.Descripcion && (
-                            <Typography
-                              variant="body2"
-                              sx={{
-                                mb: 2,
-                                color: "#666666",
-                                lineHeight: 1.5,
-                                fontSize: { xs: "0.85rem", md: "0.9rem" },
-                              }}
-                            >
-                              {producto.Descripcion}
-                            </Typography>
-                          )}
-                          <Box
-                            sx={{
-                              display: "flex",
-                              flexWrap: "wrap",
-                              gap: 1,
-                              mb: 2,
-                            }}
-                          >
-                            {producto.Precios?.map((precio, idx) => (
-                              <PriceTag
-                                key={idx}
-                                label={`${precio.Formato}: ${precio.Precio}€`}
-                                size="small"
-                              />
-                            ))}
-                          </Box>
-                          <Box sx={{ borderTop: "1px solid #e0e0e0", my: 1 }} />
-                          <AllergensButton
-                            onClick={() => handleOpenAllergensDialog(producto)}
-                          >
-                            Ver Alérgenos
-                          </AllergensButton>
-                        </Box>
-                        <CardMedia
-                          component="img"
-                          sx={{
-                            width: 200,
-                            height: "100%",
-                            objectFit: "cover",
-                            display: "block",
-                            margin: 0,
-                            padding: 0,
-                            transition: "transform 0.3s ease",
-                            "&:hover": {
-                              transform: "scale(1.03)",
-                            },
-                          }}
-                          image={
-                            producto.Foto ||
-                            "https://via.placeholder.com/400x260?text=Sin+Imagen"
-                          }
-                          alt={producto.Nombre}
-                        />
-                        {isJefe && (
-                          <Box
-                            sx={{
-                              position: "absolute",
-                              right: 8,
-                              top: 8,
-                              display: "flex",
-                              gap: 1,
-                            }}
-                          >
-                            <IconButton
-                              aria-label="edit"
-                              onClick={() =>
-                                navigate(`/modificar/${producto.ID_Producto}`)
-                              }
-                              sx={{
-                                color: "#ffffff",
-                                backgroundColor: "rgba(0,0,0,0.5)",
-                                "&:hover": {
-                                  backgroundColor: "rgba(0,0,0,0.7)",
-                                },
-                              }}
-                            >
-                              <EditIcon fontSize="small" />
-                            </IconButton>
-                            <IconButton
-                              aria-label="delete"
-                              onClick={() => handleOpenDeleteDialog(producto)}
-                              sx={{
-                                color: "#ffffff",
-                                backgroundColor: "rgba(0,0,0,0.5)",
-                                "&:hover": {
-                                  backgroundColor: "rgba(0,0,0,0.7)",
-                                },
-                              }}
-                            >
-                              <DeleteIcon fontSize="small" />
-                            </IconButton>
-                          </Box>
-                        )}
-                      </Box>
-                    </ProductCard>
-                  </Grid>
-                ))}
-              </Grid>
-            </Box>
-          </Fade>
-        ) : (
-          categorias.map((categoria) => {
-            const productosCategoria = getProductosPorCategoria(
-              categoria.ID_Categoria
-            );
-            if (productosCategoria.length === 0) return null;
-
-            return (
-              <Fade in timeout={1000} key={categoria.ID_Categoria}>
-                <Box sx={{ mb: 6 }}>
-                  <CategoryHeader>
-                    {categoryIcons[categoria.Nombre] || (
-                      <LocalBarIcon sx={{ mr: 2, fontSize: "2rem" }} />
-                    )}
-                    <Typography
-                      variant="h5"
-                      sx={{
-                        fontWeight: 600,
-                        fontSize: { xs: "1.25rem", md: "1.75rem" },
-                      }}
-                    >
-                      {categoria.Nombre}
-                    </Typography>
-                  </CategoryHeader>
-                  <Grid container spacing={{ xs: 2, md: 3 }}>
-                    {productosCategoria.map((producto) => (
+                    {
+                      categorias.find((c) => c.ID_Categoria == selectedCategory)
+                        ?.Nombre
+                    }
+                  </Typography>
+                </CategoryHeader>
+                <Grid container spacing={{ xs: 2, md: 3 }}>
+                  {getProductosPorCategoria(selectedCategory).map(
+                    (producto) => (
                       <Grid
                         item
                         xs={12}
@@ -782,9 +603,13 @@ const CartaCompleta = () => {
                                   />
                                 ))}
                               </Box>
-                              <Box sx={{ borderTop: "1px solid #e0e0e0", my: 1 }} />
+                              <Box
+                                sx={{ borderTop: "1px solid #e0e0e0", my: 1 }}
+                              />
                               <AllergensButton
-                                onClick={() => handleOpenAllergensDialog(producto)}
+                                onClick={() =>
+                                  handleOpenAllergensDialog(producto)
+                                }
                               >
                                 Ver Alérgenos
                               </AllergensButton>
@@ -803,11 +628,8 @@ const CartaCompleta = () => {
                                   transform: "scale(1.03)",
                                 },
                               }}
-                              image={
-                                producto.Foto ||
-                                "https://via.placeholder.com/400x260?text=Sin+Imagen"
-                              }
-                              alt={producto.Nombre}
+                              image={producto.Foto || sinFoto} // Si producto.Foto es falsy, usa sin_foto.png
+                              alt={producto.nombre || "Producto sin imagen"}
                             />
                             {isJefe && (
                               <Box
@@ -823,7 +645,7 @@ const CartaCompleta = () => {
                                   aria-label="edit"
                                   onClick={() =>
                                     navigate(
-                                      "/modificar/" + producto.ID_Producto
+                                      `/modificar/${producto.ID_Producto}`
                                     )
                                   }
                                   sx={{
@@ -856,174 +678,375 @@ const CartaCompleta = () => {
                           </Box>
                         </ProductCard>
                       </Grid>
-                    ))}
-                  </Grid>
-                </Box>
-              </Fade>
-            );
-          })
-        )}
-      </Container>
+                    )
+                  )}
+                </Grid>
+              </Box>
+            </Fade>
+          ) : (
+            categorias.map((categoria) => {
+              const productosCategoria = getProductosPorCategoria(
+                categoria.ID_Categoria
+              );
+              if (productosCategoria.length === 0) return null;
 
-      <Box
-        sx={{
-          backgroundColor: "#ffffff",
-          padding: 3,
-          borderTop: "1px solid #e0e0e0",
-          marginTop: 4,
-        }}
-      >
-        <Typography
-          variant="h6"
-          sx={{ fontWeight: 600, mb: 2, color: "#1a1a1a", textAlign: "center" }}
-        >
-          Leyenda de Alérgenos
-        </Typography>
+              return (
+                <Fade in timeout={1000} key={categoria.ID_Categoria}>
+                  <Box sx={{ mb: 6 }}>
+                    <CategoryHeader>
+                      {categoryIcons[categoria.Nombre] || (
+                        <LocalBarIcon sx={{ mr: 2, fontSize: "2rem" }} />
+                      )}
+                      <Typography
+                        variant="h5"
+                        sx={{
+                          fontWeight: 600,
+                          fontSize: { xs: "1.25rem", md: "1.75rem" },
+                        }}
+                      >
+                        {categoria.Nombre}
+                      </Typography>
+                    </CategoryHeader>
+                    <Grid container spacing={{ xs: 2, md: 3 }}>
+                      {productosCategoria.map((producto) => (
+                        <Grid
+                          item
+                          xs={12}
+                          sm={12}
+                          md={6}
+                          lg={4}
+                          key={producto.ID_Producto}
+                        >
+                          <ProductCard>
+                            <Box
+                              sx={{
+                                position: "relative",
+                                width: "100%",
+                                display: "flex",
+                                flexDirection: "row",
+                                alignItems: "stretch",
+                              }}
+                            >
+                              <Box sx={{ flex: 1, p: 2 }}>
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    mb: 1,
+                                  }}
+                                >
+                                  <Typography
+                                    variant="h6"
+                                    sx={{
+                                      fontWeight: 600,
+                                      flexGrow: 1,
+                                      color: "#1a1a1a",
+                                      fontSize: { xs: "1rem", md: "1.25rem" },
+                                    }}
+                                  >
+                                    {producto.Nombre}
+                                  </Typography>
+                                  {producto.Precios?.some(
+                                    (p) => p.Formato === "Nuevo"
+                                  ) && (
+                                    <Chip
+                                      label="Nuevo"
+                                      size="small"
+                                      sx={{
+                                        ml: 1,
+                                        fontWeight: 600,
+                                        backgroundColor: "#ff6b6b",
+                                        color: "#ffffff",
+                                        fontSize: {
+                                          xs: "0.7rem",
+                                          md: "0.8rem",
+                                        },
+                                      }}
+                                    />
+                                  )}
+                                </Box>
+                                {producto.Descripcion && (
+                                  <Typography
+                                    variant="body2"
+                                    sx={{
+                                      mb: 2,
+                                      color: "#666666",
+                                      lineHeight: 1.5,
+                                      fontSize: { xs: "0.85rem", md: "0.9rem" },
+                                    }}
+                                  >
+                                    {producto.Descripcion}
+                                  </Typography>
+                                )}
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    flexWrap: "wrap",
+                                    gap: 1,
+                                    mb: 2,
+                                  }}
+                                >
+                                  {producto.Precios?.map((precio, idx) => (
+                                    <PriceTag
+                                      key={idx}
+                                      label={`${precio.Formato}: ${precio.Precio}€`}
+                                      size="small"
+                                    />
+                                  ))}
+                                </Box>
+                                <Box
+                                  sx={{ borderTop: "1px solid #e0e0e0", my: 1 }}
+                                />
+                                <AllergensButton
+                                  onClick={() =>
+                                    handleOpenAllergensDialog(producto)
+                                  }
+                                >
+                                  Ver Alérgenos
+                                </AllergensButton>
+                              </Box>
+                              <CardMedia
+                                component="img"
+                                sx={{
+                                  width: 200,
+                                  height: "100%",
+                                  objectFit: "cover",
+                                  display: "block",
+                                  margin: 0,
+                                  padding: 0,
+                                  transition: "transform 0.3s ease",
+                                  "&:hover": {
+                                    transform: "scale(1.03)",
+                                  },
+                                }}
+                                image={
+                                  producto.Foto ||
+                                  sinFoto // Si producto.Foto es falsy, usa sinFoto
+                                }
+                                alt={producto.Nombre}
+                              />
+                              {isJefe && (
+                                <Box
+                                  sx={{
+                                    position: "absolute",
+                                    right: 8,
+                                    top: 8,
+                                    display: "flex",
+                                    gap: 1,
+                                  }}
+                                >
+                                  <IconButton
+                                    aria-label="edit"
+                                    onClick={() =>
+                                      navigate(
+                                        "/modificar/" + producto.ID_Producto
+                                      )
+                                    }
+                                    sx={{
+                                      color: "#ffffff",
+                                      backgroundColor: "rgba(0,0,0,0.5)",
+                                      "&:hover": {
+                                        backgroundColor: "rgba(0,0,0,0.7)",
+                                      },
+                                    }}
+                                  >
+                                    <EditIcon fontSize="small" />
+                                  </IconButton>
+                                  <IconButton
+                                    aria-label="delete"
+                                    onClick={() =>
+                                      handleOpenDeleteDialog(producto)
+                                    }
+                                    sx={{
+                                      color: "#ffffff",
+                                      backgroundColor: "rgba(0,0,0,0.5)",
+                                      "&:hover": {
+                                        backgroundColor: "rgba(0,0,0,0.7)",
+                                      },
+                                    }}
+                                  >
+                                    <DeleteIcon fontSize="small" />
+                                  </IconButton>
+                                </Box>
+                              )}
+                            </Box>
+                          </ProductCard>
+                        </Grid>
+                      ))}
+                    </Grid>
+                  </Box>
+                </Fade>
+              );
+            })
+          )}
+        </Container>
+
         <Box
           sx={{
-            display: "flex",
-            justifyContent: "center",
-            flexWrap: "wrap",
-            gap: 2,
+            backgroundColor: "#ffffff",
+            padding: 3,
+            borderTop: "1px solid #e0e0e0",
+            marginTop: 4,
           }}
         >
-          {allAlergenos.map((alergeno, index) => (
-            <Chip
-              key={index}
-              icon={
-                <img
-                  src={`http://localhost:3000/${alergeno.Imagen}`}
-                  alt={alergeno.Nombre}
-                  style={{ width: 20, height: 20 }}
-                />
-              }
-              label={alergeno.Nombre}
-              size="small"
-              sx={{
-                backgroundColor: "#fff3e0",
-                color: "#333",
-                fontSize: { xs: "0.7rem", md: "0.8rem" },
-              }}
-            />
-          ))}
-        </Box>
-      </Box>
-
-      <Dialog
-        open={openDeleteDialog}
-        onClose={handleCloseDeleteDialog}
-        PaperProps={{
-          sx: {
-            borderRadius: "8px",
-            padding: 2,
-          },
-        }}
-      >
-        <DialogTitle sx={{ fontWeight: 600 }}>
-          Confirmar eliminación
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            ¿Estás seguro de eliminar el producto "{productToDelete?.Nombre}"?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDeleteDialog} sx={{ color: "#666666" }}>
-            Cancelar
-          </Button>
-          <Button
-            onClick={handleDeleteProduct}
-            color="error"
-            variant="contained"
-            sx={{ backgroundColor: "#d32f2f" }}
-            autoFocus
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 600,
+              mb: 2,
+              color: "#1a1a1a",
+              textAlign: "center",
+            }}
           >
-            Eliminar
-          </Button>
-        </DialogActions>
-      </Dialog>
+            Leyenda de Alérgenos
+          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              flexWrap: "wrap",
+              gap: 2,
+            }}
+          >
+            {allAlergenos.map((alergeno, index) => (
+              <Chip
+                key={index}
+                icon={
+                  <img
+                    src={`http://localhost:3000/${alergeno.Imagen}`}
+                    alt={alergeno.Nombre}
+                    style={{ width: 20, height: 20 }}
+                  />
+                }
+                label={alergeno.Nombre}
+                size="small"
+                sx={{
+                  backgroundColor: "#fff3e0",
+                  color: "#333",
+                  fontSize: { xs: "0.7rem", md: "0.8rem" },
+                }}
+              />
+            ))}
+          </Box>
+        </Box>
 
-      <Dialog
-        open={openAllergensDialog}
-        onClose={handleCloseAllergensDialog}
-        PaperProps={{
-          sx: {
-            borderRadius: "8px",
-            padding: 2,
-          },
-        }}
-      >
-        <DialogTitle sx={{ fontWeight: 600 }}>
-          Alérgenos de {selectedProduct?.Nombre}
-        </DialogTitle>
-        <DialogContent>
-          {selectedProduct?.Alergenos && selectedProduct.Alergenos.length > 0 ? (
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-              {selectedProduct.Alergenos.map((alergeno) => (
-                <Chip
-                  key={alergeno.ID_Alergeno}
-                  label={alergeno.Nombre}
-                  size="small"
-                  sx={{
-                    backgroundColor: "#fff3e0",
-                    color: "#333",
-                    fontSize: { xs: "0.7rem", md: "0.8rem" },
-                  }}
-                />
-              ))}
-            </Box>
-          ) : (
+        <Dialog
+          open={openDeleteDialog}
+          onClose={handleCloseDeleteDialog}
+          PaperProps={{
+            sx: {
+              borderRadius: "8px",
+              padding: 2,
+            },
+          }}
+        >
+          <DialogTitle sx={{ fontWeight: 600 }}>
+            Confirmar eliminación
+          </DialogTitle>
+          <DialogContent>
             <DialogContentText>
-              Este producto no contiene alérgenos.
+              ¿Estás seguro de eliminar el producto "{productToDelete?.Nombre}"?
             </DialogContentText>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseAllergensDialog} sx={{ color: "red" }}>
-            Cerrar
-          </Button>
-        </DialogActions>
-      </Dialog>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDeleteDialog} sx={{ color: "#666666" }}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleDeleteProduct}
+              color="error"
+              variant="contained"
+              sx={{ backgroundColor: "#d32f2f" }}
+              autoFocus
+            >
+              Eliminar
+            </Button>
+          </DialogActions>
+        </Dialog>
 
-      <Snackbar
-        open={openSuccessSnackbar}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert
+        <Dialog
+          open={openAllergensDialog}
+          onClose={handleCloseAllergensDialog}
+          PaperProps={{
+            sx: {
+              borderRadius: "8px",
+              padding: 2,
+            },
+          }}
+        >
+          <DialogTitle sx={{ fontWeight: 600 }}>
+            Alérgenos de {selectedProduct?.Nombre}
+          </DialogTitle>
+          <DialogContent>
+            {selectedProduct?.Alergenos &&
+            selectedProduct.Alergenos.length > 0 ? (
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+                {selectedProduct.Alergenos.map((alergeno) => (
+                  <Chip
+                    key={alergeno.ID_Alergeno}
+                    label={alergeno.Nombre}
+                    size="small"
+                    sx={{
+                      backgroundColor: "#fff3e0",
+                      color: "#333",
+                      fontSize: { xs: "0.7rem", md: "0.8rem" },
+                    }}
+                  />
+                ))}
+              </Box>
+            ) : (
+              <DialogContentText>
+                Este producto no contiene alérgenos.
+              </DialogContentText>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseAllergensDialog} sx={{ color: "red" }}>
+              Cerrar
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        <Snackbar
+          open={openSuccessSnackbar}
+          autoHideDuration={6000}
           onClose={handleCloseSnackbar}
-          severity="success"
-          sx={{ bgcolor: "#d1fae5", color: "#065f46" }}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         >
-          {successMessage}
-        </Alert>
-      </Snackbar>
+          <Alert
+            onClose={handleCloseSnackbar}
+            severity="success"
+            sx={{ bgcolor: "#d1fae5", color: "#065f46" }}
+          >
+            {successMessage}
+          </Alert>
+        </Snackbar>
 
-      <Snackbar
-        open={openErrorSnackbar}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert
+        <Snackbar
+          open={openErrorSnackbar}
+          autoHideDuration={6000}
           onClose={handleCloseSnackbar}
-          severity="error"
-          sx={{ bgcolor: "#fef2f2", color: "#b91c1c" }}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         >
-          {errorMessage}
-        </Alert>
-      </Snackbar>
+          <Alert
+            onClose={handleCloseSnackbar}
+            severity="error"
+            sx={{ bgcolor: "#fef2f2", color: "#b91c1c" }}
+          >
+            {errorMessage}
+          </Alert>
+        </Snackbar>
 
-      {isJefe && (
-        <AddButton
-          variant="contained"
-          onClick={() => navigate("/añadirProducto")}
-        >
-          <AddIcon />
-        </AddButton>
-      )}
-    </Box>
+        {isJefe && (
+          <AddButton
+            variant="contained"
+            onClick={() => navigate("/añadirProducto")}
+          >
+            <AddIcon />
+          </AddButton>
+        )}
+      </Box>
+    </>
   );
 };
 
