@@ -394,3 +394,8 @@ INSERT INTO Reseña (ID_Usuario, ID_Producto, Texto, Puntuacion, Fecha) VALUES
 -- Actualizar las rutas de las imágenes para que apunten a la carpeta 'uploads'
 UPDATE Alergeno SET Imagen = REPLACE(Imagen, 'uploads/', 'uploads/') WHERE Imagen IS NOT NULL;
 UPDATE Producto SET Foto = REPLACE(Foto, 'uploads/', 'uploads/') WHERE Foto IS NOT NULL;
+
+-- Añadir columnas para el restablecimiento de contraseña
+ALTER TABLE Usuario
+ADD COLUMN resetToken VARCHAR(255) NULL,
+ADD COLUMN resetTokenExpires DATETIME NULL;

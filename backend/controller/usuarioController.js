@@ -276,6 +276,41 @@ El equipo de Cervecería Boom Bun
         .json(Respuesta.error(null, "Error al cerrar sesión"));
     }
   }
+
+  async recuperarPassword(req, res) {
+    const { Correo, nuevaContraseña } = req.body;
+
+    if (!Correo || !nuevaContraseña) {
+      return res
+        .status(400)
+        .json(Respuesta.error(null, "Correo y nueva contraseña obligatorios"));
+    }
+
+    if (nuevaContraseña.length < 8) {
+      return res
+        .status(400)
+        .json(
+          Respuesta.error(null, "La contraseña debe tener mínimo 8 caracteres")
+        );
+    }
+
+    const user = await Usuario.findOne({
+      where: { Correo: Correo.toLowerCase().trim() },
+    });
+
+    if (!user) {
+      return res
+        .status(404)
+        .json(Respuesta.error(null, "Correo no encontrado"));
+    }
+
+    const hash = await bcrypt.hash(nuevaContraseña, saltRounds);
+    await user.update({ Contraseña: hash });
+
+    return res
+      .status(200)
+      .json(Respuesta.exito(null, "Contraseña actualizada correctamente"));
+  }
 }
 
 module.exports = new UsuarioController();

@@ -11,4 +11,6 @@ router.post("/login", usuarioController.login); // <-- Corregido aquí
 // POST /api/logout
 router.post("/logout", usuarioController.logout); // <-- Corregido aquí
 
+router.post("/recuperar_password", usuarioController.recuperarPassword);
+
 module.exports = router;

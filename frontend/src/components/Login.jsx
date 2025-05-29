@@ -18,6 +18,10 @@ import {
   Login as LogInIcon,
   ErrorOutline as AlertCircleIcon,
 } from "@mui/icons-material";
+import Modal from "@mui/material/Modal";
+import IconButton from "@mui/material/IconButton";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 function Login() {
   const navigate = useNavigate();
@@ -28,6 +32,14 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showWelcome, setShowWelcome] = useState(false);
+  const [openRecovery, setOpenRecovery] = useState(false);
+  const [recoveryData, setRecoveryData] = useState({
+    Correo: "",
+    nuevaContraseña: "",
+  });
+  const [showRecoveryPassword, setShowRecoveryPassword] = useState(false);
+  const [recoveryMsg, setRecoveryMsg] = useState("");
+  const [recoveryLoading, setRecoveryLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -260,9 +272,7 @@ function Login() {
               ¿Olvidaste tu contraseña?{" "}
               <Box
                 component="span"
-                onClick={() =>
-                  alert("Funcionalidad de recuperación en desarrollo")
-                }
+                onClick={() => setOpenRecovery(true)}
                 sx={{
                   color: "#065f46",
                   cursor: "pointer",
@@ -274,13 +284,167 @@ function Login() {
                   transition: "color 0.3s ease",
                 }}
               >
-                Recupérala
+                Actualiza tu contraseña
               </Box>
             </Typography>
           </Box>
         </Box>
       </Fade>
-
+      <Modal
+        open={openRecovery}
+        onClose={() => setOpenRecovery(false)}
+        BackdropProps={{
+          sx: {
+            backgroundColor: "rgba(0, 0, 0, 0.5)", // Fondo semitransparente
+            backdropFilter: "blur(5px)", // Efecto de desenfoque
+            WebkitBackdropFilter: "blur(5px)", // Para compatibilidad con Webkit (Safari)
+          },
+        }}
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            bgcolor: "white",
+            borderRadius: 3,
+            boxShadow: 24,
+            p: 4,
+            width: 350,
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+          }}
+        >
+          <Typography
+            variant="h6"
+            sx={{
+              mb: 1,
+              color: "#065f46",
+              fontWeight: "bold",
+              textAlign: "center",
+            }}
+          >
+            Recuperar contraseña
+          </Typography>
+          <TextField
+            fullWidth
+            label="Correo electrónico"
+            value={recoveryData.Correo}
+            onChange={(e) =>
+              setRecoveryData({ ...recoveryData, Correo: e.target.value })
+            }
+            required
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <MailIcon sx={{ color: "#6b7280" }} />
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              "& .MuiInputLabel-root": {
+                color: "#065f46",
+                fontWeight: "bold",
+              },
+              "& .MuiInputLabel-root.Mui-focused": {
+                color: "#065f46",
+              },
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "#e5e7eb" },
+                "&:hover fieldset": { borderColor: "#064e3b" },
+                "&.Mui-focused fieldset": { borderColor: "#065f46" },
+                transition: "all 0.3s ease",
+              },
+            }}
+          />
+          <TextField
+            fullWidth
+            label="Nueva contraseña"
+            type={showRecoveryPassword ? "text" : "password"}
+            value={recoveryData.nuevaContraseña}
+            onChange={(e) =>
+              setRecoveryData({
+                ...recoveryData,
+                nuevaContraseña: e.target.value,
+              })
+            }
+            required
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <LockIcon sx={{ color: "#6b7280" }} />
+                </InputAdornment>
+              ),
+              endAdornment: (
+                <IconButton
+                  onClick={() => setShowRecoveryPassword((v) => !v)}
+                  edge="end"
+                  tabIndex={-1}
+                >
+                  {showRecoveryPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              ),
+            }}
+            helperText="Mínimo 8 caracteres"
+            sx={{
+              "& .MuiInputLabel-root": {
+                color: "#065f46",
+                fontWeight: "bold",
+              },
+              "& .MuiInputLabel-root.Mui-focused": {
+                color: "#065f46",
+              },
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "#e5e7eb" },
+                "&:hover fieldset": { borderColor: "#064e3b" },
+                "&.Mui-focused fieldset": { borderColor: "#065f46" },
+                transition: "all 0.3s ease",
+              },
+            }}
+          />
+          {recoveryMsg && (
+            <Alert severity="info" sx={{ mb: 1 }}>
+              {recoveryMsg}
+            </Alert>
+          )}
+          <Button
+            variant="contained"
+            sx={{ bgcolor: "#065f46", "&:hover": { bgcolor: "#047857" } }}
+            disabled={recoveryLoading}
+            onClick={async () => {
+              setRecoveryLoading(true);
+              setRecoveryMsg("");
+              try {
+                const res = await fetch(
+                  "http://localhost:3000/api/recuperar_password",
+                  {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(recoveryData),
+                  }
+                );
+                const data = await res.json();
+                setRecoveryMsg(data.mensaje || "Contraseña actualizada");
+                if (res.ok) {
+                  setTimeout(() => {
+                    setOpenRecovery(false);
+                    setRecoveryData({ Correo: "", nuevaContraseña: "" });
+                    setRecoveryMsg("");
+                  }, 2000);
+                }
+              } catch {
+                setRecoveryMsg("Error al conectar con el servidor");
+              } finally {
+                setRecoveryLoading(false);
+              }
+            }}
+          >
+            Cambiar contraseña
+          </Button>
+        </Box>
+      </Modal>
       <Snackbar
         open={showWelcome}
         autoHideDuration={1500}
