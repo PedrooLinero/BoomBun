@@ -49,6 +49,13 @@ function Register() {
       return;
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(userData.Correo)) {
+      setError("Introduce un correo electrónico válido");
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch("http://localhost:3000/api/register", {
         method: "POST",

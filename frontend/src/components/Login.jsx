@@ -126,7 +126,7 @@ function Login() {
               variant="body2"
               sx={{ color: "#d1fae5", mt: 1, opacity: 0.9 }}
             >
-              Accede para gestionar tu carta
+              Accede para poder tenerte con nosotros y dar tu opinión
             </Typography>
           </Box>
 
