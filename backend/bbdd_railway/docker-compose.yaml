@@ -6,7 +6,10 @@ services:
     ports:
       - 8080:80
     environment:
-      - PMA_HOST=switchback.proxy.rlwy.net:29608
-      - PMA_PORT=29608
+      - PMA_HOST=ballast.proxy.rlwy.net:21655
+      - PMA_PORT=21655
       - PMA_USER=root
-      - PMA_PASSWORD=izBfrNFtSsRPLCmsQaHwtKRqhHHPpzbk
+      - PMA_PASSWORD=WQcyoLaCBYoNRYOLfDgJmDeYtXDLimvo
+
+
+
