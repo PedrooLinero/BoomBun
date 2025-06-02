@@ -34,6 +34,8 @@ import LocalBarIcon from "@mui/icons-material/LocalBar";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import DinnerDiningIcon from "@mui/icons-material/DinnerDining";
 import IcecreamIcon from "@mui/icons-material/Icecream";
+import CloseIcon from "@mui/icons-material/Close";
+
 import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/material/styles";
 import sinFoto from "../assets/sin_foto.png";
@@ -50,7 +52,7 @@ const ProductCard = styled(Card)(() => ({
     boxShadow: "0 6px 20px rgba(0,0,0,0.15)",
   },
   background: "#ffffff",
-  minHeight: 230, // Altura mínima fija para todos los cards
+  minHeight: 230,
 }));
 
 const CategoryHeader = styled(Box)(({ theme }) => ({
@@ -106,7 +108,7 @@ const AddButton = styled(Button)(({ theme }) => ({
 }));
 
 const AllergensButton = styled(Button)(() => ({
-  border: "none", // Sin borde
+  border: "none",
   color: "#065f46",
   backgroundColor: "transparent",
   padding: 0,
@@ -114,7 +116,7 @@ const AllergensButton = styled(Button)(() => ({
   fontSize: "0.85rem",
   textTransform: "none",
   fontWeight: 400,
-  textDecoration: "underline", // Como enlace
+  textDecoration: "underline",
   boxShadow: "none",
   "&:hover": {
     backgroundColor: "transparent",
@@ -135,14 +137,15 @@ const CartaCompleta = () => {
   const [isJefe, setIsJefe] = useState(false);
   const [openAllergensDialog, setOpenAllergensDialog] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const navigate = useNavigate();
-
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
   const [openSuccessSnackbar, setOpenSuccessSnackbar] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [openErrorSnackbar, setOpenErrorSnackbar] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [openImageDialog, setOpenImageDialog] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const navigate = useNavigate();
 
   const categoryIcons = {
     Cervezas: <LocalBarIcon sx={{ mr: 2, fontSize: "2rem" }} />,
@@ -178,6 +181,10 @@ const CartaCompleta = () => {
       window.removeEventListener("storage", checkAuth);
     };
   }, []);
+
+  function quitarTildes(texto) {
+    return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  }
 
   const fetchData = async () => {
     try {
@@ -230,8 +237,9 @@ const CartaCompleta = () => {
     let filtered = productos;
 
     if (searchTerm) {
+      const searchSinTildes = quitarTildes(searchTerm.toLowerCase());
       filtered = filtered.filter((prod) =>
-        prod.Nombre.toLowerCase().includes(searchTerm.toLowerCase())
+        quitarTildes(prod.Nombre.toLowerCase()).includes(searchSinTildes)
       );
     }
 
@@ -297,6 +305,16 @@ const CartaCompleta = () => {
   const handleCloseAllergensDialog = () => {
     setOpenAllergensDialog(false);
     setSelectedProduct(null);
+  };
+
+  const handleOpenImageDialog = (image) => {
+    setSelectedImage(image);
+    setOpenImageDialog(true);
+  };
+
+  const handleCloseImageDialog = () => {
+    setOpenImageDialog(false);
+    setSelectedImage(null);
   };
 
   const handleCloseSnackbar = () => {
@@ -626,10 +644,14 @@ const CartaCompleta = () => {
                                 transition: "transform 0.3s ease",
                                 "&:hover": {
                                   transform: "scale(1.03)",
+                                  cursor: "pointer",
                                 },
                               }}
-                              image={producto.Foto || sinFoto} // Si producto.Foto es falsy, usa sin_foto.png
-                              alt={producto.nombre || "Producto sin imagen"}
+                              image={producto.Foto || sinFoto}
+                              alt={producto.Nombre}
+                              onClick={() =>
+                                handleOpenImageDialog(producto.Foto || sinFoto)
+                              }
                             />
                             {isJefe && (
                               <Box
@@ -817,12 +839,16 @@ const CartaCompleta = () => {
                                   transition: "transform 0.3s ease",
                                   "&:hover": {
                                     transform: "scale(1.03)",
+                                    cursor: "pointer",
                                   },
                                 }}
-                                image={
-                                  producto.Foto || sinFoto // Si producto.Foto es falsy, usa sinFoto
-                                }
+                                image={producto.Foto || sinFoto}
                                 alt={producto.Nombre}
+                                onClick={() =>
+                                  handleOpenImageDialog(
+                                    producto.Foto || sinFoto
+                                  )
+                                }
                               />
                               {isJefe && (
                                 <Box
@@ -838,7 +864,7 @@ const CartaCompleta = () => {
                                     aria-label="edit"
                                     onClick={() =>
                                       navigate(
-                                        "/modificar/" + producto.ID_Producto
+                                        `/modificar/${producto.ID_Producto}`
                                       )
                                     }
                                     sx={{
@@ -1009,10 +1035,62 @@ const CartaCompleta = () => {
             )}
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleCloseAllergensDialog} sx={{ color: "red" }}>
+            <Button
+              onClick={handleCloseAllergensDialog}
+              sx={{ color: "#065f46" }}
+            >
               Cerrar
             </Button>
           </DialogActions>
+        </Dialog>
+
+        <Dialog
+          open={openImageDialog}
+          onClose={handleCloseImageDialog}
+          maxWidth="md"
+          PaperProps={{
+            sx: {
+              borderRadius: "8px",
+              overflow: "hidden",
+              background: "rgba(255,255,255,0.97)",
+              position: "relative",
+            },
+          }}
+        >
+          {/* Botón de cerrar en la esquina superior derecha */}
+          <IconButton
+            onClick={handleCloseImageDialog}
+            sx={{
+              position: "absolute",
+              top: 12,
+              right: 12,
+              zIndex: 10,
+              background: "#fff",
+              color: "#065f46",
+              boxShadow: 2,
+              "&:hover": {
+                background: "#e0f2f1",
+                color: "#047857",
+              },
+            }}
+            aria-label="Cerrar imagen"
+          >
+            <CloseIcon fontSize="large" />
+          </IconButton>
+          <DialogContent
+            sx={{ p: 0, display: "flex", justifyContent: "center" }}
+          >
+            <img
+              src={selectedImage}
+              alt="Producto ampliado"
+              style={{
+                width: "100%",
+                maxHeight: "80vh",
+                objectFit: "contain",
+                display: "block",
+              }}
+            />
+          </DialogContent>
         </Dialog>
 
         <Snackbar

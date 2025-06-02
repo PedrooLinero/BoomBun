@@ -18,6 +18,8 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import PhoneIcon from "@mui/icons-material/Phone";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import StarIcon from "@mui/icons-material/Star";
+
 import foto2 from "../assets/foto2.JPG";
 import foto1 from "../assets/foto1.JPG";
 import foto3 from "../assets/foto3.JPG";
