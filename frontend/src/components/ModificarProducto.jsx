@@ -32,6 +32,7 @@ import {
   Image as ImageIcon,
   Close as CloseIcon,
 } from "@mui/icons-material";
+import { apiUrl, staticUrl } from "../pages/config";
 
 export default function ModificarProducto() {
   const { id } = useParams();
@@ -79,7 +80,7 @@ export default function ModificarProducto() {
   };
 
   useEffect(() => {
-    const fetchCategorias = fetch("http://localhost:3000/api/categorias")
+    const fetchCategorias = fetch(apiUrl + "/categorias")
       .then((res) =>
         res.ok ? res.json() : Promise.reject("Error al cargar categorías")
       )
@@ -92,7 +93,7 @@ export default function ModificarProducto() {
         setError("Error al cargar categorías: " + err.message);
       });
 
-    const fetchAlergenos = fetch("http://localhost:3000/api/alergenos")
+    const fetchAlergenos = fetch(apiUrl +"/alergenos")
       .then((res) =>
         res.ok ? res.json() : Promise.reject("Error al cargar alérgenos")
       )
@@ -111,7 +112,7 @@ export default function ModificarProducto() {
         setError("Error al cargar alérgenos: " + err.message);
       });
 
-    const fetchProducto = fetch(`http://localhost:3000/api/productos/${id}`)
+    const fetchProducto = fetch(`${apiUrl}/productos/${id}`)
       .then((res) =>
         res.ok ? res.json() : Promise.reject("Error al cargar producto")
       )
@@ -158,7 +159,7 @@ export default function ModificarProducto() {
       .catch((err) => {
         console.error("Producto:", err);
         setError("Error al cargar producto: " + err.message);
-      })
+      });
 
     Promise.all([fetchCategorias, fetchAlergenos, fetchProducto]).catch(
       (err) => {
@@ -243,7 +244,7 @@ export default function ModificarProducto() {
 
     try {
       const response = await fetch(
-        `http://localhost:3000/api/productos/${id}`,
+        `${apiUrl}/productos/${id}`,
         {
           method: "PUT",
           body: formData,
@@ -264,7 +265,7 @@ export default function ModificarProducto() {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
     <Box
@@ -489,7 +490,7 @@ export default function ModificarProducto() {
                   >
                     Foto del Producto
                   </Typography>
-                  
+
                   {/* Container de fotos con layout responsive mejorado */}
                   <Box
                     sx={{
@@ -513,8 +514,18 @@ export default function ModificarProducto() {
                           border: "2px solid #e5e7eb",
                           bgcolor: "#fafafa",
                           boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-                          width: { xs: "280px", sm: "320px", md: "280px", lg: "320px" },
-                          height: { xs: "280px", sm: "320px", md: "280px", lg: "320px" },
+                          width: {
+                            xs: "280px",
+                            sm: "320px",
+                            md: "280px",
+                            lg: "320px",
+                          },
+                          height: {
+                            xs: "280px",
+                            sm: "320px",
+                            md: "280px",
+                            lg: "320px",
+                          },
                           cursor: "pointer",
                           transition: "transform 0.2s ease",
                           "&:hover": {
@@ -525,7 +536,7 @@ export default function ModificarProducto() {
                           handleOpenModal(
                             producto.Foto.startsWith("http")
                               ? producto.Foto
-                              : `http://localhost:3000/${producto.Foto}`
+                              : `${staticUrl}/${producto.Foto}`
                           )
                         }
                       >
@@ -538,7 +549,11 @@ export default function ModificarProducto() {
                             textAlign: "center",
                             py: { xs: 1, sm: 1.5 },
                             fontWeight: "medium",
-                            fontSize: { xs: "0.85rem", sm: "0.9rem", md: "1rem" },
+                            fontSize: {
+                              xs: "0.85rem",
+                              sm: "0.9rem",
+                              md: "1rem",
+                            },
                           }}
                         >
                           Foto Actual
@@ -557,7 +572,7 @@ export default function ModificarProducto() {
                             src={
                               producto.Foto.startsWith("http")
                                 ? producto.Foto
-                                : `http://localhost:3000/${producto.Foto}`
+                                : `${staticUrl}/${producto.Foto}`
                             }
                             alt={datos.nombre}
                             style={{
@@ -569,7 +584,7 @@ export default function ModificarProducto() {
                             onError={(e) => {
                               e.target.onerror = null;
                               e.target.src =
-                                "http://localhost:3000/uploads/sin_foto.png";
+                                staticUrl + "/uploads/sin_foto.png";
                             }}
                           />
                         </Box>
@@ -587,8 +602,18 @@ export default function ModificarProducto() {
                         border: "2px solid #e5e7eb",
                         bgcolor: "#fafafa",
                         boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-                        width: { xs: "280px", sm: "320px", md: "280px", lg: "320px" },
-                        height: { xs: "280px", sm: "320px", md: "280px", lg: "320px" },
+                        width: {
+                          xs: "280px",
+                          sm: "320px",
+                          md: "280px",
+                          lg: "320px",
+                        },
+                        height: {
+                          xs: "280px",
+                          sm: "320px",
+                          md: "280px",
+                          lg: "320px",
+                        },
                         position: "relative",
                         cursor: vistaPreviaFoto ? "pointer" : "pointer",
                         transition: "transform 0.2s ease",
@@ -665,7 +690,11 @@ export default function ModificarProducto() {
                                 fontStyle: "italic",
                                 textAlign: "center",
                                 px: 2,
-                                fontSize: { xs: "0.8rem", sm: "0.85rem", md: "0.9rem" },
+                                fontSize: {
+                                  xs: "0.8rem",
+                                  sm: "0.85rem",
+                                  md: "0.9rem",
+                                },
                               }}
                             >
                               Selecciona una imagen
@@ -692,7 +721,11 @@ export default function ModificarProducto() {
                             "&:hover": {
                               bgcolor: "#991b1b",
                             },
-                            fontSize: { xs: "0.7rem", sm: "0.75rem", md: "0.8rem" },
+                            fontSize: {
+                              xs: "0.7rem",
+                              sm: "0.75rem",
+                              md: "0.8rem",
+                            },
                             px: 2,
                             py: 0.8,
                             borderRadius: "6px",
@@ -748,7 +781,11 @@ export default function ModificarProducto() {
                         variant="body2"
                         color="text.secondary"
                         sx={{
-                          fontSize: { xs: "0.8rem", sm: "0.85rem", md: "0.9rem" },
+                          fontSize: {
+                            xs: "0.8rem",
+                            sm: "0.85rem",
+                            md: "0.9rem",
+                          },
                         }}
                       >
                         No hay alérgenos disponibles
@@ -766,7 +803,7 @@ export default function ModificarProducto() {
                                   src={
                                     alergeno.imagen.startsWith("http")
                                       ? alergeno.imagen
-                                      : `http://localhost:3000/uploads/${alergeno.imagen}`
+                                      : `${staticUrl}/uploads/${alergeno.imagen}`
                                   }
                                   alt={alergeno.nombre}
                                   style={{ width: 20, height: 20 }}
@@ -800,7 +837,11 @@ export default function ModificarProducto() {
                                 bgcolor: isSelected ? "#047857" : "#f1f5f9",
                               },
                               transition: "all 0.3s ease",
-                              fontSize: { xs: "0.8rem", sm: "0.85rem", md: "0.9rem" },
+                              fontSize: {
+                                xs: "0.8rem",
+                                sm: "0.85rem",
+                                md: "0.9rem",
+                              },
                               height: { xs: 32, sm: 34, md: 36 },
                             }}
                           />

@@ -22,6 +22,7 @@ import Modal from "@mui/material/Modal";
 import IconButton from "@mui/material/IconButton";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import { apiUrl } from "../pages/config";
 
 function Login() {
   const navigate = useNavigate();
@@ -47,7 +48,7 @@ function Login() {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:3000/api/login", {
+      const response = await fetch( apiUrl + "/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -418,7 +419,7 @@ function Login() {
               setRecoveryMsg("");
               try {
                 const res = await fetch(
-                  "http://localhost:3000/api/actualizar_password",
+                  apiUrl + "/actualizar_password",
                   {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },

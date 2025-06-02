@@ -35,6 +35,9 @@ import RestaurantIcon from "@mui/icons-material/Restaurant";
 import DinnerDiningIcon from "@mui/icons-material/DinnerDining";
 import IcecreamIcon from "@mui/icons-material/Icecream";
 import CloseIcon from "@mui/icons-material/Close";
+import { apiUrl } from "../pages/config";
+import { staticUrl } from "../pages/config";
+
 
 import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/material/styles";
@@ -192,8 +195,8 @@ const CartaCompleta = () => {
       setError(null);
 
       const [catResponse, prodResponse] = await Promise.all([
-        fetch("http://localhost:3000/api/categorias"),
-        fetch("http://localhost:3000/api/productos"),
+        fetch(apiUrl + "/categorias"),
+        fetch(apiUrl + "/productos"),
       ]);
 
       if (!catResponse.ok) throw new Error("Error al obtener categorías");
@@ -270,10 +273,9 @@ const CartaCompleta = () => {
     if (!productToDelete) return;
 
     try {
-      const response = await fetch(
-        `http://localhost:3000/api/productos/${productToDelete.ID_Producto}`,
-        { method: "DELETE" }
-      );
+      const response = await fetch(`${apiUrl}/${productToDelete.ID_Producto}`, {
+        method: "DELETE",
+      });
 
       const data = await response.json();
 
@@ -938,7 +940,7 @@ const CartaCompleta = () => {
                 key={index}
                 icon={
                   <img
-                    src={`http://localhost:3000/${alergeno.Imagen}`}
+                    src={`${staticUrl}/${alergeno.Imagen}`}
                     alt={alergeno.Nombre}
                     style={{ width: 20, height: 20 }}
                   />
@@ -1014,7 +1016,7 @@ const CartaCompleta = () => {
                     icon={
                       alergeno.Imagen ? (
                         <img
-                          src={`http://localhost:3000/${alergeno.Imagen}`}
+                          src={`${staticUrl}/${alergeno.Imagen}`}
                           alt={alergeno.Nombre}
                           style={{ width: 20, height: 20 }}
                         />

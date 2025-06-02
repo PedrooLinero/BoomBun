@@ -19,6 +19,7 @@ import {
   Login as LoginIcon,
   ErrorOutline as ErrorOutlineIcon,
 } from "@mui/icons-material";
+import { apiUrl } from "../pages/config";
 
 function Register() {
   const navigate = useNavigate();
@@ -57,7 +58,7 @@ function Register() {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/api/register", {
+      const response = await fetch(apiUrl+ "/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

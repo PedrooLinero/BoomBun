@@ -33,6 +33,7 @@ import {
   Close as CloseIcon,
 } from "@mui/icons-material";
 import { apiUrl } from "../pages/config";
+import { staticUrl } from "../pages/config";
 
 export default function AñadirProducto() {
   const [categorias, setCategorias] = useState([]);
@@ -69,7 +70,7 @@ export default function AñadirProducto() {
   const [selectedImage, setSelectedImage] = useState(""); // Imagen seleccionada para el modal
 
   useEffect(() => {
-    const fetchCategorias = fetch("http://localhost:3000/api/categorias")
+    const fetchCategorias = fetch(apiUrl + "/categorias")
       .then((res) =>
         res.ok ? res.json() : Promise.reject("Error al cargar categorías")
       )
@@ -82,7 +83,7 @@ export default function AñadirProducto() {
         setError("Error al cargar categorías: " + err.message);
       });
 
-    const fetchAlergenos = fetch("http://localhost:3000/api/alergenos")
+    const fetchAlergenos = fetch(apiUrl + "/alergenos")
       .then((res) =>
         res.ok ? res.json() : Promise.reject("Error al cargar alérgenos")
       )
@@ -487,7 +488,10 @@ export default function AñadirProducto() {
                             }}
                           >
                             <ImageIcon
-                              sx={{ fontSize: { xs: 30, sm: 35, md: 40 }, color: "#9ca3af" }}
+                              sx={{
+                                fontSize: { xs: 30, sm: 35, md: 40 },
+                                color: "#9ca3af",
+                              }}
                             />
                             <Typography
                               variant="body2"
@@ -496,7 +500,11 @@ export default function AñadirProducto() {
                                 fontStyle: "italic",
                                 textAlign: "center",
                                 px: 2,
-                                fontSize: { xs: "0.7rem", sm: "0.8rem", md: "0.9rem" },
+                                fontSize: {
+                                  xs: "0.7rem",
+                                  sm: "0.8rem",
+                                  md: "0.9rem",
+                                },
                               }}
                             >
                               Selecciona una imagen
@@ -523,7 +531,11 @@ export default function AñadirProducto() {
                             "&:hover": {
                               bgcolor: "#991b1b",
                             },
-                            fontSize: { xs: "0.6rem", sm: "0.7rem", md: "0.75rem" },
+                            fontSize: {
+                              xs: "0.6rem",
+                              sm: "0.7rem",
+                              md: "0.75rem",
+                            },
                             px: 1.5,
                             py: 0.5,
                             borderRadius: "6px",
@@ -583,7 +595,7 @@ export default function AñadirProducto() {
                                 src={
                                   alergeno.imagen.startsWith("http")
                                     ? alergeno.imagen
-                                    : `http://localhost:3000/${alergeno.imagen}`
+                                    : `${staticUrl}/${alergeno.imagen}`
                                 }
                                 alt={alergeno.nombre}
                                 style={{ width: 20, height: 20 }}
