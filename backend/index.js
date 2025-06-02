@@ -64,25 +64,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-// app.get('/', (req, res) => {
-if (process.env.NODE_ENV !== "production") {
-  console.log("Sirviendo ficheros de desarrollo");
-  // Configurar el middleware para servir archivos estáticos desde el directorio public/dev en desarrollo
-  app.use(express.static(path.join(__dirname, "public/dev")));
-
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "public/dev", "index.html"));
-  });
-} else {
-  console.log("Sirviendo ficheros de producción");
-  // Configurar el middleware para servir archivos estáticos desde el directorio public/dev en producción
-  app.use(express.static(path.join(__dirname, "public/prod")));
-
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "public/prod", "index.html"));
-  });
-}
-
 // Iniciar el servidor solo si no estamos en modo de prueba
 if (process.env.NODE_ENV !== "test") {
   app.listen(config.port, () => {
