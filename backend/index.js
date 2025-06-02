@@ -19,14 +19,20 @@ const port = process.env.PORT || 3000;
 // Configurar middleware CORS con opciones específicas
 app.use(
   cors({
-    // origin: "http://localhost:5173", // Especifica el origen permitido
-    origin: "http://localhost:8081", // Permitir el frontend en desarrollo de React Native
+    origin: "http://localhost:5173", // Especifica el origen permitido
     credentials: true, // Habilita el envío de credenciales (cookies, etc.)
   })
 );
 
 app.use(express.json());
 app.use(cookieParser());
+
+app.use(express.static(path.join(__dirname, "public"))); // Servir archivos estáticos desde la carpeta public
+
+//Ruta para manejar las solicitudes al archivo index.html
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
 
 // Configurar la carpeta images como estática para servir imágenes
 app.use("/images", express.static(path.join(__dirname, "images")));
