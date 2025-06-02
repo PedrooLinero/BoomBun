@@ -19,7 +19,8 @@ const port = process.env.PORT || 3000;
 // Configurar middleware CORS con opciones específicas
 app.use(
   cors({
-    origin: "http://localhost:5173", // Especifica el origen permitido
+    // origin: "http://localhost:5173", // Especifica el origen permitido
+    origin: "http://localhost:8081", // Permitir el frontend en desarrollo de React Native
     credentials: true, // Habilita el envío de credenciales (cookies, etc.)
   })
 );
@@ -78,8 +79,8 @@ if (process.env.NODE_ENV !== "production") {
 
 // Iniciar el servidor solo si no estamos en modo de prueba
 if (process.env.NODE_ENV !== "test") {
-  app.listen(port, () => {
-    console.log(`Servidor escuchando en el puerto ${port}`);
+  app.listen(config.port, () => {
+    console.log(`Servidor escuchando en el puerto ${config.port}`);
   });
 }
 
