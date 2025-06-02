@@ -820,8 +820,7 @@ const CartaCompleta = () => {
                                   },
                                 }}
                                 image={
-                                  producto.Foto ||
-                                  sinFoto // Si producto.Foto es falsy, usa sinFoto
+                                  producto.Foto || sinFoto // Si producto.Foto es falsy, usa sinFoto
                                 }
                                 alt={producto.Nombre}
                               />
@@ -986,6 +985,15 @@ const CartaCompleta = () => {
                     key={alergeno.ID_Alergeno}
                     label={alergeno.Nombre}
                     size="small"
+                    icon={
+                      alergeno.Imagen ? (
+                        <img
+                          src={`http://localhost:3000/${alergeno.Imagen}`}
+                          alt={alergeno.Nombre}
+                          style={{ width: 20, height: 20 }}
+                        />
+                      ) : null
+                    }
                     sx={{
                       backgroundColor: "#fff3e0",
                       color: "#333",

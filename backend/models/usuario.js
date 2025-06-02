@@ -25,14 +25,6 @@ module.exports = function(sequelize, DataTypes) {
         type: DataTypes.ENUM("Cliente", "Jefe"),
         allowNull: false
       },
-      resetToken: { // <-- Añade este campo
-        type: DataTypes.STRING,
-        allowNull: true
-      },
-      resetTokenExpires: { // <-- Y este campo
-        type: DataTypes.DATE,
-        allowNull: true
-      }
     },
     {
       sequelize,
