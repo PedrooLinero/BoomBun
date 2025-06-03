@@ -272,14 +272,23 @@ const CartaCompleta = () => {
     if (!productToDelete) return;
 
     try {
-      const response = await fetch(`${apiUrl}/${productToDelete.ID_Producto}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `${apiUrl}/productos/${productToDelete.ID_Producto}`,
+        {
+          method: "DELETE",
+          credentials: "include", // Enviar cookies si es necesario
+          headers: {
+            "Content-Type": "application/json",
+            // Añadir token si es necesario
+            // "Authorization": `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
 
       const data = await response.json();
 
       if (response.ok) {
-        setSuccessMessage(data.mensaje);
+        setSuccessMessage(data.mensaje || "Producto eliminado correctamente");
         setOpenSuccessSnackbar(true);
         setProductos(
           productos.filter(
@@ -287,7 +296,9 @@ const CartaCompleta = () => {
           )
         );
       } else {
-        throw new Error(data.mensaje || "Error al eliminar el producto");
+        throw new Error(
+          data.mensaje || `Error ${response.status}: ${response.statusText}`
+        );
       }
     } catch (err) {
       setErrorMessage(err.message);
@@ -940,7 +951,7 @@ const CartaCompleta = () => {
                 icon={
                   alergeno.Imagen ? (
                     <img
-                      src={alergeno.Imagen} // Usar directamente alergeno.Imagen
+                      src={alergeno.Imagen}
                       alt={alergeno.Nombre}
                       style={{ width: 20, height: 20 }}
                     />
@@ -955,37 +966,6 @@ const CartaCompleta = () => {
                 }}
               />
             ))}
-            // En el diálogo de alérgenos
-            {selectedProduct?.Alergenos &&
-            selectedProduct.Alergenos.length > 0 ? (
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                {selectedProduct.Alergenos.map((alergeno) => (
-                  <Chip
-                    key={alergeno.ID_Alergeno}
-                    label={alergeno.Nombre}
-                    size="small"
-                    icon={
-                      alergeno.Imagen ? (
-                        <img
-                          src={alergeno.Imagen} // Usar directamente alergeno.Imagen
-                          alt={alergeno.Nombre}
-                          style={{ width: 20, height: 20 }}
-                        />
-                      ) : null
-                    }
-                    sx={{
-                      backgroundColor: "#fff3e0",
-                      color: "#333",
-                      fontSize: { xs: "0.7rem", md: "0.8rem" },
-                    }}
-                  />
-                ))}
-              </Box>
-            ) : (
-              <DialogContentText>
-                Este producto no contiene alérgenos.
-              </DialogContentText>
-            )}
           </Box>
         </Box>
 
