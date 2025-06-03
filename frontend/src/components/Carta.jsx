@@ -309,6 +309,10 @@ const CartaCompleta = () => {
     }
   };
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const handleOpenAllergensDialog = (producto) => {
     setSelectedProduct(producto);
     setOpenAllergensDialog(true);
@@ -1028,7 +1032,11 @@ const CartaCompleta = () => {
                     icon={
                       alergeno.Imagen ? (
                         <img
-                          src={`${staticUrl}/${alergeno.Imagen}`}
+                          src={
+                            alergeno.Imagen?.startsWith("http")
+                              ? alergeno.Imagen
+                              : `${staticUrl}/${alergeno.Imagen}`
+                          }
                           alt={alergeno.Nombre}
                           style={{ width: 20, height: 20 }}
                         />
