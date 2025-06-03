@@ -84,7 +84,7 @@ const formatearProducto = (producto, req) => {
     Alergenos: producto.Alergenos.map((alergeno) => ({
       ID_Alergeno: alergeno.ID_Alergeno,
       Nombre: alergeno.Nombre,
-      Imagen: alergeno.Imagen ? `${baseUrl}/uploads/${alergeno.Imagen}` : null,
+      Imagen: alergeno.Imagen ? `${baseUrl}/${alergeno.Imagen}` : null,
     })),
     Foto: fotoPath ? `${baseUrl}/uploads/${fotoPath}` : null,
   };
