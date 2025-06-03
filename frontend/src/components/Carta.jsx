@@ -38,7 +38,6 @@ import CloseIcon from "@mui/icons-material/Close";
 import { apiUrl } from "../pages/config";
 import { staticUrl } from "../pages/config";
 
-
 import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/material/styles";
 import sinFoto from "../assets/sin_foto.png";
@@ -939,11 +938,13 @@ const CartaCompleta = () => {
               <Chip
                 key={index}
                 icon={
-                  <img
-                    src={`${staticUrl}/${alergeno.Imagen}`}
-                    alt={alergeno.Nombre}
-                    style={{ width: 20, height: 20 }}
-                  />
+                  alergeno.Imagen ? (
+                    <img
+                      src={alergeno.Imagen} // Usar directamente alergeno.Imagen
+                      alt={alergeno.Nombre}
+                      style={{ width: 20, height: 20 }}
+                    />
+                  ) : null
                 }
                 label={alergeno.Nombre}
                 size="small"
@@ -954,6 +955,37 @@ const CartaCompleta = () => {
                 }}
               />
             ))}
+            // En el diálogo de alérgenos
+            {selectedProduct?.Alergenos &&
+            selectedProduct.Alergenos.length > 0 ? (
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+                {selectedProduct.Alergenos.map((alergeno) => (
+                  <Chip
+                    key={alergeno.ID_Alergeno}
+                    label={alergeno.Nombre}
+                    size="small"
+                    icon={
+                      alergeno.Imagen ? (
+                        <img
+                          src={alergeno.Imagen} // Usar directamente alergeno.Imagen
+                          alt={alergeno.Nombre}
+                          style={{ width: 20, height: 20 }}
+                        />
+                      ) : null
+                    }
+                    sx={{
+                      backgroundColor: "#fff3e0",
+                      color: "#333",
+                      fontSize: { xs: "0.7rem", md: "0.8rem" },
+                    }}
+                  />
+                ))}
+              </Box>
+            ) : (
+              <DialogContentText>
+                Este producto no contiene alérgenos.
+              </DialogContentText>
+            )}
           </Box>
         </Box>
 
