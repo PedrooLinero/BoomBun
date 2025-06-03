@@ -8,33 +8,31 @@ const cookieParser = require("cookie-parser");
 const usuarioRoutes = require("./routes/usuarioRoutes");
 const productoRoutes = require("./routes/productoRoutes");
 const categoriaRoutes = require("./routes/categoriaRoutes");
-const resenaRoutes = require("./routes/resenaRoutes"); // Asegúrate de importar las rutas de reseñas
-const config = require("./config/config");
-const path = require("path"); // Importar el módulo path
+const resenaRoutes = require("./routes/resenaRoutes");
 const alergenoRoutes = require("./routes/alergenoRoutes");
+const config = require("./config/config");
+const path = require("path");
 
 const app = express();
-const port = process.env.PORT || 3000;
 
-// Configurar middleware CORS con opciones específicas
+// Configurar middleware CORS
 app.use(
   cors({
-    origin: "http://localhost:5173", // Especifica el origen permitido
-    credentials: true, // Habilita el envío de credenciales (cookies, etc.)
+    origin: [
+      "http://localhost:5173",
+      "https://your-frontend-service.railway.app", // Añade el dominio del frontend en Railway
+    ],
+    credentials: true,
   })
 );
 
 app.use(express.json());
 app.use(cookieParser());
 
-app.use(express.static(path.join(__dirname, "public"))); // Servir archivos estáticos desde la carpeta public
+// Servir archivos estáticos desde la carpeta public
+app.use(express.static(path.join(__dirname, "public")));
 
-//Ruta para manejar las solicitudes al archivo index.html
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
-
-// Configurar la carpeta images como estática para servir imágenes
+// Servir imágenes desde las carpetas images y uploads
 app.use("/images", express.static(path.join(__dirname, "images")));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
@@ -42,16 +40,21 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api", usuarioRoutes);
 app.use("/api", productoRoutes);
 app.use("/api", categoriaRoutes);
-app.use("/api", resenaRoutes); // Asegúrate de importar y usar las rutas de reseñas
+app.use("/api", resenaRoutes);
 app.use("/api", alergenoRoutes);
 
-// Manejar rutas no encontradas (404)
-app.use((req, res, next) => {
+// Manejar rutas no encontradas (404) para la API
+app.use("/api/*", (req, res) => {
   res.status(404).json({
     success: false,
     data: null,
     message: `Ruta ${req.method} ${req.url} no encontrada`,
   });
+});
+
+// Servir index.html para rutas no API (frontend SPA)
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // Manejador de errores global
