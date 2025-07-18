@@ -1042,13 +1042,15 @@ const CartaCompleta = () => {
           onClose={() => setOpenImageModal(false)}
           PaperProps={{
             sx: {
-              borderRadius: "16px",
-              background: "rgba(0,0,0,0.85)",
-              boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
-              position: "relative",
-              maxWidth: "90vw",
-              maxHeight: "90vh",
-              overflow: "hidden",
+              background: "transparent",
+              boxShadow: "none",
+              borderRadius: 0,
+              maxWidth: "unset",
+              maxHeight: "unset",
+              overflow: "visible",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             },
           }}
         >
@@ -1072,20 +1074,25 @@ const CartaCompleta = () => {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              minHeight: "60vh",
-              minWidth: "60vw",
-              p: 2,
+              width: "100vw",
+              height: "100vh",
+              p: 0,
+              m: 0,
+              background: "transparent",
             }}
           >
             <img
               src={selectedImage}
               alt="Producto ampliado"
               style={{
-                maxWidth: "80vw",
-                maxHeight: "80vh",
-                borderRadius: "12px",
-                boxShadow: "0 4px 24px rgba(0,0,0,0.4)",
+                maxWidth: "100vw",
+                maxHeight: "100vh",
+                borderRadius: 0,
+                boxShadow: "none",
                 objectFit: "contain",
+                margin: 0,
+                padding: 0,
+                display: "block",
               }}
             />
           </Box>
