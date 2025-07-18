@@ -20,7 +20,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://your-frontend-service.railway.app", // Añade el dominio del frontend en Railway
+      "https://cerveceriaboombun.es", // Añade el dominio del frontend en Railway
     ],
     credentials: true,
   })
