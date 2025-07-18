@@ -38,7 +38,6 @@ import CloseIcon from "@mui/icons-material/Close";
 import { apiUrl } from "../pages/config";
 import { staticUrl } from "../pages/config";
 
-
 import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/material/styles";
 import sinFoto from "../assets/sin_foto.png";
@@ -140,14 +139,16 @@ const CartaCompleta = () => {
   const [isJefe, setIsJefe] = useState(false);
   const [openAllergensDialog, setOpenAllergensDialog] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const navigate = useNavigate();
-
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
   const [openSuccessSnackbar, setOpenSuccessSnackbar] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [openErrorSnackbar, setOpenErrorSnackbar] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [openImageModal, setOpenImageModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const navigate = useNavigate();
 
   const categoryIcons = {
     Cervezas: <LocalBarIcon sx={{ mr: 2, fontSize: "2rem" }} />,
@@ -634,12 +635,17 @@ const CartaCompleta = () => {
                                 margin: 0,
                                 padding: 0,
                                 transition: "transform 0.3s ease",
+                                cursor: "pointer",
                                 "&:hover": {
                                   transform: "scale(1.03)",
                                 },
                               }}
-                              image={producto.Foto || sinFoto} // Si producto.Foto es falsy, usa sin_foto.png
-                              alt={producto.nombre || "Producto sin imagen"}
+                              image={producto.Foto || sinFoto}
+                              alt={producto.Nombre}
+                              onClick={() => {
+                                setSelectedImage(producto.Foto || sinFoto);
+                                setOpenImageModal(true);
+                              }}
                             />
                             {isJefe && (
                               <Box
@@ -825,6 +831,7 @@ const CartaCompleta = () => {
                                   margin: 0,
                                   padding: 0,
                                   transition: "transform 0.3s ease",
+                                  cursor: "pointer",
                                   "&:hover": {
                                     transform: "scale(1.03)",
                                   },
@@ -834,6 +841,10 @@ const CartaCompleta = () => {
                                   sinFoto // Si producto.Foto es falsy, usa sinFoto
                                 }
                                 alt={producto.Nombre}
+                                onClick={() => {
+                                  setSelectedImage(producto.Foto || sinFoto);
+                                  setOpenImageModal(true);
+                                }}
                               />
                               {isJefe && (
                                 <Box
@@ -990,8 +1001,7 @@ const CartaCompleta = () => {
             Alérgenos de {selectedProduct?.Nombre}
           </DialogTitle>
           <DialogContent>
-            {selectedProduct?.Alergenos &&
-            selectedProduct.Alergenos.length > 0 ? (
+            {selectedProduct?.Alergenos && selectedProduct.Alergenos.length > 0 ? (
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
                 {selectedProduct.Alergenos.map((alergeno) => (
                   <Chip
@@ -1001,7 +1011,7 @@ const CartaCompleta = () => {
                     icon={
                       alergeno.Imagen ? (
                         <img
-                          src={`${staticUrl}/${alergeno.Imagen}`}
+                          src={alergeno.Imagen}
                           alt={alergeno.Nombre}
                           style={{ width: 20, height: 20 }}
                         />
@@ -1026,6 +1036,60 @@ const CartaCompleta = () => {
               Cerrar
             </Button>
           </DialogActions>
+        </Dialog>
+
+        <Dialog
+          open={openImageModal}
+          onClose={() => setOpenImageModal(false)}
+          PaperProps={{
+            sx: {
+              borderRadius: "16px",
+              background: "rgba(0,0,0,0.85)",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+              position: "relative",
+              maxWidth: "90vw",
+              maxHeight: "90vh",
+              overflow: "hidden",
+            },
+          }}
+        >
+          <IconButton
+            aria-label="cerrar"
+            onClick={() => setOpenImageModal(false)}
+            sx={{
+              position: "absolute",
+              top: 12,
+              right: 12,
+              color: "#fff",
+              background: "rgba(0,0,0,0.4)",
+              zIndex: 2,
+              "&:hover": { background: "rgba(0,0,0,0.7)" },
+            }}
+          >
+            <CloseIcon fontSize="large" />
+          </IconButton>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              minHeight: "60vh",
+              minWidth: "60vw",
+              p: 2,
+            }}
+          >
+            <img
+              src={selectedImage}
+              alt="Producto ampliado"
+              style={{
+                maxWidth: "80vw",
+                maxHeight: "80vh",
+                borderRadius: "12px",
+                boxShadow: "0 4px 24px rgba(0,0,0,0.4)",
+                objectFit: "contain",
+              }}
+            />
+          </Box>
         </Dialog>
 
         <Snackbar
