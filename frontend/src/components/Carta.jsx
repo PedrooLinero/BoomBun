@@ -36,7 +36,6 @@ import DinnerDiningIcon from "@mui/icons-material/DinnerDining";
 import IcecreamIcon from "@mui/icons-material/Icecream";
 import CloseIcon from "@mui/icons-material/Close";
 import { apiUrl } from "../pages/config";
-import { staticUrl } from "../pages/config";
 
 import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/material/styles";
