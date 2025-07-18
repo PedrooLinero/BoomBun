@@ -42,7 +42,6 @@ import { staticUrl } from "../pages/config";
 import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/material/styles";
 import sinFoto from "../assets/sin_foto.png";
-import { apiUrl, staticUrl } from "../pages/config";
 
 const ProductCard = styled(Card)(() => ({
   display: "flex",
