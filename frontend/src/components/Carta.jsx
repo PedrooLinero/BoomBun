@@ -1051,36 +1051,38 @@ const CartaCompleta = () => {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              position: "relative",
             },
           }}
         >
-          <IconButton
-            aria-label="cerrar"
-            onClick={() => setOpenImageModal(false)}
-            sx={{
-              position: "absolute",
-              top: 12,
-              right: 12,
-              color: "#fff",
-              background: "rgba(0,0,0,0.4)",
-              zIndex: 2,
-              "&:hover": { background: "rgba(0,0,0,0.7)" },
-            }}
-          >
-            <CloseIcon fontSize="large" />
-          </IconButton>
           <Box
             sx={{
+              position: "relative",
+              width: "100vw",
+              height: "100vh",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              width: "100vw",
-              height: "100vh",
+              background: "transparent",
               p: 0,
               m: 0,
-              background: "transparent",
             }}
           >
+            <IconButton
+              aria-label="cerrar"
+              onClick={() => setOpenImageModal(false)}
+              sx={{
+                position: "absolute",
+                top: 24,
+                right: 32,
+                color: "#fff",
+                background: "rgba(0,0,0,0.4)",
+                zIndex: 2,
+                '&:hover': { background: "rgba(0,0,0,0.7)" },
+              }}
+            >
+              <CloseIcon fontSize="large" />
+            </IconButton>
             <img
               src={selectedImage}
               alt="Producto ampliado"
