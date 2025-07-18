@@ -1058,8 +1058,8 @@ const CartaCompleta = () => {
           <Box
             sx={{
               position: "relative",
-              width: "100vw",
-              height: "100vh",
+              width: "fit-content",
+              height: "fit-content",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -1073,8 +1073,8 @@ const CartaCompleta = () => {
               onClick={() => setOpenImageModal(false)}
               sx={{
                 position: "absolute",
-                top: 24,
-                right: 32,
+                top: 12,
+                right: 12,
                 color: "#fff",
                 background: "rgba(0,0,0,0.4)",
                 zIndex: 2,
@@ -1087,10 +1087,10 @@ const CartaCompleta = () => {
               src={selectedImage}
               alt="Producto ampliado"
               style={{
-                maxWidth: "100vw",
-                maxHeight: "100vh",
-                borderRadius: 0,
-                boxShadow: "none",
+                maxWidth: "80vw",
+                maxHeight: "80vh",
+                borderRadius: "24px",
+                boxShadow: "0 4px 24px rgba(0,0,0,0.4)",
                 objectFit: "contain",
                 margin: 0,
                 padding: 0,
