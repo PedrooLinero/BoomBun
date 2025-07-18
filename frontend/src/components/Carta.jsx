@@ -34,6 +34,11 @@ import LocalBarIcon from "@mui/icons-material/LocalBar";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import DinnerDiningIcon from "@mui/icons-material/DinnerDining";
 import IcecreamIcon from "@mui/icons-material/Icecream";
+import CloseIcon from "@mui/icons-material/Close";
+import { apiUrl } from "../pages/config";
+import { staticUrl } from "../pages/config";
+
+
 import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/material/styles";
 import sinFoto from "../assets/sin_foto.png";
@@ -263,15 +268,14 @@ const CartaCompleta = () => {
     if (!productToDelete) return;
 
     try {
-      const response = await fetch(
-        `${apiUrl}/productos/${productToDelete.ID_Producto}`,
-        { method: "DELETE" }
-      );
+      const response = await fetch(`${apiUrl}/${productToDelete.ID_Producto}`, {
+        method: "DELETE",
+      });
 
       const data = await response.json();
 
       if (response.ok) {
-        setSuccessMessage(data.mensaje);
+        setSuccessMessage(data.mensaje || "Producto eliminado correctamente");
         setOpenSuccessSnackbar(true);
         setProductos(
           productos.filter(
@@ -279,7 +283,9 @@ const CartaCompleta = () => {
           )
         );
       } else {
-        throw new Error(data.mensaje || "Error al eliminar el producto");
+        throw new Error(
+          data.mensaje || `Error ${response.status}: ${response.statusText}`
+        );
       }
     } catch (err) {
       setErrorMessage(err.message);
@@ -289,6 +295,10 @@ const CartaCompleta = () => {
       handleCloseDeleteDialog();
     }
   };
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const handleOpenAllergensDialog = (producto) => {
     setSelectedProduct(producto);
@@ -913,11 +923,13 @@ const CartaCompleta = () => {
               <Chip
                 key={index}
                 icon={
-                  <img
-                    src={`${staticUrl}/${alergeno.Imagen}`}
-                    alt={alergeno.Nombre}
-                    style={{ width: 20, height: 20 }}
-                  />
+                  alergeno.Imagen ? (
+                    <img
+                      src={alergeno.Imagen}
+                      alt={alergeno.Nombre}
+                      style={{ width: 20, height: 20 }}
+                    />
+                  ) : null
                 }
                 label={alergeno.Nombre}
                 size="small"
@@ -987,6 +999,15 @@ const CartaCompleta = () => {
                     key={alergeno.ID_Alergeno}
                     label={alergeno.Nombre}
                     size="small"
+                    icon={
+                      alergeno.Imagen ? (
+                        <img
+                          src={`${staticUrl}/${alergeno.Imagen}`}
+                          alt={alergeno.Nombre}
+                          style={{ width: 20, height: 20 }}
+                        />
+                      ) : null
+                    }
                     sx={{
                       backgroundColor: "#fff3e0",
                       color: "#333",
