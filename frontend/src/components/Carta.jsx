@@ -267,7 +267,7 @@ const CartaCompleta = () => {
     if (!productToDelete) return;
 
     try {
-      const response = await fetch(`${apiUrl}/${productToDelete.ID_Producto}`, {
+      const response = await fetch(`${apiUrl}/productos/${productToDelete.ID_Producto}`, {
         method: "DELETE",
       });
 
