@@ -66,7 +66,8 @@ function HomeContent() {
   const [horario, setHorario] = useState(() => {
     // Intentar cargar el horario guardado
     const saved = localStorage.getItem("horarioBar");
-    return saved || "Lunes a Domingo: 12:00 - 23:00";
+return saved || `Horario del Bar:
+Lunes: Cerrado / Martes: 12:00 - 24:00 / Miércoles: 12:00 - 24:00 / Jueves: 12:00 - 24:00 / Viernes: 12:00 - 24:00 / Sábado: 12:00 - 24:00 / Domingo: 12:00 - 24:00`;
   });
   const [isJefe, setIsJefe] = useState(false);
   const [openHorarioModal, setOpenHorarioModal] = useState(false);
