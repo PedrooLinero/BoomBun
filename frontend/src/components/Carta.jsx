@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
+import carritoIcon from "../icons/carrito.png";
 import {
   Box,
+  Badge,
   Typography,
   CircularProgress,
   Alert,
@@ -26,6 +28,7 @@ import {
   InputLabel,
   Select,
 } from "@mui/material";
+import "@fontsource/indie-flower";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import SearchIcon from "@mui/icons-material/Search";
@@ -36,7 +39,6 @@ import DinnerDiningIcon from "@mui/icons-material/DinnerDining";
 import IcecreamIcon from "@mui/icons-material/Icecream";
 import CloseIcon from "@mui/icons-material/Close";
 import { apiUrl } from "../pages/config";
-
 import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/material/styles";
 import sinFoto from "../assets/sin_foto.png";
@@ -85,10 +87,8 @@ const PriceTag = styled(Chip)(({ theme }) => ({
   },
 }));
 
-const AddButton = styled(Button)(({ theme }) => ({
+const FloatingButton = styled(Button)(({ theme }) => ({
   position: "fixed",
-  bottom: theme.spacing(3),
-  right: theme.spacing(3),
   width: 56,
   height: 56,
   borderRadius: "50%",
@@ -96,6 +96,11 @@ const AddButton = styled(Button)(({ theme }) => ({
   backgroundColor: "#065f46",
   color: "#ffffff",
   boxShadow: "0 4px 15px rgba(6, 95, 70, 0.4)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: 0,
+  minWidth: 0,
   "&:hover": {
     backgroundColor: "#047857",
     transform: "scale(1.1)",
@@ -146,6 +151,9 @@ const CartaCompleta = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [openImageModal, setOpenImageModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [comandaExpandida, setComandaExpandida] = useState(false);
+  const [pedidoBloc, setPedidoBloc] = useState([]);
+  const [totalPedido, setTotalPedido] = useState(0);
 
   const navigate = useNavigate();
 
@@ -154,6 +162,21 @@ const CartaCompleta = () => {
     Tapas: <RestaurantIcon sx={{ mr: 2, fontSize: "2rem" }} />,
     Platos: <DinnerDiningIcon sx={{ mr: 2, fontSize: "2rem" }} />,
   };
+
+  useEffect(() => {
+    const total = pedidoBloc.reduce((acc, item) => {
+      const precioNum = Number(item.precio);
+      const cantidadNum = Number(item.cantidad) || 1;
+      return acc + (isNaN(precioNum) ? 0 : precioNum) * cantidadNum;
+    }, 0);
+    setTotalPedido(total.toFixed(2));
+    console.log("Total pedido:", total.toFixed(2));
+    pedidoBloc.forEach((item) => {
+      console.log(
+        `${item.nombre} (${item.formato}): ${item.cantidad} x ${item.precio}€`
+      );
+    });
+  }, [pedidoBloc]);
 
   useEffect(() => {
     const checkAuth = () => {
@@ -267,9 +290,12 @@ const CartaCompleta = () => {
     if (!productToDelete) return;
 
     try {
-      const response = await fetch(`${apiUrl}/productos/${productToDelete.ID_Producto}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `${apiUrl}/productos/${productToDelete.ID_Producto}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       const data = await response.json();
 
@@ -332,6 +358,18 @@ const CartaCompleta = () => {
     return { Nombre: nombre, Imagen: alergeno?.Imagen };
   });
 
+  const pedidoAgrupado = Object.values(
+    pedidoBloc.reduce((acc, item) => {
+      const key = item.nombre + "|" + item.formato;
+      if (!acc[key]) {
+        acc[key] = { ...item, cantidad: Number(item.cantidad) || 1 };
+      } else {
+        acc[key].cantidad += Number(item.cantidad) || 1;
+      }
+      return acc;
+    }, {})
+  );
+
   if (loading) {
     return (
       <Box
@@ -385,6 +423,246 @@ const CartaCompleta = () => {
     <>
       {console.log("Productos:", productos)}
       <Box sx={{ backgroundColor: "#F5F5F5", minHeight: "100vh", pb: 10 }}>
+        {/* Botón flotante de carrito abajo a la derecha si NO eres jefe */}
+        {/* Botón flotante de carrito SIEMPRE visible, posición depende si eres jefe */}
+        <FloatingButton
+          sx={{
+            right: { xs: 16, sm: 32 },
+            bottom: isJefe ? { xs: 88, sm: 104 } : { xs: 16, sm: 32 },
+            zIndex: 1300,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            position: "fixed",
+          }}
+          onClick={() => setComandaExpandida(true)}
+        >
+          <Badge
+            badgeContent={pedidoBloc.length}
+            color="error"
+            showZero
+            sx={{
+              "& .MuiBadge-badge": {
+                fontSize: "0.85rem",
+                minWidth: 20,
+                height: 20,
+                borderRadius: "50%",
+                background: "#ef4444",
+                color: "#fff",
+                boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+                top: 6,
+                right: 6,
+              },
+            }}
+          >
+            <Box
+              sx={{
+                width: 56,
+                height: 56,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <img
+                src={carritoIcon}
+                alt="Carrito"
+                style={{
+                  width: 32,
+                  height: 32,
+                  display: "block",
+                  margin: "auto",
+                }}
+              />
+            </Box>
+          </Badge>
+        </FloatingButton>
+
+        {/* Botón flotante de + solo para jefe */}
+        {isJefe && (
+          <FloatingButton
+            variant="contained"
+            sx={{
+              right: { xs: 16, sm: 32 },
+              bottom: { xs: 16, sm: 32 },
+              zIndex: 1300,
+            }}
+            onClick={() => navigate("/añadirProducto")}
+          >
+            <AddIcon sx={{ fontSize: 32 }} />
+          </FloatingButton>
+        )}
+        {/* Comanda expandida, modal centrado */}
+        {comandaExpandida && (
+          <Box
+            sx={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "100vw",
+              height: "100vh",
+              zIndex: 1300,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            {/* Overlay difuminado */}
+            <Box
+              sx={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100vw",
+                height: "100vh",
+                bgcolor: "rgba(0,0,0,0.25)",
+                backdropFilter: "blur(2px)",
+                zIndex: 1,
+              }}
+            />
+            {/* Comanda modal centrado */}
+            <Box
+              sx={{
+                position: "relative",
+                zIndex: 2,
+                width: "90vw",
+                maxWidth: 400,
+                maxHeight: "80vh",
+                background: "#fff",
+                color: "#222",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.18)",
+                borderRadius: "24px",
+                border: "2px solid #e0e0e0",
+                fontFamily: "Indie Flower, Comic Sans MS, Arial, sans-serif",
+                backgroundImage:
+                  "repeating-linear-gradient(to bottom, transparent, transparent 32px, #e0e0e0 33px)",
+                backgroundSize: "100% 33px",
+                p: 3,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                overflowY: "auto",
+              }}
+            >
+              {/* Título manuscrito, más pequeño y en una sola línea con la X */}
+              <Box
+                sx={{
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  mb: 2,
+                }}
+              >
+                <Typography
+                  variant="h2"
+                  sx={{
+                    fontWeight: 700,
+                    color: "#065f46",
+                    fontFamily:
+                      "Indie Flower, Comic Sans MS, Arial, sans-serif",
+                    fontSize: { xs: "1.7rem", sm: "2.5rem", md: "2.8rem" }, // Más grande y responsive
+                    letterSpacing: "0.5px",
+                    textAlign: "center",
+                    flex: 1,
+                    whiteSpace: { xs: "normal", sm: "nowrap" },
+                    marginLeft: 5,
+                  }}
+                >
+                  Comanda
+                </Typography>
+                <IconButton
+                  onClick={() => setComandaExpandida(false)}
+                  sx={{ ml: 2, p: 0 }}
+                >
+                  {/* Icono X para cerrar */}
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M18 6L6 18"
+                      stroke="#065f46"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d="M6 6L18 18"
+                      stroke="#065f46"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </IconButton>
+              </Box>
+              {/* Lista de productos y total, todo manuscrito */}
+              <Box sx={{ width: "100%", flex: 1, overflowY: "auto", mb: 1 }}>
+                {pedidoAgrupado.map((item) => (
+                  <Box
+                    key={item.nombre + item.formato}
+                    sx={{ display: "flex", alignItems: "center", mb: 1 }}
+                  >
+                    <Typography
+                      sx={{
+                        fontFamily:
+                          "Indie Flower, Comic Sans MS, Arial, sans-serif",
+                        fontSize: "1.1rem",
+                        flex: 1,
+                        color: "#222",
+                      }}
+                    >
+                      {item.cantidad}x {item.nombre}{" "}
+                      <b style={{ fontWeight: 700 }}>{item.formato}</b> -{" "}
+                      {item.precio}€
+                    </Typography>
+                    <Button
+                      size="small"
+                      color="error"
+                      sx={{
+                        minWidth: 24,
+                        ml: 1,
+                        fontFamily:
+                          "Indie Flower, Comic Sans MS, Arial, sans-serif",
+                        fontSize: "1.1rem",
+                        p: 0,
+                        lineHeight: 1,
+                      }}
+                      onClick={() =>
+                        setPedidoBloc((prev) =>
+                          prev.filter(
+                            (i) =>
+                              !(
+                                i.nombre === item.nombre &&
+                                i.formato === item.formato
+                              )
+                          )
+                        )
+                      }
+                    >
+                      ×
+                    </Button>
+                  </Box>
+                ))}
+              </Box>
+              <Typography
+                sx={{
+                  fontFamily: "Indie Flower, Comic Sans MS, Arial, sans-serif",
+                  fontSize: "1.2rem",
+                  fontWeight: 700,
+                  mt: 2,
+                  color: "#065f46",
+                  textAlign: "center",
+                }}
+              >
+                Total: {totalPedido}€
+              </Typography>
+            </Box>
+          </Box>
+        )}
+
         <Box
           sx={{
             background: "linear-gradient(135deg, #065f46 0%, #047857 100%)",
@@ -606,11 +884,64 @@ const CartaCompleta = () => {
                                 }}
                               >
                                 {producto.Precios?.map((precio, idx) => (
-                                  <PriceTag
+                                  <Button
                                     key={idx}
-                                    label={`${precio.Formato}: ${precio.Precio}€`}
+                                    variant="contained"
                                     size="small"
-                                  />
+                                    sx={{
+                                      fontWeight: 600,
+                                      margin: 0.5,
+                                      borderRadius: "16px",
+                                      background: "#065f46",
+                                      color: "#fff",
+                                      textTransform: "none",
+                                      cursor: "pointer",
+                                      minWidth: "auto",
+                                      fontSize: { xs: "0.75rem", md: "0.9rem" },
+                                      padding: "2px 10px",
+                                      boxShadow: "none",
+                                      "&:hover": {
+                                        background: "#047857",
+                                        color: "#fff",
+                                        boxShadow:
+                                          "0 2px 8px rgba(6,95,70,0.15)",
+                                      },
+                                    }}
+                                    onClick={() => {
+                                      setPedidoBloc((prev) => {
+                                        const idxBloc = prev.findIndex(
+                                          (item) =>
+                                            item.nombre === producto.Nombre &&
+                                            item.formato === precio.Formato
+                                        );
+                                        if (idxBloc !== -1) {
+                                          // Si existe, sumar cantidad
+                                          const nuevoBloc = [...prev];
+                                          nuevoBloc[idxBloc].cantidad += 1;
+                                          return nuevoBloc;
+                                        } else {
+                                          // Si no existe, añadir nuevo
+                                          return [
+                                            ...prev,
+                                            {
+                                              id: Date.now() + Math.random(),
+                                              nombre: producto.Nombre,
+                                              formato: precio.Formato,
+                                              precio: Number(
+                                                String(precio.Precio).replace(
+                                                  ",",
+                                                  "."
+                                                )
+                                              ),
+                                              cantidad: 1,
+                                            },
+                                          ];
+                                        }
+                                      });
+                                    }}
+                                  >
+                                    {precio.Formato}: {precio.Precio}€
+                                  </Button>
                                 ))}
                               </Box>
                               <Box
@@ -802,11 +1133,46 @@ const CartaCompleta = () => {
                                   }}
                                 >
                                   {producto.Precios?.map((precio, idx) => (
-                                    <PriceTag
+                                    <Button
                                       key={idx}
-                                      label={`${precio.Formato}: ${precio.Precio}€`}
+                                      variant="contained"
                                       size="small"
-                                    />
+                                      sx={{
+                                        fontWeight: 600,
+                                        margin: 0.5,
+                                        borderRadius: "16px",
+                                        background: "#065f46",
+                                        color: "#fff",
+                                        textTransform: "none",
+                                        cursor: "pointer",
+                                        minWidth: "auto",
+                                        fontSize: {
+                                          xs: "0.75rem",
+                                          md: "0.9rem",
+                                        },
+                                        padding: "2px 10px",
+                                        boxShadow: "none",
+                                        "&:hover": {
+                                          background: "#047857",
+                                          color: "#fff",
+                                          boxShadow:
+                                            "0 2px 8px rgba(6,95,70,0.15)",
+                                        },
+                                      }}
+                                      onClick={() => {
+                                        setPedidoBloc((prev) => [
+                                          ...prev,
+                                          {
+                                            id: Date.now() + Math.random(),
+                                            nombre: producto.Nombre,
+                                            formato: precio.Formato,
+                                            precio: precio.Precio,
+                                          },
+                                        ]);
+                                      }}
+                                    >
+                                      {precio.Formato}: {precio.Precio}€
+                                    </Button>
                                   ))}
                                 </Box>
                                 <Box
@@ -836,8 +1202,7 @@ const CartaCompleta = () => {
                                   },
                                 }}
                                 image={
-                                  producto.Foto ||
-                                  sinFoto // Si producto.Foto es falsy, usa sinFoto
+                                  producto.Foto || sinFoto // Si producto.Foto es falsy, usa sinFoto
                                 }
                                 alt={producto.Nombre}
                                 onClick={() => {
@@ -1000,7 +1365,8 @@ const CartaCompleta = () => {
             Alérgenos de {selectedProduct?.Nombre}
           </DialogTitle>
           <DialogContent>
-            {selectedProduct?.Alergenos && selectedProduct.Alergenos.length > 0 ? (
+            {selectedProduct?.Alergenos &&
+            selectedProduct.Alergenos.length > 0 ? (
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
                 {selectedProduct.Alergenos.map((alergeno) => (
                   <Chip
@@ -1078,7 +1444,7 @@ const CartaCompleta = () => {
                 color: "#fff",
                 background: "rgba(0,0,0,0.4)",
                 zIndex: 2,
-                '&:hover': { background: "rgba(0,0,0,0.7)" },
+                "&:hover": { background: "rgba(0,0,0,0.7)" },
               }}
             >
               <CloseIcon fontSize="large" />
@@ -1131,12 +1497,17 @@ const CartaCompleta = () => {
         </Snackbar>
 
         {isJefe && (
-          <AddButton
+          <FloatingButton
             variant="contained"
+            sx={{
+              right: { xs: 16, sm: 32 },
+              bottom: { xs: 16, sm: 32 },
+              zIndex: 1300,
+            }}
             onClick={() => navigate("/añadirProducto")}
           >
-            <AddIcon />
-          </AddButton>
+            <AddIcon sx={{ fontSize: 32 }} />
+          </FloatingButton>
         )}
       </Box>
     </>

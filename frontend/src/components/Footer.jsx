@@ -7,12 +7,14 @@ import {
   IconButton,
   Divider,
   Link as MuiLink,
+  Grid,
 } from "@mui/material";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import PlaceIcon from "@mui/icons-material/Place";
 import RoomServiceIcon from "@mui/icons-material/RoomService";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link } from "react-router-dom"; // For internal navigation links
+import cruzcampo from "../assets/cruzcampo.png"; // Adjust the path as needed
 
 function Footer() {
   return (
@@ -27,10 +29,9 @@ function Footer() {
       }}
     >
       <Toolbar sx={{ flexDirection: "column" }}>
-        <Box sx={{ width: "100%", maxWidth: "1200px", mx: "auto" }}>
-          <div className="row g-4">
+          <Grid container spacing={0} alignItems="flex-start" justifyContent="space-between" wrap="nowrap">
             {/* Sección 1: Información de Boom Bun */}
-            <div className="col-12 col-md-4 text-center text-md-start">
+            <Grid item xs={12} md={4} sx={{ textAlign: { xs: "center", md: "left" }, pl: { md: 4 } }}>
               <Typography
                 variant="h5"
                 sx={{
@@ -67,10 +68,10 @@ function Footer() {
                   <InstagramIcon />
                 </IconButton>
               </Box>
-            </div>
+            </Grid>
 
             {/* Sección 2: Contacto */}
-            <div className="col-12 col-md-4 text-center text-md-start">
+            <Grid item xs={12} md={4} sx={{ textAlign: "center" }}>
               <Typography
                 variant="h6"
                 sx={{
@@ -110,31 +111,24 @@ function Footer() {
                   Opciones de servicio: Tiene terraza · Sirve cenas
                 </Typography>
               </Box>
-            </div>
+            </Grid>
 
-            {/* Sección 3: Horario */}
-            <div className="col-12 col-md-4 text-center text-md-start">
+            {/* Sección 3: Cruzcampo */}
+            <Grid item xs={12} md={4} sx={{ textAlign: "center" }}>
               <Typography
                 variant="h6"
                 sx={{
                   fontWeight: "bold",
                   color: "#ffffff",
-                  mb: 2,
+                  ml: 2
                 }}
               >
-                Horario
+                Cruzcampo
               </Typography>
-              <Typography variant="body2" sx={{ color: "#b0b0b0", mb: 1 }}>
-                Lunes: Cerrado
-              </Typography>
-              <Typography variant="body2" sx={{ color: "#b0b0b0", mb: 1 }}>
-                Martes: 12:00–17:30
-              </Typography>
-              <Typography variant="body2" sx={{ color: "#b0b0b0", mb: 1 }}>
-                Miércoles - Domingo: 12:00–24:00
-              </Typography>
-            </div>
-          </div>
+              <img src={cruzcampo} alt="Cruzcampo" style={{ maxWidth: "30%", height: "auto", marginTop: -1, marginLeft: 20 }} />
+            </Grid>
+          </Grid>
+          </Toolbar>
 
           {/* Separador y derechos reservados */}
           <Divider sx={{ borderColor: "#424242", my: 4 }} />
@@ -147,9 +141,7 @@ function Footer() {
               derechos reservados.
             </Typography>
           </Box>
-        </Box>
-      </Toolbar>
-    </AppBar>
+        </AppBar>
   );
 }
 

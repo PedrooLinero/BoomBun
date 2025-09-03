@@ -11,6 +11,17 @@ import {
   Grid,
   Divider,
   Fade,
+  TextField,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+  Checkbox,
+  FormControlLabel,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import PlaceIcon from "@mui/icons-material/Place";
@@ -52,6 +63,52 @@ const photos = [
 
 function HomeContent() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [horario, setHorario] = useState(() => {
+    // Intentar cargar el horario guardado
+    const saved = localStorage.getItem("horarioBar");
+    return saved || "Lunes a Domingo: 12:00 - 23:00";
+  });
+  const [isJefe, setIsJefe] = useState(false);
+  const [openHorarioModal, setOpenHorarioModal] = useState(false);
+  const [horarioDias, setHorarioDias] = useState(() => {
+    // Intentar cargar el horario por días guardado
+    const saved = localStorage.getItem("horarioBarDias");
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {
+        // Si hay error, usar valores por defecto
+      }
+    }
+    return {
+      Lunes: { abierto: true, inicio: "12:00", fin: "23:00" },
+      Martes: { abierto: true, inicio: "12:00", fin: "23:00" },
+      Miércoles: { abierto: true, inicio: "12:00", fin: "23:00" },
+      Jueves: { abierto: true, inicio: "12:00", fin: "23:00" },
+      Viernes: { abierto: true, inicio: "12:00", fin: "23:00" },
+      Sábado: { abierto: true, inicio: "12:00", fin: "23:00" },
+      Domingo: { abierto: true, inicio: "12:00", fin: "23:00" },
+    };
+  });
+
+  const horas = [
+    "Cerrado",
+    "10:00",
+    "11:00",
+    "12:00",
+    "13:00",
+    "14:00",
+    "15:00",
+    "16:00",
+    "17:00",
+    "18:00",
+    "19:00",
+    "20:00",
+    "21:00",
+    "22:00",
+    "23:00",
+    "24:00",
+  ];
 
   const nextSlide = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % photos.length);
@@ -62,6 +119,56 @@ function HomeContent() {
       (prevIndex) => (prevIndex - 1 + photos.length) % photos.length
     );
   };
+
+  // Manejo de apertura y cierre del modal de horario
+  const handleOpenHorarioModal = () => setOpenHorarioModal(true);
+  const handleCloseHorarioModal = () => setOpenHorarioModal(false);
+
+  // Manejo de cambios en los días del horario
+  const handleHorarioDiaChange = (dia, campo, valor) => {
+    // Actualizar el estado de los días del horario
+    setHorarioDias((prev) => ({
+      // ...prev sirve para mantener el estado anterior
+      ...prev,
+      [dia]: {
+        ...prev[dia],
+        [campo]: valor,
+        abierto:
+          campo === "inicio" || campo === "fin"
+            ? valor !== "Cerrado"
+            : prev[dia].abierto,
+      },
+    }));
+  };
+
+  const handleGuardarHorario = () => {
+    // Construir string resumen
+    const resumen = Object.entries(horarioDias)
+      .map(([dia, datos]) =>
+        datos.abierto
+          ? `${dia}: ${datos.inicio} - ${datos.fin}`
+          : `${dia}: Cerrado`
+      )
+      .join(" / ");
+    setHorario(resumen);
+    // Guardar en localStorage
+    localStorage.setItem("horarioBar", resumen);
+    localStorage.setItem("horarioBarDias", JSON.stringify(horarioDias));
+    setOpenHorarioModal(false);
+  };
+
+  useEffect(() => {
+    const authData = localStorage.getItem("auth");
+    if (authData) {
+      try {
+        const { isAuthenticated, user } = JSON.parse(authData);
+        const tipo = user?.tipo || user?.Tipo || "";
+        setIsJefe(isAuthenticated && user && tipo.toLowerCase() === "jefe");
+      } catch {
+        setIsJefe(false);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -240,10 +347,140 @@ function HomeContent() {
                     <AccessTimeIcon
                       sx={{ color: "#065f46", mr: 1, fontSize: "24px" }}
                     />
-                    <Typography variant="body2" sx={{ color: "black" }}>
-                      Lunes: Cerrado / Martes: 12:00–17:30 / Miércoles -
-                      Domingo: 12:00–24:00
-                    </Typography>
+                    <Box>
+                      <Typography variant="h6" sx={{ mb: 2, color: "#065f46", fontWeight: "bold" }}>
+                        Horario del Bar:
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          mb: 2,
+                          color: isJefe ? "#065f46" : "#bdbdbd",
+                        }}
+                      >
+                        {horario}
+                      </Typography>
+                      {isJefe && (
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={handleOpenHorarioModal}
+                          sx={{
+                              backgroundColor: "#065f46",
+                              "&:hover": { backgroundColor: "#047857" },
+                            }}
+                        >
+                          Editar horario
+                        </Button>
+                      )}
+                      <Dialog
+                        open={openHorarioModal}
+                        onClose={handleCloseHorarioModal}
+                      >
+                        <DialogTitle
+                          sx={{ textAlign: "center", color: "#065f46" }}
+                        >
+                          Editar horario del bar
+                        </DialogTitle>
+                        <DialogContent>
+                          {Object.entries(horarioDias).map(([dia, datos]) => (
+                            <Box
+                              key={dia}
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 2,
+                                mb: 2,
+                              }}
+                            >
+                              <Typography sx={{ minWidth: 90 }}>
+                                {dia}
+                              </Typography>
+                              <FormControl
+                                size="small"
+                                sx={{ minWidth: 90, marginTop: 1 }}
+                              >
+                                <InputLabel>Inicio</InputLabel>
+                                <Select
+                                  value={
+                                    datos.abierto ? datos.inicio : "Cerrado"
+                                  }
+                                  label="Inicio"
+                                  onChange={(e) =>
+                                    handleHorarioDiaChange(
+                                      dia,
+                                      "inicio",
+                                      e.target.value
+                                    )
+                                  }
+                                >
+                                  {horas.map((h) => (
+                                    <MenuItem key={h} value={h}>
+                                      {h}
+                                    </MenuItem>
+                                  ))}
+                                </Select>
+                              </FormControl>
+                              <FormControl size="small" sx={{ minWidth: 90, marginTop: 1 }}>
+                                <InputLabel>Fin</InputLabel>
+                                <Select
+                                  value={datos.abierto ? datos.fin : "Cerrado"}
+                                  label="Fin"
+                                  onChange={(e) =>
+                                    handleHorarioDiaChange(
+                                      dia,
+                                      "fin",
+                                      e.target.value
+                                    )
+                                  }
+                                  disabled={datos.inicio === "Cerrado"}
+                                >
+                                  {horas
+                                    .filter((h) => h !== "Cerrado")
+                                    .map((h) => (
+                                      <MenuItem key={h} value={h}>
+                                        {h}
+                                      </MenuItem>
+                                    ))}
+                                </Select>
+                              </FormControl>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={!datos.abierto}
+                                    onChange={(e) =>
+                                      handleHorarioDiaChange(dia, "inicio", e.target.checked ? "Cerrado" : "12:00")
+                                    }
+                                    sx={{
+                                      color: "#065f46", // color primario MUI
+                                      '&.Mui-checked': {
+                                        color: "#065f46",
+                                      },
+                                    }}
+                                  />
+                                }
+                                label="Cerrado"
+                              />
+                            </Box>
+                          ))}
+                        </DialogContent>
+                        <DialogActions>
+                          <Button onClick={handleCloseHorarioModal} sx={{ color: "#065f46" }}>
+                            Cancelar
+                          </Button>
+                          <Button
+                            onClick={handleGuardarHorario}
+                            variant="contained"
+                            sx={{
+                              backgroundColor: "#065f46",
+                              "&:hover": { backgroundColor: "#047857" },
+                            }}
+                          >
+                            Guardar
+                          </Button>
+                        </DialogActions>
+                      </Dialog>
+                    </Box>
                   </Box>
                 </Box>
               </Grid>
