@@ -355,7 +355,7 @@ function HomeContent() {
                         variant="body1"
                         sx={{
                           mb: 2,
-                          color: isJefe ? "#065f46" : "#bdbdbd",
+                          color: "#065f46",
                         }}
                       >
                         {horario}

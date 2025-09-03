@@ -695,6 +695,18 @@ const CartaCompleta = () => {
           >
             Descubre las mejor cerveza, tapas y platos en Cervecería Boom Bun.
           </Typography>
+          <Typography
+            sx={{
+              fontFamily: "Indie Flower, Comic Sans MS, Arial, sans-serif",
+              fontSize: "0.9rem",
+              color: "#bdbdbd",
+              textAlign: "center",
+              mt: 2,
+            }}
+          >
+            (Pulsa en los botones de los precios para añadir productos al pedido
+            y te será más fácil pedírselo al camarero)
+          </Typography>
         </Box>
 
         <Container maxWidth="xl" sx={{ py: 4 }}>
